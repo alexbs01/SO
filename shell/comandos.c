@@ -5,33 +5,84 @@
 #include "comandos.h"
 
 int autores(char *tokens[], int ntokens) {
-    if(ntokens != 0) {
+    if(ntokens == 1) {
         if(strcmp(tokens[0], "-l") == 0) {
-            printf("\nLogin: a.becerra@udc.es");
+            printf("Login: a.becerra@udc.es");
+            printf("\nLogin: adrian.rego@udc.es");
         } else if(strcmp(tokens[0], "-n") == 0) {
-            printf("\nNombre: Alejandro Becerra Suarez");
+            printf("Nombre: Alejandro Becerra Suarez");
+            printf("\nNombre: Adrián Rego Criado");
+        } else {
+            printf("Parámetro inválido.");
         }
-    } else {
-        printf("\nLogin: a.becerra@udc.es");
+    } else if (ntokens == 0) {
+        printf("Login: a.becerra@udc.es");
+        printf("\nLogin: adrian.rego@udc.es");
         printf("\nNombre: Alejandro Becerra Suarez");
+        printf("\nNombre: Adrián Rego Criado");
+    } else {
+        printf("Número de parámetros incorrecto.");
     }
-
 
     return 0;
 }
 
 int pid(char *tokens[], int ntokens) {
-    printf("pid");
+    pid_t pid = getpid();
+    pid_t ppid = getppid();
+
+    if(ntokens == 1) {
+        if(strcmp(tokens[0], "-p") == 0) {
+            printf("Pid parent process: %d", ppid);
+        } else {
+            printf("Parámetro inválido.");
+        }
+    } else if(ntokens == 0) {
+        printf("Pid process: %d", pid);
+    } else {
+        printf("Número de parámetros incorrecto.");
+    }
     return 0;
 }
 
 int carpeta(char *tokens[], int ntokens) {
-    printf("carpeta");
+    char directory[MAX_LENGTH];
+
+    if(ntokens == 1) {
+        /*char directory[MAX_LENGTH];
+        getcwd(directory, sizeof(directory));
+        chdir(tokens[0]);*/
+        //getcwd();
+
+    } else if(ntokens == 0) {
+        getcwd(directory, sizeof(directory));
+        printf("%s\n", directory);
+    } else {
+        printf("Número de parámetros incorrecto.");
+    }
     return 0;
 }
 
 int fecha(char *tokens[], int ntokens) {
-    printf("fecha");
+
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+
+    if(ntokens == 1) {
+        if(strcmp(tokens[0], "-d") == 0) {
+            printf("%02d/%02d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+        } else if(strcmp(tokens[0], "-h") == 0) {
+            printf("%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+        } else {
+            printf("Parámetro no encontrado.");
+        }
+    } else if (ntokens == 0) {
+        printf("%02d/%02d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+        printf("%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
+    } else {
+        printf("Número de parámetros incorrecto.");
+    }
+
     return 0;
 }
 

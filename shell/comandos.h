@@ -7,7 +7,11 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <time.h>
 #include "funcionesAuxiliares.h"
+
+#define MAX_LENGTH 255
 
 int autores(char *tokens[], int ntokens);
 int pid(char *tokens[], int ntokens);
@@ -20,6 +24,5 @@ int ayuda(char *tokens[], int ntokens);
 int fin(char *tokens[], int ntokens);
 int salir(char *tokens[], int ntokens);
 int bye(char *tokens[], int ntokens);
-
 
 #endif //SHELL_C_COMANDOS_H
