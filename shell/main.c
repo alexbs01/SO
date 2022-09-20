@@ -9,15 +9,15 @@ int main() {
     char input[MAX_INPUT_SIZE];
     char *tokens[MAX_TOKENS];
     int ntokens;
-
+    int endShell = 0;
     list historial;
-    createEmptyList(&historial);
+    //createEmptyList(&historial);
 
-    while(1) {
+    while(!endShell) {
         printf("\n> ");
         fgets(input, MAX_INPUT_SIZE, stdin); // stdin es para que lea del teclado, pero fgets tambien vale para ficheros
         ntokens = splitString(input, tokens);
-        processInput(tokens, &historial, ntokens);
+        endShell = processInput(tokens, &historial, ntokens);
         //printf("\n%s ", input);
 
         }

@@ -36,13 +36,15 @@ struct cmd {
 };
 
 int processInput(char *tokens[], list *historial, int ntokens) {
+    int exit = 0;
     for(int i = 0; cmds[i].cmdName != NULL; i++) {
         if(strcmp(tokens[0], cmds[i].cmdName) == 0) {
-            cmds[i].cmdFunction(tokens + 1, ntokens - 1);
-            return 0;
+            exit = cmds[i].cmdFunction(tokens + 1, ntokens - 1);
+            return exit;
         }
     }
 
     printf("Comando no encontrado");
+    return exit;
 }
 

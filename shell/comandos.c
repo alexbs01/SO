@@ -46,17 +46,25 @@ int pid(char *tokens[], int ntokens) {
 }
 
 int carpeta(char *tokens[], int ntokens) {
+    char previousDirectory[MAX_LENGTH];
     char directory[MAX_LENGTH];
+    char error[] = "No se pudo cambiar al directorio";
 
     if(ntokens == 1) {
-        /*char directory[MAX_LENGTH];
+        //char directory[MAX_LENGTH];
+        getcwd(previousDirectory, sizeof(previousDirectory));
+        chdir(tokens[0]);
         getcwd(directory, sizeof(directory));
-        chdir(tokens[0]);*/
-        //getcwd();
+
+        if(strcmp(previousDirectory, directory) == 0) {
+            perror(error);
+        }
+
+        printf("%s", directory);
 
     } else if(ntokens == 0) {
         getcwd(directory, sizeof(directory));
-        printf("%s\n", directory);
+        printf("%s", directory);
     } else {
         printf("Número de parámetros incorrecto.");
     }
@@ -64,7 +72,6 @@ int carpeta(char *tokens[], int ntokens) {
 }
 
 int fecha(char *tokens[], int ntokens) {
-
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
@@ -77,7 +84,7 @@ int fecha(char *tokens[], int ntokens) {
             printf("Parámetro no encontrado.");
         }
     } else if (ntokens == 0) {
-        printf("%02d/%02d/%d", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
+        printf("%02d/%02d/%d ", tm.tm_mday, tm.tm_mon + 1, tm.tm_year + 1900);
         printf("%02d:%02d:%02d", tm.tm_hour, tm.tm_min, tm.tm_sec);
     } else {
         printf("Número de parámetros incorrecto.");
@@ -108,15 +115,12 @@ int ayuda(char *tokens[], int ntokens) {
 
 int fin(char *tokens[], int ntokens) {
     bye(tokens, ntokens);
-    return 0;
 }
 
 int salir(char *tokens[], int ntokens) {
     bye(tokens, ntokens);
-    return 0;
 }
 
 int bye(char *tokens[], int ntokens) {
-    printf("bye");
-    return 0;
+    return 1;
 }

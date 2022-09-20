@@ -9,6 +9,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
+#include <errno.h>
 #include "funcionesAuxiliares.h"
 
 #define MAX_LENGTH 255
