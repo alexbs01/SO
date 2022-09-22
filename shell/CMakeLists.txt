@@ -13,4 +13,4 @@ add_executable(shell
         list_test.c
         lista.c
         lista.h
-        main.c)
+        main.c cabeceras.h)

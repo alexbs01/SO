@@ -13,12 +13,10 @@ typedef struct node *pos;
 
 list createEmptyList();
 void insert(list L, void *name);
-
 pos first(list L);
+pos second(list L);
 pos next(list L, pos p);
 int at_end(list L, pos p);
 void *get(list L, pos p);
-void mostrarLista(list L);
-
 
 #endif //SHELL_C_LISTA_H
