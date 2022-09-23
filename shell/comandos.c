@@ -120,6 +120,7 @@ int hist(char *tokens[], int ntokens, list *lista) {
             }
 
         }
+        free(ptr);
     } else if(ntokens == 0) {
         for(pos p = second(*lista); !at_end(*lista, p); p = next(*lista, p)) {
             struct histData *info = get(*lista, p);
@@ -153,6 +154,7 @@ int comando(char *tokens[], int ntokens, list *lista) {
             char *tokensHist[MAX_TOKENS];
             int numeroTokens = splitString(command->command, tokensHist);
             processInput(tokensHist, numeroTokens, lista);
+            free(ptr);
         } else {
             printf("Se debe insertar un número mayor a 0 como parámetro");
         }
@@ -160,6 +162,7 @@ int comando(char *tokens[], int ntokens, list *lista) {
         printf("El comando \"comando\" debe llevar una parámetro del tipo -N, donde N es un número\n"
                "Mira el historial con el comando \"hist\" para saber que comandos puedes ejecutar");
     }
+
     return 0;
 }
 
