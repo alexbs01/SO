@@ -1,7 +1,3 @@
-//
-// Created by alexb on 09/09/2022.
-//
-
 #include <stdio.h>
 #include "funcionesAuxiliares.h"
 #include "lista.h"
@@ -19,9 +15,9 @@ int splitString(char *cadena, char *trozos[]) {
 }
 
 struct cmd {
-    char *cmdName;
-    int (*cmdFunction)(char *tokens[], int ntokens, list *lista);
-    char *ayudaCmd[MAX_LENGTH];
+    char *cmdName; // Nombre con el que llamamos a una función
+    int (*cmdFunction)(char *tokens[], int ntokens, list *lista); // Nombre de la función y sus parámetros
+    char *ayudaCmd[MAX_LENGTH]; // Almacena el mensaje de ayuda de cada comando
 };
 
 struct cmd cmds[] = {
@@ -41,9 +37,9 @@ struct cmd cmds[] = {
 
 int processInput(char *tokens[], int ntokens, list *lista) {
     int exit = 0;
-    for(int i = 0; cmds[i].cmdName != NULL; i++) {
+    for(int i = 0; cmds[i].cmdName != NULL; i++) { // Se busca el nombre del comando en el struct de arriba
         if(strcmp(tokens[0], cmds[i].cmdName) == 0) {
-            exit = cmds[i].cmdFunction(tokens + 1, ntokens - 1, lista);
+            exit = cmds[i].cmdFunction(tokens + 1, ntokens - 1, lista); // Cuando se encuentra se ejecuta la función asociada
             return exit;
         }
     }
@@ -52,6 +48,7 @@ int processInput(char *tokens[], int ntokens, list *lista) {
     return exit;
 }
 
+// Se hace el mismo proceso que con processInput, pero se muestra por pantalla lo almacenado en ayudaCmd
 int ayuda(char *tokens[], int ntokens, list *lista) {
     if(tokens[0] != NULL){
         for(int i=0; cmds[i].cmdName != NULL; i++) {
@@ -61,7 +58,7 @@ int ayuda(char *tokens[], int ntokens, list *lista) {
         }
     } else {
         printf("ayuda [cmd] siendo cmd uno de los siguientes comandos:\n");
-        for(int i=0; cmds[i].cmdName != NULL; i++) {
+        for(int i=0; cmds[i].cmdName != NULL; i++) { // Muestra los comando disponibles
             printf(" %s |",cmds[i].cmdName);
         }
         printf("\n");

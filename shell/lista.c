@@ -1,6 +1,3 @@
-//
-// Created by alexb on 09/09/2022.
-//
 #include <stdlib.h>
 
 struct node{

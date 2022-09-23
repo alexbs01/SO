@@ -13,7 +13,7 @@ funcionesAuxiliares.o: funcionesAuxiliares.c funcionesAuxiliares.h
 	gcc -c funcionesAuxiliares.c
 
 main: main.o lista.o funcionesAuxiliares.o comandos.c
-	gcc -o p0 main.o lista.o funcionesAuxiliares.o comandos.c
+	gcc -o p0 -Wall main.o lista.o funcionesAuxiliares.o comandos.c
 
 clean:
 	rm -f shell.o list.o shell
