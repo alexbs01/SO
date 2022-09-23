@@ -9,7 +9,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <time.h>
-#include <errno.h>
+#include <errno.h> // Perror
+#include <string.h>
 #include <sys/utsname.h> //infosis
 #include "funcionesAuxiliares.h"
 #include "lista.h"
@@ -18,12 +19,6 @@
 
 struct histData{ //data for history list
     char command[MAX_LENGTH];
-};
-
-struct cmd {
-    char *cmdName;
-    int (*cmdFunction)(char *tokens[], int ntokens, list *lista);
-    char *ayudaCmd[MAX_LENGTH];
 };
 
 #endif //SHELL_CABECERAS_H

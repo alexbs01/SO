@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "comandos.h"
+#include "cabeceras.h"
 #include "lista.h"
 #include "funcionesAuxiliares.h"
+
 
 int autores(char *tokens[], int ntokens, list *lista) {
     if(ntokens == 1) {
@@ -99,23 +101,65 @@ int fecha(char *tokens[], int ntokens, list *lista) {
 int hist(char *tokens[], int ntokens, list *lista) {
     int position = 1;
 
-    if(ntokens != 0) {
-        printf("hist");
-    } else {
-        for(pos p = first(*lista); !at_end(*lista, p); p = next(*lista, p)) {
+    if(ntokens == 1) {
+        char *ptr;
+        int numero = strtol(tokens[0], &ptr, 10) * -1;
+
+        if(strcmp(tokens[0], "-c") == 0  ) {
+            deleteList(lista);
+
+        } else if(numero > 0 && numero < elementsNumber(*lista)) {
+
+            int contador = 1;
+            pos p;
+
+            for(p = second(*lista); contador != numero+1; p = next(*lista, p)) {
+                struct histData *info = get(*lista, p);
+                printf("%d-> %s", contador, info->command);
+                contador++;
+            }
+
+        }
+    } else if(ntokens == 0) {
+        for(pos p = second(*lista); !at_end(*lista, p); p = next(*lista, p)) {
             struct histData *info = get(*lista, p);
-            printf("%d-> %s\n", position, info->command);
+            printf("%d-> %s", position, info->command);
             position++;
         }
 
-
+    } else {
+        printf("Número incorrecto de parámetros aceptados por la función hist.");
     }
 
     return 0;
 }
 
 int comando(char *tokens[], int ntokens, list *lista) {
-    printf("comando");
+
+    if(ntokens == 1) {
+        char *ptr;
+        int numero = strtol(tokens[0], &ptr, 10) * -1;
+        int contador = 1;
+
+        if(numero > 0 && numero < elementsNumber(*lista)) {
+
+            pos position;
+
+            for(position = second(*lista); contador != numero; position = next(*lista, position)) {
+                contador++;
+            }
+            struct histData *command = get(*lista, position);
+
+            char *tokensHist[MAX_TOKENS];
+            int numeroTokens = splitString(command->command, tokensHist);
+            processInput(tokensHist, numeroTokens, lista);
+        } else {
+            printf("Se debe insertar un número mayor a 0 como parámetro");
+        }
+    } else {
+        printf("El comando \"comando\" debe llevar una parámetro del tipo -N, donde N es un número\n"
+               "Mira el historial con el comando \"hist\" para saber que comandos puedes ejecutar");
+    }
     return 0;
 }
 
@@ -125,11 +169,11 @@ int infosis(char *tokens[], int ntokens, list *lista) {
     struct utsname systeminfo;
 
     if(!uname(&systeminfo)) {
-        printf("%s (%s), OS: %s-%s-%s \n",  systeminfo.nodename,
-                                                   systeminfo.machine,
-                                                   systeminfo.sysname,
-                                                   systeminfo.release,
-                                                   systeminfo.version);
+        printf("%s (%s), OS: %s-%s-%s", systeminfo.nodename,
+                                               systeminfo.machine,
+                                               systeminfo.sysname,
+                                               systeminfo.release,
+                                               systeminfo.version);
     } else {
         perror(error);
     }
@@ -137,23 +181,7 @@ int infosis(char *tokens[], int ntokens, list *lista) {
     return 0;
 }
 
-int ayuda(char *tokens[], int ntokens, list *lista) {
-    if(tokens[0] != NULL){
-        for(int i=0; cmds[i].cmdName != NULL; i++) {
-            if(strcmp(tokens[0], cmds[i].cmdName) == 0) {
-                printf("%s %s\n", cmds[i].cmdName, *cmds[i].ayudaCmd);
-            }
-        }
-    } else {
-        printf("'ayuda cmd' donde cmd es uno de los siguientes comandos:\n");
-        for(int i=0; cmds[i].cmdName != NULL; i++) {
-            printf("%s ",cmds[i].cmdName);
-        }
-        printf("\n");
-    }
 
-    return 0;
-}
 
 int fin(char *tokens[], int ntokens, list *lista) {
     bye(tokens, ntokens, lista);
