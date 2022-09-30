@@ -7,14 +7,14 @@ struct node{
 
 #include "lista.h"
 
-list createEmptyList() {
+lista createEmptyList() {
     struct node *node = malloc(sizeof(struct node));
     node->next = NULL;
 
     return node;
 }
 
-void insert(list *L, void *data) {
+void insert(lista *L, void *data) {
     struct node *node = *L;
     while(node->next != NULL) {
         node = node->next;
@@ -24,33 +24,33 @@ void insert(list *L, void *data) {
     node->next->data = data;
 }
 
-pos first(list L) {
+pos first(lista L) {
     return L;
 }
 
-pos second(list L) {
+pos second(lista L) {
     return L->next;
 }
 
-pos next(list L, pos p) {
+pos next(lista L, pos p) {
     if(p->next != NULL) {
         return p->next;
     }
     return p;
 }
 
-int at_end(list L, pos p) {
+int at_end(lista L, pos p) {
     return p->next == NULL;
 }
 
-void *get(list L, pos p) {
+void *get(lista L, pos p) {
     if(p->next != NULL) {
         return p->next->data;
     }
     return NULL;
 }
 
-int elementsNumber(list L) {
+int elementsNumber(lista L) {
     pos position;
     int cantidadElementos = 0;
     for(position = second(L); position->next != NULL; position = next(L, position)) {
@@ -59,11 +59,11 @@ int elementsNumber(list L) {
     return cantidadElementos;
 }
 
-bool isEmptyList(list L) {
+bool isEmptyList(lista L) {
     return L == NULL;
 }
 
-/*pos prev(list L,pos p) {
+/*pos prev(lista L,pos p) {
     pos q;
     for(q = first(L); q -> next != p; q = next(L,q)) {
     }
@@ -71,7 +71,7 @@ bool isEmptyList(list L) {
 }
 */
 
-void deleteList(list *L) {
+void deleteList(lista *L) {
     pos p;
 
     while(!isEmptyList(*L)) {

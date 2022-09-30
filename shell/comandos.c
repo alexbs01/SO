@@ -6,7 +6,7 @@
 #include "funcionesAuxiliares.h"
 
 
-int autores(char *tokens[], int ntokens, list *lista) {
+int autores(char *tokens[], int ntokens, lista *lista) {
     if(ntokens == 1) {                                          // Miramos si autores viene acompañado de [-l] o [-n]
         if(strcmp(tokens[0], "-l") == 0) {
             printf("Login: a.becerra");                 // En caso de [-l] damos por salida los logins de los autores
@@ -29,7 +29,7 @@ int autores(char *tokens[], int ntokens, list *lista) {
     return 0;
 }
 
-int pid(char *tokens[], int ntokens, list *lista) {
+int pid(char *tokens[], int ntokens, lista *lista) {
     pid_t pid = getpid();
     pid_t ppid = getppid();
 
@@ -47,7 +47,7 @@ int pid(char *tokens[], int ntokens, list *lista) {
     return 0;
 }
 
-int carpeta(char *tokens[], int ntokens, list *lista) {
+int carpeta(char *tokens[], int ntokens, lista *lista) {
     char previousDirectory[MAX_LENGTH]; // Creamos una variable con un tamaño máximo para el directorio actual y el previo
     char directory[MAX_LENGTH];
     char error[] = "No se pudo cambiar al directorio"; // Mensaje de error por si no puede cambiar de directorio
@@ -73,7 +73,7 @@ int carpeta(char *tokens[], int ntokens, list *lista) {
     return 0;
 }
 
-int fecha(char *tokens[], int ntokens, list *lista) {
+int fecha(char *tokens[], int ntokens, lista *lista) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
@@ -99,12 +99,12 @@ int fecha(char *tokens[], int ntokens, list *lista) {
     return 0;
 }
 
-int hist(char *tokens[], int ntokens, list *lista) {
+int hist(char *tokens[], int ntokens, lista *lista) {
     int position = 1;
 
     if(ntokens == 1) {  //Miramos si hist viene acompañado de un comando entre [] o no
-        char *ptr;
-        int numero = strtol(tokens[0], &ptr, 10) * -1; // Sacamos el número introducido y lo volvemos positivo
+
+        int numero = atoi(tokens[0]) * -1; // Sacamos el número introducido y lo volvemos positivo
 
         if(strcmp(tokens[0], "-c") == 0  ) {    //Si hay [-c] se borrará la lista que guarda el historial de comandos.
             deleteList(lista);
@@ -136,11 +136,11 @@ int hist(char *tokens[], int ntokens, list *lista) {
     return 0;
 }
 
-int comando(char *tokens[], int ntokens, list *lista) {
+int comando(char *tokens[], int ntokens, lista *lista) {
 
     if(ntokens == 1) {
-        char *ptr;
-        int numero = strtol(tokens[0], &ptr, 10) * -1; // El número introducido lo volvemos positivo
+
+        int numero = atoi(tokens[0]) * -1; // El número introducido lo volvemos positivo
         int contador = 1;
 
         if(numero > 0 && numero < elementsNumber(*lista)) {
@@ -166,7 +166,7 @@ int comando(char *tokens[], int ntokens, list *lista) {
     return 0;
 }
 
-int infosis(char *tokens[], int ntokens, list *lista) {
+int infosis(char *tokens[], int ntokens, lista *lista) {
     char error[] = "Uname function fail";   // Mensaje que mostraremos de salida por si la función uname falla
     struct utsname systeminfo;              // Gracias a la librería <sys/utsname.h> creamos una variable de
                                             // tiempo struct utsname donde se guardan los datos del dispositivo
@@ -186,14 +186,63 @@ int infosis(char *tokens[], int ntokens, list *lista) {
 
 
 
-int fin(char *tokens[], int ntokens, list *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int fin(char *tokens[], int ntokens, lista *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int salir(char *tokens[], int ntokens, list *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int salir(char *tokens[], int ntokens, lista *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int bye(char *tokens[], int ntokens, list *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int bye(char *tokens[], int ntokens, lista *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
+}
+
+int create(char *tokens[], int ntokens, lista *lista) {
+    int errorNumber;
+
+    if(ntokens == 1) {
+        errorNumber = mkdir(tokens[0], 0771); // Se crea la carpeta con permisos rwxrwx--x, y se guarda el número de error
+
+        if(errorNumber == -1) { // Si hay número de error es que no se pudo crear la carpeta
+            printf("No se pudo crear %s: %s", tokens[0], strerror(errno));
+
+        } else {
+            printf("Se creo la carpeta; %s", tokens[0]);
+
+        }
+
+    } else if(ntokens == 2) {
+        if(strcmp(tokens[0], "-f") == 0) {
+            fopen(tokens[1], "wb"); // Creamos el fichero con el nombre de tokens[1]
+            printf("Se creo el archivo: %s", tokens[1]);
+
+        } else {
+            printf("Parámetro incorrecto.");
+        }
+
+    } else {
+        printf("Numero de parámetros incorrecto.");
+    }
+    return 0;
+}
+
+/*int stat(char *tokens[], int ntokens, lista *lista) {
+
+    return 0;
+}*/
+
+int list(char *tokens[], int ntokens, lista *lista) {
+
+    return 0;
+}
+
+int delete(char *tokens[], int ntokens, lista *lista) {
+
+    return 0;
+}
+
+int deltree(char *tokens[], int ntokens, lista *lista) {
+
+    return 0;
 }

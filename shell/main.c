@@ -17,7 +17,7 @@ int main() {
     char *tokens[MAX_TOKENS];
     int ntokens;
     int endShell = 0;
-    list historial = createEmptyList(); // Inicializamos una lista con cabecera
+    lista historial = createEmptyList(); // Inicializamos una lista con cabecera
     insert(&historial, NULL);
 
     while(!endShell) {
@@ -28,7 +28,7 @@ int main() {
         duplicateInput = strdup(input);
         insert(&historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
 
-        ntokens = splitString(input, tokens); // Se almancenan el número de tokens que hay en la cadena
+        ntokens = splitString(input, tokens); // Se almacenan el número de tokens que hay en la cadena
 
         endShell = processInput(tokens, ntokens, &historial);
         if(isEmptyList(historial)) { // Si borramos el historial, volvemos a crearla y le insertamos la cabecera
@@ -37,7 +37,7 @@ int main() {
         }
 
         }
-    deleteList(&historial); // LIberamos la memoria dinámica
+    deleteList(&historial); // Liberamos la memoria dinámica
     free(duplicateInput);
     return 0;
 }

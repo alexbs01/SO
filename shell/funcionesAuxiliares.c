@@ -4,6 +4,7 @@
 
 int splitString(char *cadena, char *trozos[]) {
     int i=1;
+
     if((trozos[0] = strtok(cadena, " \n\t")) == NULL) {
         return 0;
     }
@@ -11,12 +12,13 @@ int splitString(char *cadena, char *trozos[]) {
     while((trozos[i] = strtok(NULL, " \n\t")) != NULL) {
         i++;
     }
+
     return i;
 }
 
 struct cmd {
     char *cmdName; // Nombre con el que llamamos a una función
-    int (*cmdFunction)(char *tokens[], int ntokens, list *lista); // Nombre de la función y sus parámetros
+    int (*cmdFunction)(char *tokens[], int ntokens, lista *lista); // Nombre de la función y sus parámetros
     char *ayudaCmd[MAX_LENGTH]; // Almacena el mensaje de ayuda de cada comando
 };
 
@@ -25,18 +27,24 @@ struct cmd cmds[] = {
         {"pid", pid, "[] Imprime el pid del proceso que esta ejecutando el shell.\n[-p] Imprime el pid del proceso padre del shell."},
         {"carpeta", carpeta, "[direct] Cambia el directorio de trabajo actual del shell para direct.\n[] Imprime el directorio de trabajo actual."},
         {"fecha", fecha, "[-d] Imprime la fecha actual en formato: at DD/MM/YYYY.\n[-h] Imprime la fecha actual en formato: h:mm:ss.\n[] Imprime la fecha actual en los dos formatos."},
-        {"hist", hist, "[] Imprime la lista de comandos usasdos anteriormente con un número asignado a cada uno.\n[-c] Vacía la lista de comandos guardados.\n[-N] Imprime los primeros N comandos."},
+        {"hist", hist, "[] Imprime la lista de comandos usados anteriormente con un número asignado a cada uno.\n[-c] Vacía la lista de comandos guardados.\n[-N] Imprime los primeros N comandos."},
         {"comando", comando, "[-N] Ejecuta el comando en la posición N del historial"},
         {"infosis", infosis, "Imprime información en la máquina que ejecuta el shell."},
         {"ayuda", ayuda, "[] Imprime una lista de los comandos disponibles.\n[cmd] Imprime un poco de ayuda del comando cmd."},
         {"fin", fin, "Acaba la ejecución del shell."},
         {"salir", salir, "Acaba la ejecución del shell."},
         {"bye", bye, "Acaba la ejecución del shell."},
+        {"create", create, "[] Crea una carpeta. \n [-f] Crea un fichero."},
+        //{"stat", stat, "[] Lista los ficheros. \n [-long] Usa el formato largo. \n [-acc] Modifica la hora del último acceso. \n [link] Si hay enlace simbólico, muestra a que hace referencia"},
+        {"list", list, "[] Lista el contenido de directorios. \n [-reca] Lo hace recursivamente antes. \n [-recb] Recursivamente después. \n [-hid] Muestra también los fichero ocultos. \n [-long] Usa el formato largo. \n [-acc] Modifica la hora del último acceso. \n [link] Si hay enlace simbólico, muestra a que hace referencia."},
+        {"delete", delete, "[name1, name2...] Elimina los ficheros o directorios vacíos que se pasan como parámetro."},
+        {"deltree", deltree, "[name1, name2...] Elimina los ficheros o directorios vacíos de forma recursiva."},
         {NULL, NULL}
 };
 
-int processInput(char *tokens[], int ntokens, list *lista) {
+int processInput(char *tokens[], int ntokens, lista *lista) {
     int exit = 0;
+
     for(int i = 0; cmds[i].cmdName != NULL; i++) { // Se busca el nombre del comando en el struct de arriba
         if(strcmp(tokens[0], cmds[i].cmdName) == 0) {
             exit = cmds[i].cmdFunction(tokens + 1, ntokens - 1, lista); // Cuando se encuentra se ejecuta la función asociada
@@ -49,8 +57,8 @@ int processInput(char *tokens[], int ntokens, list *lista) {
 }
 
 // Se hace el mismo proceso que con processInput, pero se muestra por pantalla lo almacenado en ayudaCmd
-int ayuda(char *tokens[], int ntokens, list *lista) {
-    if(tokens[0] != NULL){
+int ayuda(char *tokens[], int ntokens, lista *lista) {
+    if(tokens[0] != NULL) {
         for(int i=0; cmds[i].cmdName != NULL; i++) {
             if(strcmp(tokens[0], cmds[i].cmdName) == 0) {
                 printf("%s %s\n", cmds[i].cmdName, *cmds[i].ayudaCmd);

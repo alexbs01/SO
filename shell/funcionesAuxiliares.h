@@ -12,8 +12,8 @@
 #include "cabeceras.h"
 
 int splitString(char *cadena, char *trozos[]);                  // Cuenta cuantos parámetros tiene un comando
-int processInput(char *tokens[], int ntokens, list *lista);     // Procesa la entrada
+int processInput(char *tokens[], int ntokens, lista *lista);     // Procesa la entrada
 
-int ayuda(char *tokens[], int ntokens, list *lista);            // Muestra la ayuda de cada comando
+int ayuda(char *tokens[], int ntokens, lista *lista);            // Muestra la ayuda de cada comando
 
 #endif //SHELL_C_FUNCIONESAUXILIARES_H
