@@ -18,7 +18,7 @@ int autores(char *tokens[], int ntokens, lista *lista) {
             printf("Parámetro inválido.");              // Si han puesto otra cosa entre los corchetes, se mostrará que ese comando no existe
         }
     } else if (ntokens == 0) {                                // Si autores no viene acompañado de [-l] o [-n] se
-        printf("Login: a.becerra");                    // mostraran tanto los nombres como los login pro salida
+        printf("Login: a.becerra");                    // mostrarán tanto los nombres como los login pro salida
         printf("\nLogin: adrian.rego");
         printf("\nNombre: Alejandro Becerra Suarez");
         printf("\nNombre: Adrián Rego Criado");
@@ -153,7 +153,7 @@ int comando(char *tokens[], int ntokens, lista *lista) {
             struct histData *command = get(*lista, position);
             char *tokensHist[MAX_TOKENS];
             int numeroTokens = splitString(command->command, tokensHist);
-            processInput(tokensHist, numeroTokens, lista); // Con el comando encontrado, los procesmos para ejecutarlo
+            processInput(tokensHist, numeroTokens, lista); // Con el comando encontrado, los procesamos para ejecutarlo
 
         } else {
             printf("Se debe insertar un número mayor a 0 como parámetro");
@@ -233,6 +233,35 @@ int create(char *tokens[], int ntokens, lista *lista) {
 }*/
 
 int list(char *tokens[], int ntokens, lista *lista) {
+
+    char path[MAX_LENGTH]; // Creamos un array de caracteres para guardar la dirección del directorio a saber.
+
+    if (ntokens == 0) { // Si el usuario no introduce un directorio ejecutamos list sobre el actual.
+        if (getcwd(path, sizeof(path)) == NULL) { // Si no falla se guarda en path la dirección del directorio actual.
+            perror("getcwd() error"); // Si falla la función para conseguir la ruta del directorio se muestra un mensaje de error.
+            return 1;
+        }
+
+    } else if (ntokens == 1) { // Si el usuario introduce un directorio ejecutamos list sobre ese.
+        strncpy(path, tokens[0], sizeof(tokens) - 1); // Se guarda en path la dirección del directorio dado.
+        path[sizeof(tokens) - 1] = '\0';
+    }
+
+    DIR *d;
+    struct dirent *dir;
+
+    d = opendir(path); // Abrir directorio y guardarlo en la variable d.
+
+    if (d) {
+        while ((dir = readdir(d)) != NULL) {              // Vamos mostrando por salida cada cosa almacenada en el directorio hasta que no haya nada más.
+            if (dir-> d_type != DT_DIR) {                      // Si no es directorio que lo muestre de color azul.
+                //printf("%10ld %s%s\n", , BLUE, dir->d_name); // //ANÑADIR EL PESO DEL DIRECTORIO
+            } else if (dir -> d_type == DT_DIR && strcmp(dir->d_name,".")!=0 && strcmp(dir->d_name,"..")!=0 ) { // No se mostrarán el contenido de directorios posteriores o anteriores al dado.
+                //printf("%10ld %s%s\n", , GREEN, dir->d_name);  // Si es un directorio lo muestra en verde.
+            }
+        }
+        closedir(d);
+    }
 
     return 0;
 }

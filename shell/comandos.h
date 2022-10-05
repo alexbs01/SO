@@ -2,6 +2,11 @@
 #define SHELL_C_COMANDOS_H
 
 #include "cabeceras.h"
+#include <dirent.h> // Para el comando <list>
+
+#define NORMAL_COLOR  "\x1B[0m" // Colores para <list>
+#define GREEN  "\x1B[32m"
+#define BLUE  "\x1B[34m"
 
 #define MAX_LENGTH 255
 #define MAX_INPUT_SIZE 1024
