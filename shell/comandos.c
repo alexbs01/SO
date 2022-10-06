@@ -234,7 +234,7 @@ int create(char *tokens[], int ntokens, lista *lista) {
 
 int list(char *tokens[], int ntokens, lista *lista) {
 
-    char path[MAX_LENGTH]; // Creamos un array de caracteres para guardar la dirección del directorio a saber.
+    char path[MAX_LENGTH]; // Creamos un array de caracteres para guardar la dirección del directorio a saber
 
     if (ntokens == 0) { // Si el usuario no introduce un directorio ejecutamos list sobre el actual.
         if (getcwd(path, sizeof(path)) == NULL) { // Si no falla se guarda en path la dirección del directorio actual.
