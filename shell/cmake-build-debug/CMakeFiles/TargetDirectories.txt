@@ -1,3 +1,0 @@
-/home/rego/universidad/proyectosGit/SO/SO/shell/cmake-build-debug/CMakeFiles/shell.dir
-/home/rego/universidad/proyectosGit/SO/SO/shell/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/rego/universidad/proyectosGit/SO/SO/shell/cmake-build-debug/CMakeFiles/rebuild_cache.dir
