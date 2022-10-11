@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "funcionesAuxiliares.h"
 #include "lista.h"
+#include "cabeceras.h"
 
 int splitString(char *cadena, char *trozos[]) {
     int i=1;
@@ -35,7 +36,7 @@ struct cmd cmds[] = {
         {"salir", salir, "Acaba la ejecución del shell."},
         {"bye", bye, "Acaba la ejecución del shell."},
         {"create", create, "[] Crea una carpeta. \n [-f] Crea un fichero."},
-        //{"stat", stat, "[] Lista los ficheros. \n [-long] Usa el formato largo. \n [-acc] Modifica la hora del último acceso. \n [link] Si hay enlace simbólico, muestra a que hace referencia"},
+        {"stat", stats, "[] Lista los ficheros. \n [-long] Usa el formato largo. \n [-acc] Modifica la hora del último acceso. \n [link] Si hay enlace simbólico, muestra a que hace referencia"},
         {"list", list, "[] Lista el contenido de directorios. \n [-reca] Lo hace recursivamente antes. \n [-recb] Recursivamente después. \n [-hid] Muestra también los fichero ocultos. \n [-long] Usa el formato largo. \n [-acc] Modifica la hora del último acceso. \n [link] Si hay enlace simbólico, muestra a que hace referencia."},
         {"delete", delete, "[name1, name2...] Elimina los ficheros o directorios vacíos que se pasan como parámetro."},
         {"deltree", deltree, "[name1, name2...] Elimina los ficheros o directorios vacíos de forma recursiva."},
@@ -73,5 +74,91 @@ int ayuda(char *tokens[], int ntokens, lista *lista) {
     }
 
     return 0;
+}
+
+char LetraTF (mode_t m)
+{
+    switch (m&S_IFMT) { /*and bit a bit con los bits de formato,0170000 */
+        case S_IFSOCK: return 's'; /*socket */
+        case S_IFLNK: return 'l'; /*symbolic link*/
+        case S_IFREG: return '-'; /* fichero normal*/
+        case S_IFBLK: return 'b'; /*block device*/
+        case S_IFDIR: return 'd'; /*directorio */
+        case S_IFCHR: return 'c'; /*char device*/
+        case S_IFIFO: return 'p'; /*pipe*/
+        default: return '?'; /*desconocido, no deberia aparecer*/
+    }
+}
+/*las siguientes funciones devuelven los permisos de un fichero en formato rwx----*/
+/*a partir del campo st_mode de la estructura stat */
+/*las tres son correctas pero usan distintas estrategias de asignación de memoria*/
+
+char * ConvierteModo2 (mode_t m)
+{
+    static char permisos[12];
+    strcpy (permisos,"---------- ");
+
+    permisos[0]=LetraTF(m);
+    if (m&S_IRUSR) permisos[1]='r';    /*propietario*/
+    if (m&S_IWUSR) permisos[2]='w';
+    if (m&S_IXUSR) permisos[3]='x';
+    if (m&S_IRGRP) permisos[4]='r';    /*grupo*/
+    if (m&S_IWGRP) permisos[5]='w';
+    if (m&S_IXGRP) permisos[6]='x';
+    if (m&S_IROTH) permisos[7]='r';    /*resto*/
+    if (m&S_IWOTH) permisos[8]='w';
+    if (m&S_IXOTH) permisos[9]='x';
+    if (m&S_ISUID) permisos[3]='s';    /*setuid, setgid y stickybit*/
+    if (m&S_ISGID) permisos[6]='s';
+    if (m&S_ISVTX) permisos[9]='t';
+
+    return permisos;
+}
+
+int printStat(char tokens, SStatCommand*flags) {
+    char fecha[MAX_LENGTH];
+    struct tm fechaYHora;
+    char formatoFechaYHora[] = "%Y/%m/%d-%H:%M";
+    struct stat stat; // número de links, número de inodos y tamaño del archivo
+    struct passwd *usuario; // El struct passwd, contiene información del usuario
+    struct group *grupo; // El struct group, contiene información del grupo
+    char *permisos = "----------"; // Los permisos si no tienen valor tienen un guion
+    char linkSimbolico[MAX_LENGTH];
+
+    if(!flags->longFlag) {
+        long espacio = sizeFich(&tokens);
+        if(espacio == -1) {
+            return -1;
+        } else {
+            printf("%ld\t%s\n", espacio, &tokens);
+        }
+    } else {
+        (flags->accFlag)? (localtime_r(&stat.st_atime, &fechaYHora)) : (localtime_r(&stat.st_mtime, &fechaYHora));
+
+        usuario = getpwuid(stat.st_uid);
+        grupo = getgrgid(stat.st_gid);
+        permisos = ConvierteModo2(stat.st_mode);
+
+        strftime(fecha, MAX_LENGTH, formatoFechaYHora, &fechaYHora);
+        printf("%s\t%ld ( %ld)\t%s\t%s\t%s\t%ld %s", fecha,
+                                                            stat.st_nlink,
+                                                            stat.st_ino,
+                                                            usuario->pw_name,
+                                                            grupo->gr_name,
+                                                            permisos,
+                                                            stat.st_size,
+                                                            &tokens);
+
+        // Si el flag de links simbólicos y la función readlink dan true, mostrará el link
+                                // Cuando readlink falla retorna un -1
+        if(flags->linkFlag && (readlink(&tokens, linkSimbolico, MAX_LENGTH) != -1)) {
+            printf(" --> %s\n", linkSimbolico);
+
+        } else {
+            printf("\n");
+
+        }
+        return 0;
+    }
 }
 

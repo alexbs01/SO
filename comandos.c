@@ -5,7 +5,6 @@
 #include "lista.h"
 #include "funcionesAuxiliares.h"
 
-
 int autores(char *tokens[], int ntokens, lista *lista) {
     if(ntokens == 1) {                                          // Miramos si autores viene acompañado de [-l] o [-n]
         if(strcmp(tokens[0], "-l") == 0) {
@@ -227,14 +226,175 @@ int create(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-/*int stat(char *tokens[], int ntokens, lista *lista) {
+int stats(char *tokens[], int ntokens, lista *lista) {
+    SStatCommand flags = {false, false, false};
+    int numberFlags = 0;
 
+    if(ntokens != 0) {
+        for(int i = 0; i < ntokens; i++) {
+            if(strcmp(tokens[i], "-long") == 0) {
+                flags.longFlag = true;
+                numberFlags++;
+            } else if(strcmp(tokens[i], "-link") == 0) {
+                flags.linkFlag = true;
+                numberFlags++;
+            } else if(strcmp(tokens[i], "-flag") == 0) {
+                flags.accFlag = true;
+                numberFlags++;
+            }
+        }
+
+        for(int i = numberFlags - 1; i < ntokens; i++) {
+            printStat(*tokens[i], flags);
+        }
+
+    }
     return 0;
-}*/
+}
+
+//**********************************************************************************************************************
+
+off_t sizeFich(char *file) {     //Returns size of one file
+    struct stat s;
+
+    if(stat(file,&s)==-1) return -1;
+    return s.st_size;
+}
+
+int printFileInfo(char *path, struct listOptions *com) {   //Shows one file's info
+    struct stat s;
+    struct group *grp;
+    struct passwd *pwd;
+    char fechaOut [MAX_LENGTH];
+    char *permisos = "---------- ";
+    struct tm lt;
+    char symlink[MAX_LENGTH] = "";
+    char *file = basename(path);
+
+    if(lstat(path,&s)==-1) return -1;
+
+    permisos = ConvierteModo2(s.st_mode);
+
+    if (!com->lng){ //Basic listing
+        long size;
+        if((size=sizeFich(path))==-1) return -1;
+        else printf("%ld\t%s\n", size, file);
+    }else{ //Long listing
+        if((pwd = getpwuid(s.st_uid)) == NULL) return -1;
+        if((grp = getgrgid(s.st_gid)) == NULL) return -1;
+
+        if(com->acc) localtime_r(&s.st_atime, &lt);
+        else localtime_r(&s.st_mtime, &lt);
+
+        // YY/MM/DD-hh:mm
+        strftime(fechaOut, MAX_LENGTH, "%Y/%m/%d-%H:%M", &lt);
+
+        printf("%s%4ld ( %ld)\t%s\t%s\t%s%9ld %s", fechaOut, s.st_nlink, s.st_ino,
+                pwd->pw_name, grp->gr_name, permisos, s.st_size, file) ;
+        if(com->link && (readlink(path, symlink, MAX_LENGTH)!=-1))
+            printf(" -> %s\n", symlink);
+        else printf("\n");
+    }
+    return 0;
+}
+
+
+int isDir(const char *path) {
+    struct stat s;
+    stat(path, &s);
+    int out = S_ISDIR(s.st_mode);
+    return out;
+}
+
+int listSubDir(char *dir, struct listOptions *com) {
+    DIR *dirp;
+    struct dirent *flist;
+    char aux[MAX_LENGTH];
+
+    if ((dirp=opendir(dir)) == NULL) return -1;
+    while ((flist=readdir(dirp))!= NULL) { //recorre los archivos en el directorio
+
+        if (!com->hid && flist->d_name[0] == '.') continue;   //If "hid" option is off, we ignore
+        if (strcmp(flist->d_name, "..") == 0 ||              // files that start with ".." or "."
+           strcmp(flist->d_name, ".") == 0)continue;
+
+        strcpy(aux, dir);
+        strcat(strcat(aux, "/"),flist->d_name);
+        if (isDir(aux)) {
+            printDirInfo(aux, com);
+        }
+    }
+    closedir(dirp);
+    return 0;
+}
+
+int printDirInfo(char *dir, struct listOptions *com) {  //Shows one directory's information
+    DIR *dirp;
+    struct dirent *flist;
+    char aux[MAX_LENGTH];
+
+    if (com->recb) {
+        if(listSubDir(dir, com)) return -1;
+    }
+    if((dirp = opendir(dir)) == NULL) return -1;
+
+    printf("✦****** %s ******✦\n",dir);
+    while ((flist=readdir(dirp)) != NULL) { // Recorre los archivos en el directorio
+        strcpy(aux, dir);
+        strcat(strcat(aux, "/"),flist->d_name);
+
+        if(!com->hid && flist->d_name[0] == '.') continue;
+
+        if(printFileInfo(aux, com)) return -1;
+    }
+    closedir(dirp);
+
+    if(!com->recb && com->reca){            //recb has priority over reca
+        if(listSubDir(dir, com)) return -1;
+    }
+    return 0;
+}
 
 int list(char *tokens[], int ntokens, lista *lista) {
+    char msgError[] = "Error de lectura"; //Mensaje de error.
 
+    if (ntokens != 0) {
+
+        struct listOptions com = {0,0,0,0,0,0};
+
+        for (int cnt = 0; cnt < ntokens; cnt++) {
+            if (strcmp(tokens[cnt], "-acc") == 0)         com.acc = 1;
+            else if (strcmp(tokens[cnt], "-hid") == 0)    com.hid = 1;
+            else if (strcmp(tokens[cnt], "-link") == 0)   com.link = 1;
+            else if (strcmp(tokens[cnt], "-lng") == 0)    com.lng = 1;
+            else if (strcmp(tokens[cnt], "-reca") == 0)   com.reca = 1;
+            else if (strcmp(tokens[cnt], "-recb") == 0)   com.recb = 1;
+        }
+
+        int cnt = (com.acc + com.hid + com.link + com.lng + com.reca + com.recb);
+
+        if (cnt == ntokens) {
+            carpeta(0,0,lista); //si no existe parametro a listar
+        }
+
+        while (cnt < ntokens) {
+            if (printDirInfo(tokens[cnt], &com) == (-1)) {
+                perror(msgError); // Mostramos mensaje de error.
+            }
+            cnt++;
+        }
+    } else {
+        carpeta(0,0,lista); // Muestra el directorio actual.
+    }
+
+    return 0;
+}
+
+
+/*#include <dirent.h>  se necesita si queremos recuperar este list*/
+/*int list(char *tokens[], int ntokens, lista *lista) {
     char path[MAX_LENGTH]; // Creamos un array de caracteres para guardar la dirección del directorio a saber
+    struct stat sb;
 
     if (ntokens == 0) { // Si el usuario no introduce un directorio ejecutamos list sobre el actual.
         if (getcwd(path, sizeof(path)) == NULL) { // Si no falla se guarda en path la dirección del directorio actual.
@@ -243,8 +403,8 @@ int list(char *tokens[], int ntokens, lista *lista) {
         }
 
     } else if (ntokens == 1) { // Si el usuario introduce un directorio ejecutamos list sobre ese.
-        strncpy(path, tokens[0], sizeof(tokens) - 1); // Se guarda en path la dirección del directorio dado.
-        path[sizeof(tokens) - 1] = '\0';
+        strncpy(path, tokens[0], sizeof(*tokens) - 1); // Se guarda en path la dirección del directorio dado.
+        path[sizeof(*tokens) - 1] = '\0';
     }
 
     DIR *d;
@@ -252,12 +412,13 @@ int list(char *tokens[], int ntokens, lista *lista) {
 
     d = opendir(path); // Abrir directorio y guardarlo en la variable d.
 
-    if (d) {
-        while ((dir = readdir(d)) != NULL) {              // Vamos mostrando por salida cada cosa almacenada en el directorio hasta que no haya nada más.
-            if (dir-> d_type != DT_DIR) {                      // Si no es directorio que lo muestre de color azul.
-                //printf("%10ld %s%s\n", , BLUE, dir->d_name); // //ANÑADIR EL PESO DEL DIRECTORIO
+    if(d) {
+        while((dir = readdir(d)) != NULL) {              // Vamos mostrando por salida cada cosa almacenada en el directorio hasta que no haya nada más.
+            stat((char*) d, &sb);
+            if (dir-> d_type != DT_DIR) {                     // Si no es directorio que lo muestre de color azul.
+                printf("%10ld %s\n", sb.st_size, dir->d_name); // //AÑADIR EL PESO DEL DIRECTORIO
             } else if (dir -> d_type == DT_DIR && strcmp(dir->d_name,".")!=0 && strcmp(dir->d_name,"..")!=0 ) { // No se mostrarán el contenido de directorios posteriores o anteriores al dado.
-                //printf("%10ld %s%s\n", , GREEN, dir->d_name);  // Si es un directorio lo muestra en verde.
+                printf("%10ld %s\n", sb.st_size, dir->d_name);  // Si es un directorio lo muestra en verde.
             }
         }
         closedir(d);
@@ -265,7 +426,7 @@ int list(char *tokens[], int ntokens, lista *lista) {
 
     return 0;
 }
-
+*/
 int delete(char *tokens[], int ntokens, lista *lista) {
 
     return 0;
