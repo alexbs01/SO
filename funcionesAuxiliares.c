@@ -114,7 +114,7 @@ char * ConvierteModo2 (mode_t m)
 
     return permisos;
 }
-
+/*
 int printStat(char tokens, SStatCommand*flags) {
     char fecha[MAX_LENGTH];
     struct tm fechaYHora;
@@ -160,5 +160,6 @@ int printStat(char tokens, SStatCommand*flags) {
         }
         return 0;
     }
-}
+}*/
+
 

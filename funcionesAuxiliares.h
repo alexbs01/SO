@@ -20,6 +20,5 @@ int ayuda(char *tokens[], int ntokens, lista *lista);            // Muestra la a
 char LetraTF (mode_t m);
 char * ConvierteModo2 (mode_t m);
 
-int printStat(char tokens, SStatCommand *flags);
 
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

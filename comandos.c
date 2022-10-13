@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include "funcionesAuxiliares.h"
 #include "comandos.h"
 #include "cabeceras.h"
 #include "lista.h"
-#include "funcionesAuxiliares.h"
 
 int autores(char *tokens[], int ntokens, lista *lista) {
     if(ntokens == 1) {                                          // Miramos si autores viene acompañado de [-l] o [-n]
@@ -226,6 +226,69 @@ int create(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
+off_t tamanoFichero(char *file) {     //Returns size of one file
+    struct stat size;
+
+    if(stat(file,&size) == -1) {
+        return -1;
+    }
+
+    return size.st_size;
+}
+
+int printStat(char *tokens, SStatCommand *flags) {
+    char fecha[MAX_LENGTH];
+    struct tm fechaYHora;
+    char formatoFechaYHora[] = "%Y/%m/%d-%H:%M";
+    struct stat datos; // número de links, número de inodos y tamaño del archivo
+    struct passwd *usuario; // El struct passwd, contiene información del usuario
+    struct group *grupo; // El struct group, contiene información del grupo
+    char *permisos; // Los permisos si no tienen valor tienen un guion
+    char linkSimbolico[MAX_LENGTH];
+    //char *archivo = basename(tokens);
+
+    if(!flags->longFlag) {
+        long espacio = tamanoFichero(tokens);
+        if(espacio == -1) {
+            return -1;
+        } else {
+            printf("%ld\t%s\n", espacio, tokens);
+        }
+    } else {
+        (flags->accFlag)? (localtime_r(&datos.st_atime, &fechaYHora)) : (localtime_r(&datos.st_mtime, &fechaYHora));
+
+        if(lstat(tokens, &datos) == -1) {
+            return 1;
+        }
+
+        usuario = getpwuid(datos.st_uid);
+        grupo = getgrgid(datos.st_gid);
+        permisos = ConvierteModo2(datos.st_mode);
+
+        strftime(fecha, MAX_LENGTH, formatoFechaYHora, &fechaYHora);
+        printf("%s\t%ld \t(%8ld)\t%s\t%s\t%s\t%ld %s", fecha,
+               datos.st_nlink,
+               datos.st_ino,
+               usuario->pw_name,
+               grupo->gr_name,
+               permisos,
+               datos.st_size,
+               tokens);
+
+        // Si el flag de links simbólicos y la función readlink dan true, mostrará el link
+        // Cuando readlink falla retorna un -1
+        if(flags->linkFlag && (readlink(tokens, linkSimbolico, MAX_LENGTH) != -1)) {
+            printf(" --> %s\n", linkSimbolico);
+
+        } else {
+            printf("\n");
+
+        }
+
+    }
+    return 0;
+}
+
 int stats(char *tokens[], int ntokens, lista *lista) {
     SStatCommand flags = {false, false, false};
     int numberFlags = 0;
@@ -238,29 +301,24 @@ int stats(char *tokens[], int ntokens, lista *lista) {
             } else if(strcmp(tokens[i], "-link") == 0) {
                 flags.linkFlag = true;
                 numberFlags++;
-            } else if(strcmp(tokens[i], "-flag") == 0) {
+            } else if(strcmp(tokens[i], "-acc") == 0) {
                 flags.accFlag = true;
                 numberFlags++;
             }
         }
 
         for(int i = numberFlags - 1; i < ntokens; i++) {
-            printStat(*tokens[i], flags);
+            printStat(tokens[i], &flags);
         }
 
     }
     return 0;
 }
 
+
+
 //**********************************************************************************************************************
-
-off_t sizeFich(char *file) {     //Returns size of one file
-    struct stat s;
-
-    if(stat(file,&s)==-1) return -1;
-    return s.st_size;
-}
-
+/*
 int printFileInfo(char *path, struct listOptions *com) {   //Shows one file's info
     struct stat s;
     struct group *grp;
@@ -277,7 +335,7 @@ int printFileInfo(char *path, struct listOptions *com) {   //Shows one file's in
 
     if (!com->lng){ //Basic listing
         long size;
-        if((size=sizeFich(path))==-1) return -1;
+        if((size=tamanoFichero(path))==-1) return -1;
         else printf("%ld\t%s\n", size, file);
     }else{ //Long listing
         if((pwd = getpwuid(s.st_uid)) == NULL) return -1;
@@ -316,7 +374,7 @@ int listSubDir(char *dir, struct listOptions *com) {
 
         if (!com->hid && flist->d_name[0] == '.') continue;   //If "hid" option is off, we ignore
         if (strcmp(flist->d_name, "..") == 0 ||              // files that start with ".." or "."
-           strcmp(flist->d_name, ".") == 0)continue;
+            strcmp(flist->d_name, ".") == 0)continue;
 
         strcpy(aux, dir);
         strcat(strcat(aux, "/"),flist->d_name);
@@ -354,7 +412,9 @@ int printDirInfo(char *dir, struct listOptions *com) {  //Shows one directory's 
     }
     return 0;
 }
+*/
 
+/*
 int list(char *tokens[], int ntokens, lista *lista) {
     char msgError[] = "Error de lectura"; //Mensaje de error.
 
@@ -389,10 +449,10 @@ int list(char *tokens[], int ntokens, lista *lista) {
 
     return 0;
 }
-
+*/
 
 /*#include <dirent.h>  se necesita si queremos recuperar este list*/
-/*int list(char *tokens[], int ntokens, lista *lista) {
+int list(char *tokens[], int ntokens, lista *lista) {/*
     char path[MAX_LENGTH]; // Creamos un array de caracteres para guardar la dirección del directorio a saber
     struct stat sb;
 
@@ -423,10 +483,10 @@ int list(char *tokens[], int ntokens, lista *lista) {
         }
         closedir(d);
     }
-
+*/
     return 0;
 }
-*/
+
 int delete(char *tokens[], int ntokens, lista *lista) {
 
     return 0;

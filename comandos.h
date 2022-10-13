@@ -2,11 +2,11 @@
 #define SHELL_C_COMANDOS_H
 
 
-
+#include "cabeceras.h"
 #include <libgen.h> // Para el comando <list>
 #include <grp.h>    // Para el comando <list>
 #include <pwd.h>    // Para el comando <list>
-#include "cabeceras.h"
+
 #define MAX_LENGTH 255
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64
@@ -25,6 +25,8 @@ int salir(char *tokens[], int ntokens, lista *lista);
 int bye(char *tokens[], int ntokens, lista *lista);
 
 int create(char *tokens[], int ntokens, lista *lista);   // Crea una carpeta o un fichero.
+off_t tamanoFichero(char *file);
+int printStat(char *tokens, SStatCommand *flags);
 int stats(char *tokens[], int ntokens, lista *lista);     //
 int list(char *tokens[], int ntokens, lista *lista);     //
 int delete(char *tokens[], int ntokens, lista *lista);   // Elimina los ficheros o directorios vacíos que se pasan como parámetro.
@@ -32,10 +34,10 @@ int deltree(char *tokens[], int ntokens, lista *lista);  // Elimina los ficheros
 
 
 /* Para el comando <list> */
-int printDirInfo(char *dir, struct listOptions *com);
-int listSubDir(char *dir, struct listOptions *com);
-int isDir(const char *path);
-int printFileInfo(char *path, struct listOptions *com);
-off_t sizeFich(char *file);
+//int printDirInfo(char *dir, struct listOptions *com);
+//int listSubDir(char *dir, struct listOptions *com);
+//int isDir(const char *path);
+//int printFileInfo(char *path, struct listOptions *com);
+
 
 #endif //SHELL_C_COMANDOS_H
