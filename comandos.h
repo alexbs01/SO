@@ -25,8 +25,6 @@ int salir(char *tokens[], int ntokens, lista *lista);
 int bye(char *tokens[], int ntokens, lista *lista);
 
 int create(char *tokens[], int ntokens, lista *lista);   // Crea una carpeta o un fichero.
-off_t tamanoFichero(char *file);
-int printStat(char *tokens, SStatCommand *flags);
 int stats(char *tokens[], int ntokens, lista *lista);     //
 int list(char *tokens[], int ntokens, lista *lista);     //
 int delete(char *tokens[], int ntokens, lista *lista);   // Elimina los ficheros o directorios vacíos que se pasan como parámetro.

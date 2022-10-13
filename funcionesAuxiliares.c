@@ -114,52 +114,69 @@ char * ConvierteModo2 (mode_t m)
 
     return permisos;
 }
-/*
-int printStat(char tokens, SStatCommand*flags) {
+
+off_t tamanoFichero(char *file) {     //Returns size of one file
+    struct stat size;
+
+    if(stat(file,&size) == -1) {
+        return -1;
+    }
+
+    return size.st_size;
+}
+
+int printStat(char *tokens, SStatCommand *flags) {
     char fecha[MAX_LENGTH];
     struct tm fechaYHora;
     char formatoFechaYHora[] = "%Y/%m/%d-%H:%M";
-    struct stat stat; // número de links, número de inodos y tamaño del archivo
+    struct stat datos; // número de links, número de inodos y tamaño del archivo
     struct passwd *usuario; // El struct passwd, contiene información del usuario
     struct group *grupo; // El struct group, contiene información del grupo
-    char *permisos = "----------"; // Los permisos si no tienen valor tienen un guion
+    char *permisos; // Los permisos si no tienen valor tienen un guion
     char linkSimbolico[MAX_LENGTH];
 
     if(!flags->longFlag) {
-        long espacio = sizeFich(&tokens);
+        long espacio = tamanoFichero(tokens);
         if(espacio == -1) {
             return -1;
         } else {
-            printf("%ld\t%s\n", espacio, &tokens);
+            printf("%ld\t%s\n", espacio, tokens);
         }
     } else {
-        (flags->accFlag)? (localtime_r(&stat.st_atime, &fechaYHora)) : (localtime_r(&stat.st_mtime, &fechaYHora));
+        (flags->accFlag)? (localtime_r(&datos.st_atime, &fechaYHora)) : (localtime_r(&datos.st_mtime, &fechaYHora));
 
-        usuario = getpwuid(stat.st_uid);
-        grupo = getgrgid(stat.st_gid);
-        permisos = ConvierteModo2(stat.st_mode);
+        if(lstat(tokens, &datos) == -1) {
+            return 1;
+        }
+
+        usuario = getpwuid(datos.st_uid);
+        grupo = getgrgid(datos.st_gid);
+        permisos = ConvierteModo2(datos.st_mode);
 
         strftime(fecha, MAX_LENGTH, formatoFechaYHora, &fechaYHora);
-        printf("%s\t%ld ( %ld)\t%s\t%s\t%s\t%ld %s", fecha,
-                                                            stat.st_nlink,
-                                                            stat.st_ino,
-                                                            usuario->pw_name,
-                                                            grupo->gr_name,
-                                                            permisos,
-                                                            stat.st_size,
-                                                            &tokens);
+        printf("%s\t%ld \t(%8ld)\t%s    \t%s    \t%s\t%ld\t\t%s", fecha,
+               datos.st_nlink,
+               datos.st_ino,
+               usuario->pw_name,
+               grupo->gr_name,
+               permisos,
+               datos.st_size,
+               tokens);
 
         // Si el flag de links simbólicos y la función readlink dan true, mostrará el link
-                                // Cuando readlink falla retorna un -1
-        if(flags->linkFlag && (readlink(&tokens, linkSimbolico, MAX_LENGTH) != -1)) {
+        // Cuando readlink falla retorna un -1
+        if(flags->linkFlag && (readlink(tokens, linkSimbolico, MAX_LENGTH) != -1)) {
             printf(" --> %s\n", linkSimbolico);
 
         } else {
             printf("\n");
 
         }
-        return 0;
+
     }
-}*/
+
+
+    return 0;
+}
 
 

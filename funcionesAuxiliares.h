@@ -19,6 +19,7 @@ int ayuda(char *tokens[], int ntokens, lista *lista);            // Muestra la a
 // Esta dos funciones pertenecen a las funciones de ayuda dadas en la página web de SO
 char LetraTF (mode_t m);
 char * ConvierteModo2 (mode_t m);
-
+off_t tamanoFichero(char *file);
+int printStat(char *tokens, SStatCommand *flags);
 
 #endif //SHELL_C_FUNCIONESAUXILIARES_H
