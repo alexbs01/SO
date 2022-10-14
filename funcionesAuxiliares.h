@@ -20,6 +20,6 @@ int ayuda(char *tokens[], int ntokens, lista *lista);            // Muestra la a
 char LetraTF (mode_t m);
 char * ConvierteModo2 (mode_t m);
 off_t tamanoFichero(char *file);
-int printStat(char *tokens, SStatCommand *flags);
+int printStatAndList(char *tokens, SStatListCommand *flags);
 
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

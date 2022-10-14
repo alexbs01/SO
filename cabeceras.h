@@ -24,16 +24,10 @@ typedef struct statCommand {
     bool longFlag;
     bool linkFlag;
     bool accFlag;
-} SStatCommand;
-
-struct listOptions{ //Opciones de listado de archivos según el comando introducido.
-    int acc;
-    int hid;
-    int link;
-    int lng;
-    int reca;
-    int recb;
-};
+    bool recaFlag;
+    bool recbFlag;
+    bool hidFlag;
+} SStatListCommand;
 
 /*
 int delete_item(char *path) {

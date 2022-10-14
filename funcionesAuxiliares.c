@@ -125,7 +125,7 @@ off_t tamanoFichero(char *file) {     //Returns size of one file
     return size.st_size;
 }
 
-int printStat(char *tokens, SStatCommand *flags) {
+int printStatAndList(char *tokens, SStatListCommand *flags) {
     char fecha[MAX_LENGTH];
     struct tm fechaYHora;
     char formatoFechaYHora[] = "%Y/%m/%d-%H:%M";
@@ -174,7 +174,6 @@ int printStat(char *tokens, SStatCommand *flags) {
         }
 
     }
-
 
     return 0;
 }

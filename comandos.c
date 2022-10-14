@@ -227,7 +227,7 @@ int create(char *tokens[], int ntokens, lista *lista) {
 }
 
 int stats(char *tokens[], int ntokens, lista *lista) {
-    SStatCommand flags = {false, false, false};
+    SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
 
     if(ntokens != 0) {
@@ -248,13 +248,55 @@ int stats(char *tokens[], int ntokens, lista *lista) {
             printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
         }
         for(int i = numberFlags - 1; i < ntokens; i++) {
-            printStat(tokens[i], &flags);
+            printStatAndList(tokens[i], &flags);
         }
 
     }
     return 0;
 }
 
+int list(char *tokens[], int ntokens, lista *lista) {
+    SStatListCommand flags = {false, false, false, false, false, false};
+    int numberFlags = 0;
+
+    if(ntokens != 0) {
+        for(int i = 0; i < ntokens; i++) {
+            if(strcmp(tokens[i], "-long") == 0) {
+                flags.longFlag = true;
+                numberFlags++;
+
+            } else if(strcmp(tokens[i], "-link") == 0) {
+                flags.linkFlag = true;
+                numberFlags++;
+
+            } else if(strcmp(tokens[i], "-acc") == 0) {
+                flags.accFlag = true;
+                numberFlags++;
+
+            } else if(strcmp(tokens[i], "-reca") == 0) {
+                flags.recaFlag = true;
+                numberFlags++;
+
+            } else if(strcmp(tokens[i], "-recb") == 0) {
+                flags.recbFlag = true;
+                numberFlags++;
+
+            } else if(strcmp(tokens[i], "-hid") == 0) {
+                flags.hidFlag = true;
+                numberFlags++;
+            }
+        }
+    }
+
+    if(flags.longFlag) {
+        printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
+    }
+    for(int i = numberFlags - 1; i < ntokens; i++) {
+        printStatAndList(tokens[i], &flags);
+    }
+
+    return 0;
+}
 
 
 //**********************************************************************************************************************
@@ -355,44 +397,11 @@ int printDirInfo(char *dir, struct listOptions *com) {  //Shows one directory's 
 
 
 */
-/*int list(char *tokens[], int ntokens, lista *lista) {
-    /*char msgError[] = "Error de lectura"; //Mensaje de error.
 
-    if (ntokens != 0) {
-
-        struct listOptions com = {0,0,0,0,0,0};
-
-        for (int cnt = 0; cnt < ntokens; cnt++) {
-            if (strcmp(tokens[cnt], "-acc") == 0)         com.acc = 1;
-            else if (strcmp(tokens[cnt], "-hid") == 0)    com.hid = 1;
-            else if (strcmp(tokens[cnt], "-link") == 0)   com.link = 1;
-            else if (strcmp(tokens[cnt], "-lng") == 0)    com.lng = 1;
-            else if (strcmp(tokens[cnt], "-reca") == 0)   com.reca = 1;
-            else if (strcmp(tokens[cnt], "-recb") == 0)   com.recb = 1;
-        }
-
-        int cnt = (com.acc + com.hid + com.link + com.lng + com.reca + com.recb);
-
-        if (cnt == ntokens) {
-            carpeta(0,0,lista); //si no existe parametro a listar
-        }
-
-        while (cnt < ntokens) {
-            if (printDirInfo(tokens[cnt], &com) == (-1)) {
-                perror(msgError); // Mostramos mensaje de error.
-            }
-            cnt++;
-        }
-    } else {
-        carpeta(0,0,lista); // Muestra el directorio actual.
-    }
-
-    return 0;
-}*/
 
 
 /*#include <dirent.h>  se necesita si queremos recuperar este list*/
-int list(char *tokens[], int ntokens, lista *lista) {/*
+/*int list(char *tokens[], int ntokens, lista *lista) {/*
     char path[MAX_LENGTH]; // Creamos un array de caracteres para guardar la dirección del directorio a saber
     struct stat sb;
 
@@ -423,9 +432,9 @@ int list(char *tokens[], int ntokens, lista *lista) {/*
         }
         closedir(d);
     }
-*/
+
     return 0;
-}
+}*/
 
 int delete(char *tokens[], int ntokens, lista *lista) {
 
