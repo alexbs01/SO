@@ -1,3 +1,9 @@
+/*
+    Login: a.becerra
+    Login: adrian.rego
+    Nombre: Alejandro Becerra Suarez
+    Nombre: Adrián Rego Criado
+*/
 #ifndef SHELL_C_COMANDOS_H
 #define SHELL_C_COMANDOS_H
 

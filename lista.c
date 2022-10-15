@@ -1,3 +1,9 @@
+/*
+    Login: a.becerra
+    Login: adrian.rego
+    Nombre: Alejandro Becerra Suarez
+    Nombre: Adrián Rego Criado
+*/
 #include <stdlib.h>
 
 struct node{
