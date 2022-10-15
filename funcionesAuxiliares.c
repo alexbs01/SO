@@ -145,7 +145,7 @@ int printStatAndList(char *tokens, SStatListCommand *flags) {
     } else {
         (flags->accFlag)? (localtime_r(&datos.st_atime, &fechaYHora)) : (localtime_r(&datos.st_mtime, &fechaYHora));
 
-        if(lstat(tokens, &datos) == -1) {
+        if(lstat(tokens, &datos) == -1) { // Carga en datos la información del archivo
             return 1;
         }
 
@@ -172,6 +172,8 @@ int printStatAndList(char *tokens, SStatListCommand *flags) {
             printf("\n");
 
         }
+
+
 
     }
 

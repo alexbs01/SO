@@ -258,6 +258,7 @@ int stats(char *tokens[], int ntokens, lista *lista) {
 int list(char *tokens[], int ntokens, lista *lista) {
     SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
+    struct stat st;
 
     if(ntokens != 0) {
         for(int i = 0; i < ntokens; i++) {
@@ -291,8 +292,39 @@ int list(char *tokens[], int ntokens, lista *lista) {
     if(flags.longFlag) {
         printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
     }
+
+
     for(int i = numberFlags - 1; i < ntokens; i++) {
-        printStatAndList(tokens[i], &flags);
+       //strcat(tokens[i], "/");
+
+        lstat(tokens[i], &st);
+
+        if(st.st_mode & S_IFMT) {
+            DIR *d;
+            struct dirent *ent;
+
+            if((d = opendir(tokens[i])) == NULL) {
+                printf("Could not open %s: %s\n", tokens[i], strerror(errno));
+                return 0;
+            }
+
+            printf("*** %s\n", tokens[i]);
+            ent = readdir(d);
+            printf("%d", ent != 0);
+            while((ent = readdir(d)) != NULL) {
+                // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
+                if(!flags.hidFlag && (ent->d_name[0] == '.')) {
+                    continue;
+                } else {
+                    printStatAndList(ent->d_name, &flags);
+                }
+
+                //printf("%s\n", ent->d_name);
+
+            }
+            closedir(d);
+        }
+
     }
 
     return 0;
