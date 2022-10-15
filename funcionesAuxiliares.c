@@ -172,9 +172,6 @@ int printStatAndList(char *tokens, SStatListCommand *flags) {
             printf("\n");
 
         }
-
-
-
     }
 
     return 0;

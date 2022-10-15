@@ -155,7 +155,7 @@ int comando(char *tokens[], int ntokens, lista *lista) {
             processInput(tokensHist, numeroTokens, lista); // Con el comando encontrado, los procesamos para ejecutarlo
 
         } else {
-            printf("Se debe insertar un número mayor a 0 como parámetro");
+            printf("Se debe insertar un número precedido de una guión y que exista dentro del historial");
         }
     } else {
         printf("El comando \"comando\" debe llevar una parámetro del tipo -N, donde N es un número\n"
@@ -247,6 +247,7 @@ int stats(char *tokens[], int ntokens, lista *lista) {
         if(flags.longFlag) {
             printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
         }
+
         for(int i = numberFlags - 1; i < ntokens; i++) {
             printStatAndList(tokens[i], &flags);
         }
@@ -259,6 +260,7 @@ int list(char *tokens[], int ntokens, lista *lista) {
     SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
     struct stat st;
+    char previousDirectory[MAX_LENGTH], directory[MAX_LENGTH];
 
     if(ntokens != 0) {
         for(int i = 0; i < ntokens; i++) {
@@ -293,37 +295,40 @@ int list(char *tokens[], int ntokens, lista *lista) {
         printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
     }
 
+    for(int i = 0 + numberFlags; i < ntokens; i++) {
+        getcwd(previousDirectory, sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
+        chdir(tokens[i]);                           // Nos cambiamos de directorio
+        getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
 
-    for(int i = numberFlags - 1; i < ntokens; i++) {
-       //strcat(tokens[i], "/");
-
-        lstat(tokens[i], &st);
+        lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
 
         if(st.st_mode & S_IFMT) {
-            DIR *d;
-            struct dirent *ent;
+            DIR *direct;
+            struct dirent *entrada;
 
-            if((d = opendir(tokens[i])) == NULL) {
+           if((direct = opendir(directory)) == NULL) {
                 printf("Could not open %s: %s\n", tokens[i], strerror(errno));
-                return 0;
+                return -1;
+            } else {
+                printf("\n*** %s\n", tokens[i]);
             }
 
-            printf("*** %s\n", tokens[i]);
-            ent = readdir(d);
-            printf("%d", ent != 0);
-            while((ent = readdir(d)) != NULL) {
+            entrada = readdir(direct); // Guarda los datos del directorio direct en entradad
+            printf("%d", entrada != 0);
+             do {
                 // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
-                if(!flags.hidFlag && (ent->d_name[0] == '.')) {
+                if(!flags.hidFlag && (entrada->d_name[0] == '.')) {
                     continue;
                 } else {
-                    printStatAndList(ent->d_name, &flags);
+                    printStatAndList(entrada->d_name, &flags);
                 }
 
-                //printf("%s\n", ent->d_name);
-
-            }
-            closedir(d);
+            } while((entrada = readdir(direct)) != NULL);
+            closedir(direct);
         }
+
+        chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+
 
     }
 
