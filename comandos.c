@@ -258,7 +258,11 @@ int stats(char *tokens[], int ntokens, lista *lista) {
             printStatAndList(tokens[i], &flags);
         }
 
+    } else {
+        carpeta(NULL, 0, NULL); // Si solo se pone stat sin ningún parámetro, muestra el directorio actual
+
     }
+
     return 0;
 }
 
@@ -295,48 +299,53 @@ int list(char *tokens[], int ntokens, lista *lista) {
                 numberFlags++;
             }
         }
-    }
 
-    if(flags.longFlag) {
-        printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
-    }
-
-    for(int i = 0 + numberFlags; i < ntokens; i++) {
-        getcwd(previousDirectory, sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
-        chdir(tokens[i]);                           // Nos cambiamos de directorio
-        getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
-
-        lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
-
-        if(st.st_mode & S_IFMT) {
-            DIR *direct;
-            struct dirent *entrada;
-
-           if((direct = opendir(directory)) == NULL) {
-                printf("Could not open %s: %s\n", tokens[i], strerror(errno));
-                return -1;
-            } else {
-                printf("\n*** %s\n", tokens[i]);
-            }
-
-            entrada = readdir(direct); // Guarda los datos del directorio direct en entradad
-            printf("%d", entrada != 0);
-             do {
-                // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
-                if(!flags.hidFlag && (entrada->d_name[0] == '.')) {
-                    continue;
-                } else {
-                    printStatAndList(entrada->d_name, &flags);
-                }
-
-            } while((entrada = readdir(direct)) != NULL);
-            closedir(direct);
+        // Imprime del formato largo si se escribe el parámetro correspondiente
+        if(flags.longFlag) {
+            printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
         }
 
-        chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+        for(int i = 0 + numberFlags; i < ntokens; i++) {
+            getcwd(previousDirectory, sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
+            chdir(tokens[i]);                           // Nos cambiamos de directorio
+            getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
 
+            lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
 
+            if(st.st_mode & S_IFMT) { // Comprueba que la ruta exista
+                DIR *direct; // Tipo de variable para directorios
+                struct dirent *entrada;
+
+                if((direct = opendir(directory)) == NULL) {
+                    printf("Could not open %s: %s\n", tokens[i], strerror(errno));
+                    return -1;
+                } else {
+                    printf("\n*** %s\n", tokens[i]);
+                }
+
+                entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
+                //printf("%d", entrada != 0);
+                do {
+                    // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
+                    if(!flags.hidFlag && (entrada->d_name[0] == '.')) {
+                        continue;
+                    } else {
+                        printStatAndList(entrada->d_name, &flags);
+                    }
+
+                } while((entrada = readdir(direct)) != NULL);
+                closedir(direct); // Cierra el directorio una vez se enseñó su contenido
+
+            }
+
+            chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+
+        }
+    } else {
+        carpeta(NULL, 0, NULL); // Si solo se pone list sin ningún parámetro, muestra el directorio actual
     }
+
+
 
     return 0;
 }

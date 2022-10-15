@@ -24,6 +24,9 @@ int main() {
         printf("\n> "); // Imprime el prompt
 
         fgets(input, MAX_INPUT_SIZE, stdin); // Recoge la línea que escribimos
+        if(input[0] == '\n') {
+            continue;
+        }
         duplicateInput = strdup(input);
         insert(&historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
 

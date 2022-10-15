@@ -27,5 +27,6 @@ char LetraTF (mode_t m);
 char * ConvierteModo2 (mode_t m);
 off_t tamanoFichero(char *file);
 int printStatAndList(char *tokens, SStatListCommand *flags);
-
+int isDirectory(char *tokens);
+int recAyB(char *tokens, SStatListCommand *flags);
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

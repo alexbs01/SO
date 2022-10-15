@@ -183,4 +183,26 @@ int printStatAndList(char *tokens, SStatListCommand *flags) {
     return 0;
 }
 
+int isDirectory(char *tokens) {
+    struct stat st;
+    stat(tokens, &st);
+
+    int isDirectory = S_ISDIR(st.st_mode);
+    return isDirectory;
+}
+
+int recAyB(char *tokens, SStatListCommand *flags) {
+    if(flags->recaFlag) {
+        printStatAndList(tokens, flags);
+        if(isDirectory(tokens)) {
+            recAyB(tokens, flags);
+        }
+    }
+
+    return 0;
+}
+
+
+
+
 
