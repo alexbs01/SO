@@ -11,7 +11,7 @@ lista.o: lista.c lista.h
 funcionesAuxiliares.o: funcionesAuxiliares.c funcionesAuxiliares.h cabeceras.h
 	gcc -c funcionesAuxiliares.c
 
-p1.o: $(EXECUTABLE).c lista.h funcionesAuxiliares.h
+$(EXECUTABLE).o: $(EXECUTABLE).c lista.h funcionesAuxiliares.h
 	gcc -c $(EXECUTABLE).c
 
 main: $(EXECUTABLE).o lista.o funcionesAuxiliares.o comandos.o cabeceras.h
