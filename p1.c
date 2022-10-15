@@ -24,9 +24,11 @@ int main() {
         printf("\n> "); // Imprime el prompt
 
         fgets(input, MAX_INPUT_SIZE, stdin); // Recoge la línea que escribimos
-        if(input[0] == '\n') {
+
+        if(input[0] == '\n') { // Evita que si no se introduce nada por el terminal, se corte la ejecución del programa
             continue;
         }
+
         duplicateInput = strdup(input);
         insert(&historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
 
@@ -43,3 +45,4 @@ int main() {
     free(duplicateInput);
     return 0;
 }
+

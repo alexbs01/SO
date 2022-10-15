@@ -6,10 +6,7 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
-#include "funcionesAuxiliares.h"
 #include "comandos.h"
-#include "cabeceras.h"
-#include "lista.h"
 
 int autores(char *tokens[], int ntokens, lista *lista) {
     if(ntokens == 1) {                                          // Miramos si autores viene acompañado de [-l] o [-n]
@@ -349,7 +346,6 @@ int list(char *tokens[], int ntokens, lista *lista) {
 
     return 0;
 }
-
 
 //**********************************************************************************************************************
 /*

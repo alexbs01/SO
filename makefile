@@ -1,21 +1,23 @@
+EXECUTABLE = p1
+
 all:main
 
-lista.o: lista.c lista.h cabeceras.h
+comandos.o: comandos.c comandos.h cabeceras.h
+	gcc -c comandos.c
+
+lista.o: lista.c lista.h
 	gcc -c lista.c
 
 funcionesAuxiliares.o: funcionesAuxiliares.c funcionesAuxiliares.h cabeceras.h
 	gcc -c funcionesAuxiliares.c
 
-comandos.o: comandos.c comandos.h cabeceras.h
-	gcc -c comandos.c
+p1.o: $(EXECUTABLE).c lista.h funcionesAuxiliares.h
+	gcc -c $(EXECUTABLE).c
 
-main.o: main.c lista.h funcionesAuxiliares.h cabeceras.h
-	gcc -c main.c
-
-main: main.o lista.o funcionesAuxiliares.o comandos.c cabeceras.h
-	gcc -o p0 main.o lista.o funcionesAuxiliares.o comandos.c
+main: $(EXECUTABLE).o lista.o funcionesAuxiliares.o comandos.o cabeceras.h
+	gcc -o $(EXECUTABLE) $(EXECUTABLE).o lista.o funcionesAuxiliares.o comandos.o
 
 clean:
-	rm -f shell.o list.o shell
+	rm -f lista.o funcionesAuxiliares.o comandos.o $(EXECUTABLE).o $(EXECUTABLE)
 
 

@@ -7,17 +7,18 @@
 #ifndef SHELL_C_COMANDOS_H
 #define SHELL_C_COMANDOS_H
 
-
+#include "funcionesAuxiliares.h"
 #include "cabeceras.h"
 #include <libgen.h> // Para el comando <list>
 #include <grp.h>    // Para el comando <list>
 #include <pwd.h>    // Para el comando <list>
 
+#include "cabeceras.h"
+#include "lista.h"
+
 #define MAX_LENGTH 255
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64
-
-
 
 int autores(char *tokens[], int ntokens, lista *lista);  // Imprime los nombres, los login o ambas.
 int pid(char *tokens[], int ntokens, lista *lista);      // Muestra el pid o el pid padre.
