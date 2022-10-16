@@ -494,6 +494,7 @@ int delete(char *tokens[], int ntokens, lista *lista) {
                 printf("Archivo %s eliminado\n", tokens[i]);
             } else {
                 perror(error);
+                return -1;
             }
             i++;
         } while(i < ntokens);
@@ -505,6 +506,8 @@ int delete(char *tokens[], int ntokens, lista *lista) {
 
 int deltree(char *tokens[], int ntokens, lista *lista) {
 
-    delete_item(tokens[0]);
+    for(int i = 0; i < ntokens; i++) {
+        delete_item(tokens[i]);
+    }
     return 0;
 }

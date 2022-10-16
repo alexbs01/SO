@@ -204,48 +204,47 @@ int recAyB(char *tokens, SStatListCommand *flags) {
 
 int delete_item(char *path) {
     struct stat st;
+    char *new_path;
 
     if(lstat(path, &st) == -1) {
         printf("Could not delete %s: %s\n", path, strerror(errno));
     }
 
-    if(st.st_mode & S_IFMT) {
+    //if(st.st_mode & S_IFMT) {
         DIR *d;
         struct dirent *ent;
 
         if((d = opendir(path)) == NULL) {
             printf("Could not open %s: %s\n", path, strerror(errno));
+            remove(path);
             return 0;
         }
 
         while((ent = readdir(d)) != NULL) {
-            char new_path[MAX_LENGTH];
-            strcpy(new_path, "");
-
             if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
                 continue;
             }
 
-            strcat(new_path, path);
-            strcat(new_path, "/");
-            strcat(new_path, ent->d_name);
-            //sprintf(new_path, "%s/%s\n", path, ent -> d_name);
-            if(remove(path) == -1) {
-                printf("Could not delete %s: %s\n", path, strerror(errno));
-            } else {
-                printf("%s borrado\n", new_path);
+            sprintf(new_path, "%s/%s", path, ent->d_name);
+            if(strcmp(&new_path[strlen(new_path) - 1], "\n") == 0) {
+                new_path[strlen(new_path) - 1] = '\n';
             }
 
-            delete_item(new_path);
+            if(remove(new_path) == -1) {
+                printf("Could not delete %s: %s\n", path, strerror(errno));
+                delete_item(new_path);
+
+            } else {
+                printf("Borrar %s\n", new_path);
+            }
+
 
         }
         closedir(d);
-    }
+    //}
 
-    //if(remove(path) == -1) {
-    //   printf("Could not delete %s: %s\n", path, strerror(errno));
-    // }
-
-    printf("Borrar %s\n", path);
+    /*if(remove(path) == -1) {
+       printf("Could not delete %s: %s\n", path, strerror(errno));
+    }*/
     return 0;
 }
