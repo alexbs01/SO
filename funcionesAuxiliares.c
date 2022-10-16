@@ -201,3 +201,51 @@ int recAyB(char *tokens, SStatListCommand *flags) {
 
     return 0;
 }
+
+int delete_item(char *path) {
+    struct stat st;
+
+    if(lstat(path, &st) == -1) {
+        printf("Could not delete %s: %s\n", path, strerror(errno));
+    }
+
+    if(st.st_mode & S_IFMT) {
+        DIR *d;
+        struct dirent *ent;
+
+        if((d = opendir(path)) == NULL) {
+            printf("Could not open %s: %s\n", path, strerror(errno));
+            return 0;
+        }
+
+        while((ent = readdir(d)) != NULL) {
+            char new_path[MAX_LENGTH];
+            strcpy(new_path, "");
+
+            if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+                continue;
+            }
+
+            strcat(new_path, path);
+            strcat(new_path, "/");
+            strcat(new_path, ent->d_name);
+            //sprintf(new_path, "%s/%s\n", path, ent -> d_name);
+            if(remove(path) == -1) {
+                printf("Could not delete %s: %s\n", path, strerror(errno));
+            } else {
+                printf("%s borrado\n", new_path);
+            }
+
+            delete_item(new_path);
+
+        }
+        closedir(d);
+    }
+
+    //if(remove(path) == -1) {
+    //   printf("Could not delete %s: %s\n", path, strerror(errno));
+    // }
+
+    printf("Borrar %s\n", path);
+    return 0;
+}

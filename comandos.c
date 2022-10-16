@@ -485,11 +485,26 @@ int printDirInfo(char *dir, struct listOptions *com) {  //Shows one directory's 
 }*/
 
 int delete(char *tokens[], int ntokens, lista *lista) {
+    char error[] = "No se pudo borrar el fichero";
+    int i = 0;
 
+    if(ntokens != 0) {
+        do {
+            if(remove(tokens[i]) == 0) {
+                printf("Archivo %s eliminado\n", tokens[i]);
+            } else {
+                perror(error);
+            }
+            i++;
+        } while(i < ntokens);
+    } else {
+        carpeta(NULL, 0, NULL);
+    }
     return 0;
 }
 
 int deltree(char *tokens[], int ntokens, lista *lista) {
 
+    delete_item(tokens[0]);
     return 0;
 }
