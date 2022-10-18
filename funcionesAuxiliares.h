@@ -30,4 +30,5 @@ int printStatAndList(char *tokens, SStatListCommand *flags);
 int isDirectory(char *tokens);
 int recAyB(char *tokens, SStatListCommand *flags);
 int delete_item(char *path);
+//void list_item(int numberFlags, SStatListCommand flags)
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

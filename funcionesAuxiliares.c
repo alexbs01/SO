@@ -193,58 +193,46 @@ int isDirectory(char *tokens) {
 
 int recAyB(char *tokens, SStatListCommand *flags) {
     if(flags->recaFlag) {
-        printStatAndList(tokens, flags);
-        if(isDirectory(tokens)) {
-            recAyB(tokens, flags);
-        }
+        recAyB(tokens, flags);
+    }
+
+    printStatAndList(tokens, flags);
+
+    if(flags->recbFlag) {
+        recAyB(tokens, flags);
     }
 
     return 0;
 }
 
 int delete_item(char *path) {
-    struct stat st;
-    char *new_path;
+    char new_path[MAX_LENGTH];
+    DIR *d;
+    struct dirent *ent;
 
-    if(lstat(path, &st) == -1) {
-        printf("Could not delete %s: %s\n", path, strerror(errno));
+    if((d = opendir(path)) == NULL) {
+        return -1;
     }
 
-    //if(st.st_mode & S_IFMT) {
-        DIR *d;
-        struct dirent *ent;
+    while((ent = readdir(d)) != NULL) {
 
-        if((d = opendir(path)) == NULL) {
-            printf("Could not open %s: %s\n", path, strerror(errno));
-            remove(path);
-            return 0;
+        strcpy(new_path, path);
+        strcat(strcat(new_path, "/"),ent->d_name);
+
+        if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+            continue;
         }
 
-        while((ent = readdir(d)) != NULL) {
-            if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
-                continue;
-            }
-
-            sprintf(new_path, "%s/%s", path, ent->d_name);
-            if(strcmp(&new_path[strlen(new_path) - 1], "\n") == 0) {
-                new_path[strlen(new_path) - 1] = '\n';
-            }
-
-            if(remove(new_path) == -1) {
-                printf("Could not delete %s: %s\n", path, strerror(errno));
-                delete_item(new_path);
-
-            } else {
-                printf("Borrar %s\n", new_path);
-            }
-
-
+        if(isDirectory(new_path)) {
+            delete_item(new_path);
         }
-        closedir(d);
-    //}
 
-    /*if(remove(path) == -1) {
-       printf("Could not delete %s: %s\n", path, strerror(errno));
-    }*/
+        if(remove(new_path)) {
+            return -1;
+        }
+
+    }
+    closedir(d);
+
     return 0;
 }
