@@ -131,7 +131,7 @@ off_t tamanoFichero(char *file) {     //Returns size of one file
     return size.st_size;
 }
 
-int printStatAndList(char *tokens, SStatListCommand *flags) {
+int printStatAndList(char *tokens, SStatListCommand flags) {
     char fecha[MAX_LENGTH];
     struct tm fechaYHora;
     char formatoFechaYHora[] = "%Y/%m/%d-%H:%M";
@@ -140,16 +140,17 @@ int printStatAndList(char *tokens, SStatListCommand *flags) {
     struct group *grupo; // El struct group, contiene información del grupo
     char *permisos; // Los permisos si no tienen valor tienen un guion
     char linkSimbolico[MAX_LENGTH];
+    long espacio = tamanoFichero(tokens);
 
-    if(!flags->longFlag) {
-        long espacio = tamanoFichero(tokens);
+    if(!flags.longFlag) {
         if(espacio == -1) {
             return -1;
-        } else {
-            printf("%ld\t%s\n", espacio, tokens);
         }
+
+        printf("%ld\t%s\n", espacio, tokens);
+
     } else {
-        (flags->accFlag)? (localtime_r(&datos.st_atime, &fechaYHora)) : (localtime_r(&datos.st_mtime, &fechaYHora));
+        (flags.accFlag)? (localtime_r(&datos.st_atime, &fechaYHora)) : (localtime_r(&datos.st_mtime, &fechaYHora));
 
         if(lstat(tokens, &datos) == -1) { // Carga en datos la información del archivo
             return 1;
@@ -171,14 +172,17 @@ int printStatAndList(char *tokens, SStatListCommand *flags) {
 
         // Si el flag de links simbólicos y la función readlink dan true, mostrará el link
         // Cuando readlink falla retorna un -1
-        if(flags->linkFlag && (readlink(tokens, linkSimbolico, MAX_LENGTH) != -1)) {
+        if(flags.linkFlag && (readlink(tokens, linkSimbolico, MAX_LENGTH) != -1)) {
             printf(" --> %s\n", linkSimbolico);
 
         } else {
             printf("\n");
 
         }
+
+
     }
+
 
     return 0;
 }
@@ -191,48 +195,33 @@ int isDirectory(char *tokens) {
     return isDirectory;
 }
 
-int recAyB(char *tokens, SStatListCommand *flags) {
-    if(flags->recaFlag) {
-        recAyB(tokens, flags);
-    }
-
-    printStatAndList(tokens, flags);
-
-    if(flags->recbFlag) {
-        recAyB(tokens, flags);
-    }
-
-    return 0;
-}
-
 int delete_item(char *path) {
-    char new_path[MAX_LENGTH];
-    DIR *d;
-    struct dirent *ent;
+    char nuevaRuta[MAX_LENGTH];
+    DIR *directorio;
+    struct dirent *entrada;
 
-    if((d = opendir(path)) == NULL) {
+    if((directorio = opendir(path)) == NULL) {
         return -1;
     }
 
-    while((ent = readdir(d)) != NULL) {
+    while((entrada = readdir(directorio)) != NULL) {
+        strcpy(nuevaRuta, path);
+        strcat(strcat(nuevaRuta, "/"),entrada->d_name);
 
-        strcpy(new_path, path);
-        strcat(strcat(new_path, "/"),ent->d_name);
-
-        if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+        if(strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
             continue;
         }
 
-        if(isDirectory(new_path)) {
-            delete_item(new_path);
+        if(isDirectory(nuevaRuta)) {
+            delete_item(nuevaRuta);
         }
 
-        if(remove(new_path)) {
+        if(remove(nuevaRuta)) {
             return -1;
         }
 
     }
-    closedir(d);
+    closedir(directorio);
 
     return 0;
 }

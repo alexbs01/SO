@@ -40,7 +40,8 @@ int main() {
             insert(&historial, NULL);
         }
 
-        }
+    }
+
     deleteList(&historial); // Liberamos la memoria dinámica
     free(duplicateInput);
     return 0;
