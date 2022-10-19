@@ -225,3 +225,77 @@ int delete_item(char *path) {
 
     return 0;
 }
+
+int recAyB(char *path, SStatListCommand flags) {
+    /*struct stat st;
+
+    if(lstat(path, &st) == -1) {
+       // printf("Could not access %s: %s\n", path, strerror(errno));
+        return 0;
+    }*/
+
+    //if((st.st_mode & S_IFMT) == S_IFDIR) { // path es un directorio
+        /*DIR *d;
+        struct dirent *ent;
+        char *new_path;
+        d = opendir(path);
+        /*if(() == NULL) {
+            printf("Could not open %s: %s\n", path, strerror(errno));
+            return 0;
+        }*/
+
+       /* while((ent = readdir(d)) != NULL) {
+
+            if(strcmp(ent->d_name, ".") == 0 || strcmp(ent->d_name, "..") == 0) {
+                continue;
+            }
+
+            if(flags.recbFlag) {
+                recAyB(new_path, flags);
+            }
+
+            sprintf(new_path, "%s/%s", path, ent->d_name);
+
+            printStatAndList(path, flags);
+            if(flags.recaFlag) {
+                recAyB(new_path, flags);
+            }
+        }
+
+        closedir(d);*/
+    //}
+    char nuevaRuta[MAX_LENGTH];
+    DIR *directorio;
+    struct dirent *entrada;
+
+    if((directorio = opendir(path)) == NULL) {
+        return -1;
+    }
+
+    printf("*** %s\n", path);
+
+    while((entrada = readdir(directorio)) != NULL) {
+
+        strcpy(nuevaRuta, path);
+        strcat(strcat(nuevaRuta, "/"),entrada->d_name);
+
+        if(strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
+            continue;
+        }
+
+        if(flags.recbFlag) {
+            recAyB(nuevaRuta, flags);
+        }
+
+        printStatAndList(nuevaRuta, flags);
+
+        if(flags.recaFlag) {
+            recAyB(nuevaRuta, flags);
+        }
+    }
+
+
+    closedir(directorio);
+
+    return 0;
+}

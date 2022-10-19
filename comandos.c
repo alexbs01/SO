@@ -274,7 +274,7 @@ int list(char *tokens[], int ntokens, lista *lista) {
 
     if(ntokens != 0) {
         for (int i = 0; i < ntokens; i++) {
-            if (strcmp(tokens[i], "-long") == 0) {
+            if(strcmp(tokens[i], "-long") == 0) {
                 flags.longFlag = true;
                 numberFlags++;
 
@@ -305,38 +305,73 @@ int list(char *tokens[], int ntokens, lista *lista) {
             printf("   Date\t\tNº of hardlinks\t  Inodes    \tUser ID   \tGroup ID\tPermissions\tTotal size\tFile\n");
         }
 
-        for(int i = 0 + numberFlags; i < ntokens; i++) {
-            getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
-            chdir(tokens[i]);                           // Nos cambiamos de directorio
-            getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
+        if(!(flags.recaFlag || flags.recbFlag)) {
+            for(int i = 0 + numberFlags; i < ntokens; i++) {
+                getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
+                chdir(tokens[i]);                           // Nos cambiamos de directorio
+                getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
 
-            lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
+                lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
 
-            if((direct = opendir(directory)) == NULL) {
-                printf("Could not open %s: %s\n", tokens[i], strerror(errno));
-                return -1;
-            } else {
-                printf("\n*** %s\n", tokens[i]);
+                if((direct = opendir(directory)) == NULL) {
+                    printf("Could not open %s: %s\n", tokens[i], strerror(errno));
+                    return -1;
+                } else {
+                    printf("\n*** %s\n", tokens[i]);
 
-                entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
+                    entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
 
-                do {
-                    // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
-                    if (!flags.hidFlag && (entrada->d_name[0] == '.')) {
-                        continue;
-                    } else {
-                        printStatAndList(entrada->d_name, flags);
-                    }
+                    do {
+                        // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
+                        if (!flags.hidFlag && (entrada->d_name[0] == '.')) {
+                            continue;
+                        } else {
+                            printStatAndList(entrada->d_name, flags);
+                        }
 
-                } while ((entrada = readdir(direct)) != NULL);
+                    } while ((entrada = readdir(direct)) != NULL);
 
-                closedir(direct); // Cierra el directorio una vez se enseñó su contenido
+                    closedir(direct); // Cierra el directorio una vez se enseñó su contenido
+                }
+
+                chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+
             }
+        } else {
+            for(int i = 0 + numberFlags; i < ntokens; i++) {
+                getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
+                chdir(tokens[i]);                           // Nos cambiamos de directorio
+                getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
 
+                lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
 
-            chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+                if((direct = opendir(directory)) == NULL) {
+                    printf("Could not open %s: %s\n", tokens[i], strerror(errno));
+                    return 0;
+                } else {
+                    printf("\n*** %s\n", tokens[i]);
 
+                    entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
+
+                    do {
+                        // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
+                        if (!flags.hidFlag && (entrada->d_name[0] == '.')) {
+                            continue;
+                        } else {
+                            //printStatAndList(entrada->d_name, flags);
+                            recAyB(entrada->d_name, flags);
+                        }
+
+                    } while ((entrada = readdir(direct)) != NULL);
+
+                    closedir(direct); // Cierra el directorio una vez se enseñó su contenido
+                }
+
+                chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+
+            }
         }
+
     } else {
         carpeta(NULL, 0, NULL); // Si solo se pone list sin ningún parámetro, muestra el directorio actual
     }
@@ -386,4 +421,6 @@ int deltree(char *tokens[], int ntokens, lista *lista) {
 
     return 0;
 }
+
+
 
