@@ -267,7 +267,7 @@ int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
     char previousDirectory[MAX_LENGTH], directory[MAX_LENGTH];
     DIR *direct; // Tipo de variable para directorios
     struct dirent *entrada;
-    int numberFlags = flags.hidFlag + flags.recbFlag + flags.recaFlag;
+    int numberFlags = flags.hidFlag + flags.recbFlag + flags.recaFlag + flags.longFlag + flags.accFlag + flags.linkFlag;
 
     for(int i = 0 + numberFlags; i < ntokens; i++) {
         getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
