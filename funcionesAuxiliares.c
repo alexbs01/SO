@@ -257,8 +257,47 @@ int recAyB(char *path, SStatListCommand flags) {
         }
     }
 
-
     closedir(directorio);
 
+    return 0;
+}
+
+int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
+    //struct stat st;
+    char previousDirectory[MAX_LENGTH], directory[MAX_LENGTH];
+    DIR *direct; // Tipo de variable para directorios
+    struct dirent *entrada;
+    int numberFlags = flags.hidFlag + flags.recbFlag + flags.recaFlag;
+
+    for(int i = 0 + numberFlags; i < ntokens; i++) {
+        getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
+        chdir(&tokens[i]);                           // Nos cambiamos de directorio
+        getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
+
+        //lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
+
+        if((direct = opendir(directory)) == NULL) {
+            printf("Could not open %s: %s\n", &tokens[i], strerror(errno));
+            return -1;
+        } else {
+            printf("\n*** %s\n", &tokens[i]);
+
+            entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
+
+            do {
+                // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
+                if (!flags.hidFlag && (entrada->d_name[0] == '.')) {
+                    continue;
+                } else {
+                    printStatAndList(entrada->d_name, flags);
+                }
+
+            } while ((entrada = readdir(direct)) != NULL);
+
+            closedir(direct); // Cierra el directorio una vez se enseñó su contenido
+        }
+
+        chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+    }
     return 0;
 }
