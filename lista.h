@@ -7,9 +7,10 @@
 #ifndef SHELL_C_lista_H
 #define SHELL_C_lista_H
 
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdbool.h>
+#include "cabeceras.h"
+//#include <stdlib.h>
+//#include <stdio.h>
+//#include <stdbool.h>
 
 typedef struct node *lista;
 typedef struct node *pos;
@@ -25,5 +26,6 @@ int elementsNumber(lista L);         // Cuenta cuantos elementos hay en la lista
 void deleteList(lista *L);           // Elimina la lista entera, incluyendo la cabecera
 //pos prev(lista L,pos p);           // Retorna el elemento previo al indicado
 bool isEmptyList(lista L);           // Comprueba si una lista está vacía o no
+void recorrerDe0aN(lista L);
 
 #endif //SHELL_C_lista_H

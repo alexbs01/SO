@@ -7,6 +7,18 @@
 #ifndef SHELL_CABECERAS_H
 #define SHELL_CABECERAS_H
 
+
+#include <stdbool.h>
+typedef struct statCommand {
+    bool longFlag;
+    bool linkFlag;
+    bool accFlag;
+    bool recaFlag;
+    bool recbFlag;
+    bool hidFlag;
+} SStatListCommand;
+#include "lista.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -16,8 +28,9 @@
 #include <sys/utsname.h> // Utilizada por la función infosis
 #include <sys/stat.h>
 #include <dirent.h>
-#include "funcionesAuxiliares.h"
-#include "lista.h"
+//#include "funcionesAuxiliares.h"
+
+#include "comandos.h"
 
 #define MAX_LENGTH 255
 #define MAX_PATH 255
@@ -26,14 +39,7 @@ struct histData{ // Para obtener los commandos del historial
     char command[MAX_LENGTH];
 };
 
-typedef struct statCommand {
-    bool longFlag;
-    bool linkFlag;
-    bool accFlag;
-    bool recaFlag;
-    bool recbFlag;
-    bool hidFlag;
-} SStatListCommand;
+
 
 /*
 int delete_item(char *path) {

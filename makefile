@@ -2,14 +2,14 @@ EXECUTABLE = p1
 
 all:main
 
+funcionesAuxiliares.o: funcionesAuxiliares.c funcionesAuxiliares.h cabeceras.h
+	gcc -c funcionesAuxiliares.c
+
 comandos.o: comandos.c comandos.h cabeceras.h
 	gcc -c comandos.c
 
-lista.o: lista.c lista.h
+lista.o: lista.c lista.h cabeceras.h
 	gcc -c lista.c
-
-funcionesAuxiliares.o: funcionesAuxiliares.c funcionesAuxiliares.h cabeceras.h
-	gcc -c funcionesAuxiliares.c
 
 $(EXECUTABLE).o: $(EXECUTABLE).c lista.h funcionesAuxiliares.h
 	gcc -c $(EXECUTABLE).c

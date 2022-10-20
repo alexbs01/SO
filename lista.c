@@ -4,7 +4,8 @@
     Nombre: Alejandro Becerra Suarez
     Nombre: Adrián Rego Criado
 */
-#include <stdlib.h>
+#include "cabeceras.h"
+//#include <stdlib.h>
 
 struct node{
     void *data;
@@ -84,5 +85,14 @@ void deleteList(lista *L) {
         p = *L;
         *L = (*L)->next;
         free(p);
+    }
+}
+
+void recorrerDe0aN(lista L) {
+    int contador = 0;
+    for(pos p = first(L); contador != elementsNumber(L); p = next(L, p)) {
+        struct histData *path = get(L, p);
+        printf("### %s\n", path->command); // Mostramos los N primeros comandos
+        contador++;
     }
 }

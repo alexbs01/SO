@@ -4,9 +4,10 @@
     Nombre: Alejandro Becerra Suarez
     Nombre: Adrián Rego Criado
 */
-#include <stdio.h>
-#include "funcionesAuxiliares.h"
-#include "lista.h"
+#include "cabeceras.h"
+//#include <stdio.h>
+//#include "funcionesAuxiliares.h"
+//#include "lista.h"
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64

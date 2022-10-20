@@ -25,7 +25,7 @@ int splitString(char *cadena, char *trozos[]) {
 
 struct cmd {
     char *cmdName; // Nombre con el que llamamos a una función
-    int (*cmdFunction)(char *tokens[], int ntokens, lista *lista); // Nombre de la función y sus parámetros
+    int (*cmdFunction)(char *tokens[], int ntokens, lista *listas); // Nombre de la función y sus parámetros
     char *ayudaCmd[MAX_LENGTH]; // Almacena el mensaje de ayuda de cada comando
 };
 
@@ -298,6 +298,51 @@ int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
         }
 
         chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+    }
+    return 0;
+}
+
+lista listaArbolCarpetas(lista *L, char *path, SStatListCommand flags) {
+    struct stat st;
+    char nuevaRuta[MAX_LENGTH];
+    DIR *directorio;
+    struct dirent *entrada;
+    char nuevaEntrada[MAX_LENGTH];
+
+    directorio = opendir(path);
+
+    while((entrada = readdir(directorio)) != NULL) {
+        if(strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
+            continue;
+        }
+        strcpy(nuevaRuta, path);
+        strcat(strcat(nuevaRuta, "/"),entrada->d_name);
+        //printf("Nueva Ruta: %s\n", nuevaRuta);
+       // printf("d_name: %s\n", entrada->d_name);
+
+
+        if(isDirectory(nuevaRuta)) {
+            strcpy(nuevaEntrada, entrada->d_name);
+            //printf("d_name: %c\n", nuevaEntrada[0]);
+
+            if(nuevaEntrada[0] != '.') {
+                insert(L, nuevaRuta);
+                printf("Insertado %s\n", nuevaRuta);
+                listaArbolCarpetas(L, nuevaRuta, flags);
+            }
+
+        }
+
+    }
+    closedir(directorio);
+
+    return *L;
+}
+
+int recursivaA(lista L, SStatListCommand flags) {
+    for(pos p = first(L); next(L, p) != NULL; p = next(L, p)) {
+        struct histData *path = get(L, p);
+        printStatAndList(path->command, flags);
     }
     return 0;
 }

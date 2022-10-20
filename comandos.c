@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "comandos.h"
 
-int autores(char *tokens[], int ntokens, lista *lista) {
+int autores(char *tokens[], int ntokens, lista *listas) {
     if(ntokens == 1) {                                          // Miramos si autores viene acompañado de [-l] o [-n]
         if(strcmp(tokens[0], "-l") == 0) {
             printf("Login: a.becerra");                 // En caso de [-l] damos por salida los logins de los autores
@@ -31,7 +31,7 @@ int autores(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int pid(char *tokens[], int ntokens, lista *lista) {
+int pid(char *tokens[], int ntokens, lista *listas) {
     pid_t pid = getpid();
     pid_t ppid = getppid();
 
@@ -49,7 +49,7 @@ int pid(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int carpeta(char *tokens[], int ntokens, lista *lista) {
+int carpeta(char *tokens[], int ntokens, lista *listas) {
     char previousDirectory[MAX_LENGTH]; // Creamos una variable con un tamaño máximo para el directorio actual y el previo
     char directory[MAX_LENGTH];
     char error[] = "No se pudo cambiar al directorio"; // Mensaje de error por si no puede cambiar de directorio
@@ -75,7 +75,7 @@ int carpeta(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int fecha(char *tokens[], int ntokens, lista *lista) {
+int fecha(char *tokens[], int ntokens, lista *listas) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
@@ -101,7 +101,7 @@ int fecha(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int hist(char *tokens[], int ntokens, lista *lista) {
+int hist(char *tokens[], int ntokens, lista *listas) {
     int position = 1;
 
     if(ntokens == 1) {  //Miramos si hist viene acompañado de un comando entre [] o no
@@ -109,15 +109,15 @@ int hist(char *tokens[], int ntokens, lista *lista) {
         int numero = atoi(tokens[0]) * -1; // Sacamos el número introducido y lo volvemos positivo
 
         if(strcmp(tokens[0], "-c") == 0  ) {    //Si hay [-c] se borrará la lista que guarda el historial de comandos.
-            deleteList(lista);
+            deleteList(listas);
 
-        } else if(numero > 0 && numero < elementsNumber(*lista)) { // Coprobamos que el número esté dentro del número de elementos del historial
+        } else if(numero > 0 && numero < elementsNumber(*listas)) { // Coprobamos que el número esté dentro del número de elementos del historial
 
             int contador = 1;
             pos p;
 
-            for(p = second(*lista); contador != numero+1; p = next(*lista, p)) {
-                struct histData *info = get(*lista, p);
+            for(p = second(*listas); contador != numero+1; p = next(*listas, p)) {
+                struct histData *info = get(*listas, p);
                 printf("%d-> %s", contador, info->command); // Mostramos los N primeros comandos
                 contador++;
             }
@@ -125,8 +125,8 @@ int hist(char *tokens[], int ntokens, lista *lista) {
         }
 
     } else if(ntokens == 0) { // Si hist no viene acompañado de [-c] o [-N] se mostrará por pantalla toda la lista de comandos usada.
-        for(pos p = second(*lista); !at_end(*lista, p); p = next(*lista, p)) {
-            struct histData *info = get(*lista, p);
+        for(pos p = second(*listas); !at_end(*listas, p); p = next(*listas, p)) {
+            struct histData *info = get(*listas, p);
             printf("%d-> %s", position, info->command); // Mostramos los comandos desde el primero al último
             position++;
         }
@@ -138,24 +138,24 @@ int hist(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int comando(char *tokens[], int ntokens, lista *lista) {
+int comando(char *tokens[], int ntokens, lista *listas) {
 
     if(ntokens == 1) {
 
         int numero = atoi(tokens[0]) * -1; // El número introducido lo volvemos positivo
         int contador = 1;
 
-        if(numero > 0 && numero < elementsNumber(*lista)) {
+        if(numero > 0 && numero < elementsNumber(*listas)) {
             pos position;
 
-            for(position = second(*lista); contador != numero; position = next(*lista, position)) {
+            for(position = second(*listas); contador != numero; position = next(*listas, position)) {
                 contador++; // Guardamos en position, el comando que estamos buscando
             }
 
-            struct histData *command = get(*lista, position);
+            struct histData *command = get(*listas, position);
             char *tokensHist[MAX_TOKENS];
             int numeroTokens = splitString(command->command, tokensHist);
-            processInput(tokensHist, numeroTokens, lista); // Con el comando encontrado, los procesamos para ejecutarlo
+            processInput(tokensHist, numeroTokens, listas); // Con el comando encontrado, los procesamos para ejecutarlo
 
         } else {
             printf("Se debe insertar un número precedido de una guión y que exista dentro del historial");
@@ -168,7 +168,7 @@ int comando(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int infosis(char *tokens[], int ntokens, lista *lista) {
+int infosis(char *tokens[], int ntokens, lista *listas) {
     char error[] = "Uname function fail";   // Mensaje que mostraremos de salida por si la función uname falla
     struct utsname systeminfo;              // Gracias a la librería <sys/utsname.h> creamos una variable de
                                             // tiempo struct utsname donde se guardan los datos del dispositivo
@@ -188,19 +188,19 @@ int infosis(char *tokens[], int ntokens, lista *lista) {
 
 
 
-int fin(char *tokens[], int ntokens, lista *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int fin(char *tokens[], int ntokens, lista *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int salir(char *tokens[], int ntokens, lista *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int salir(char *tokens[], int ntokens, lista *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int bye(char *tokens[], int ntokens, lista *lista) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int bye(char *tokens[], int ntokens, lista *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int create(char *tokens[], int ntokens, lista *lista) {
+int create(char *tokens[], int ntokens, lista *listas) {
     int errorNumber;
 
     if(ntokens == 1) {
@@ -229,7 +229,7 @@ int create(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int stats(char *tokens[], int ntokens, lista *lista) {
+int stats(char *tokens[], int ntokens, lista *listas) {
     SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
 
@@ -264,13 +264,9 @@ int stats(char *tokens[], int ntokens, lista *lista) {
 }
 
 
-int list(char *tokens[], int ntokens, lista *lista) {
+int list(char *tokens[], int ntokens, lista *listas) {
     SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
-    struct stat st;
-    char previousDirectory[MAX_LENGTH], directory[MAX_LENGTH];
-    DIR *direct; // Tipo de variable para directorios
-    struct dirent *entrada;
 
     if(ntokens != 0) {
         for (int i = 0; i < ntokens; i++) {
@@ -309,50 +305,26 @@ int list(char *tokens[], int ntokens, lista *lista) {
             listarCarpeta(*tokens, flags, ntokens);
 
         } else {
+            lista listaCarpetas = createEmptyList();
             for(int i = 0 + numberFlags; i < ntokens; i++) {
-                getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
-                chdir(tokens[i]);                           // Nos cambiamos de directorio
-                getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
-
-                lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
-
-                if((direct = opendir(directory)) == NULL) {
-                    printf("Could not open %s: %s\n", tokens[i], strerror(errno));
-                    return 0;
-                } else {
-                    printf("\n*** %s\n", tokens[i]);
-
-                    entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
-
-                    do {
-                        // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
-                        if (!flags.hidFlag && (entrada->d_name[0] == '.')) {
-                            continue;
-                        } else {
-                            //printStatAndList(entrada->d_name, flags);
-                            recAyB(entrada->d_name, flags);
-                        }
-
-                    } while ((entrada = readdir(direct)) != NULL);
-
-                    closedir(direct); // Cierra el directorio una vez se enseñó su contenido
-                }
-
-                chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
-
+                listaArbolCarpetas(&listaCarpetas, tokens[i], flags);
+                recorrerDe0aN(listaCarpetas);
+                //recursivaA(listaCarpetas, flags);
             }
+
+
+
         }
 
     } else {
         carpeta(NULL, 0, NULL); // Si solo se pone list sin ningún parámetro, muestra el directorio actual
     }
 
-    free(entrada);
     return 0;
 }
 
 
-int delete(char *tokens[], int ntokens, lista *lista) {
+int delete(char *tokens[], int ntokens, lista *listas) {
     char error[] = "No se pudo borrar el fichero";
     int i = 0;
 
@@ -372,7 +344,7 @@ int delete(char *tokens[], int ntokens, lista *lista) {
     return 0;
 }
 
-int deltree(char *tokens[], int ntokens, lista *lista) {
+int deltree(char *tokens[], int ntokens, lista *listas) {
     char error[] = "No se puede borrar\n";
 
     if(ntokens != 0) {
