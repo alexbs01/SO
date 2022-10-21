@@ -95,6 +95,8 @@ char LetraTF (mode_t m)
         default: return '?'; /*desconocido, no deberia aparecer*/
     }
 }
+
+// Las dos siguientes son dadas como código de ayuda en la página web de la asignatura
 /*las siguientes funciones devuelven los permisos de un fichero en formato rwx----*/
 /*a partir del campo st_mode de la estructura stat */
 /*las tres son correctas pero usan distintas estrategias de asignación de memoria*/
@@ -142,7 +144,7 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
     char linkSimbolico[MAX_LENGTH];
     long espacio = tamanoFichero(tokens);
 
-    lstat(tokens, &datos);
+    lstat(tokens, &datos); // Carga en datos la dirección
 
     if(!flags.longFlag) {
         if(espacio == -1) {
@@ -158,6 +160,7 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
             return 1;
         }
 
+        // Guarda los datos de usuario, grupos y permisos
         usuario = getpwuid(datos.st_uid);
         grupo = getgrgid(datos.st_gid);
         permisos = ConvierteModo2(datos.st_mode);
@@ -184,7 +187,7 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
     return 0;
 }
 
-int isDirectory(char *tokens) {
+int isDirectory(char *tokens) { // Comprueba si tokens es un directorio
     struct stat st;
     stat(tokens, &st);
 
@@ -261,7 +264,6 @@ int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
 }
 
 int listaArbolCarpetas(char *path, SStatListCommand flags) {
-    struct stat st;
     char nuevaRuta[MAX_LENGTH];
     DIR *directorio;
     struct dirent *entrada;
@@ -269,9 +271,12 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
 
     if((directorio = opendir(path)) != NULL) {
         while((entrada = readdir(directorio)) != NULL) {
+            // Hace que no entre ni en . ni .., para evitar una recursión infinita
             if(strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
                 continue;
             }
+
+            // Si listamos /, conatenamos de otra forma para evitar el // del concatenado habitual
             if(strcmp(path, "/") == 0) {
                 strcat(strcpy(nuevaRuta, "/"),entrada->d_name);
             } else {
@@ -286,8 +291,8 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
                     continue;
 
                 } else {
+                    // Si es una carpeta se lista su contenida
                     if(flags.recbFlag && !flags.recaFlag) listaArbolCarpetas(nuevaRuta, flags);
-                    //printf("Nueva ruta: %s\n", nuevaRuta);
                     listarCarpeta(nuevaRuta, flags, 1);
                     if(flags.recaFlag) listaArbolCarpetas(nuevaRuta, flags);
                 }
@@ -298,6 +303,5 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
     }
 
     closedir(directorio);
-
     return 0;
 }

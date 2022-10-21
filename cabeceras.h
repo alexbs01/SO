@@ -7,7 +7,6 @@
 #ifndef SHELL_CABECERAS_H
 #define SHELL_CABECERAS_H
 
-
 #include <stdbool.h>
 typedef struct statCommand {
     bool longFlag;
@@ -18,7 +17,6 @@ typedef struct statCommand {
     bool hidFlag;
 } SStatListCommand;
 #include "lista.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -39,8 +37,7 @@ struct histData{ // Para obtener los commandos del historial
     char command[MAX_LENGTH];
 };
 
-
-
+// Código de París
 /*
 int delete_item(char *path) {
     struct stat st;

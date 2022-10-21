@@ -10,7 +10,7 @@
 #define MAX_TOKENS 64
 
 int main() {
-    char input[MAX_INPUT_SIZE], duplicateInput[MAX_LENGTH];
+    char input[MAX_INPUT_SIZE], *duplicateInput;
     char *tokens[MAX_TOKENS];
     int ntokens;
     int endShell = 0;
@@ -27,7 +27,8 @@ int main() {
             continue;
         }
 
-        strcpy(duplicateInput, input);
+        //strcpy(duplicateInput, input);
+        duplicateInput = strdup(input);
         insert(&historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
 
         ntokens = splitString(input, tokens); // Se almacenan el número de tokens que hay en la cadena
@@ -40,6 +41,7 @@ int main() {
 
     }
 
+    free(duplicateInput);
     deleteList(&historial); // Liberamos la memoria dinámica
     return 0;
 }

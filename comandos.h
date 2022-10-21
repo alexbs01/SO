@@ -32,8 +32,8 @@ int salir(char *tokens[], int ntokens, lista *listas);
 int bye(char *tokens[], int ntokens, lista *listas);
 
 int create(char *tokens[], int ntokens, lista *listas);   // Crea una carpeta o un fichero.
-int stats(char *tokens[], int ntokens, lista *listas);     //
-int list(char *tokens[], int ntokens, lista *listas);     //
+int stats(char *tokens[], int ntokens, lista *listas);    // Retorna datos del archivo
+int list(char *tokens[], int ntokens, lista *listas);     // Retorna los datos de los archivos del directorio
 int delete(char *tokens[], int ntokens, lista *listas);   // Elimina los ficheros o directorios vacíos que se pasan como parámetro.
 int deltree(char *tokens[], int ntokens, lista *listas);  // Elimina los ficheros o directorios vacíos de forma recursiva.
 

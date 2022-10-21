@@ -27,9 +27,9 @@ char LetraTF (mode_t m);
 char * ConvierteModo2 (mode_t m);
 
 // Funciones de la práctica 1
-off_t tamanoFichero(char *file);
-int printStatAndList(char *tokens, SStatListCommand flags);
-int isDirectory(char *tokens);
+off_t tamanoFichero(char *file); // Retorna el tamaño de un fichero
+int printStatAndList(char *tokens, SStatListCommand flags); // Imprime la información de un archivo
+int isDirectory(char *tokens); // Comprueba que sea un directorio
 int delete_item(char *path); // Borra recursivamente, hecha a partir del código de París
 int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens); // Lista la carpeta
 int listaArbolCarpetas(char *path, SStatListCommand flags); // Lista carpetas de forma recursiva, hecha a partir del código de París
