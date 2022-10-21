@@ -142,6 +142,8 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
     char linkSimbolico[MAX_LENGTH];
     long espacio = tamanoFichero(tokens);
 
+    lstat(tokens, &datos);
+
     if(!flags.longFlag) {
         if(espacio == -1) {
             return -1;
