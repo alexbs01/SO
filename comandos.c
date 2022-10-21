@@ -313,7 +313,7 @@ int list(char *tokens[], int ntokens, lista *listas) {
                     listarCarpeta(tokens[i], flags, ntokens);
                 }
                 listaArbolCarpetas(tokens[i], flags);
-                if(flags.recbFlag) {
+                if(flags.recbFlag && !flags.recaFlag) {
                     listarCarpeta(tokens[i], flags, ntokens);
                 }
 

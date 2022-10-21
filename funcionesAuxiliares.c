@@ -324,7 +324,6 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
             //printf("Nueva Ruta: %s\n", nuevaRuta);
             // printf("d_name: %s\n", entrada->d_name);
 
-
             if(isDirectory(nuevaRuta)) {
                 strcpy(nuevaEntrada, entrada->d_name);
                 //printf("d_name: %c\n", nuevaEntrada[0]);
@@ -333,7 +332,7 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
                     continue;
 
                 } else {
-                    if(flags.recbFlag) listaArbolCarpetas(nuevaRuta, flags);
+                    if(flags.recbFlag && !flags.recaFlag) listaArbolCarpetas(nuevaRuta, flags);
                     //printf("Nueva ruta: %s\n", nuevaRuta);
                     listarCarpeta(nuevaRuta, flags, 1);
                     if(flags.recaFlag) listaArbolCarpetas(nuevaRuta, flags);
