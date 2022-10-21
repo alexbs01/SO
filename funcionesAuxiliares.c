@@ -263,42 +263,40 @@ int recAyB(char *path, SStatListCommand flags) {
 }
 
 int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
-    //struct stat st;
+    struct stat st;
     char previousDirectory[MAX_LENGTH], directory[MAX_LENGTH];
     DIR *direct; // Tipo de variable para directorios
     struct dirent *entrada;
-    int numberFlags = flags.hidFlag + flags.recbFlag + flags.recaFlag + flags.longFlag + flags.accFlag + flags.linkFlag;
 
-    for(int i = 0 + numberFlags; i < ntokens; i++) {
-        getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
-        chdir(&tokens[i]);                           // Nos cambiamos de directorio
-        getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
+    getcwd(previousDirectory,sizeof(previousDirectory)); // Guardamos el directorio actual por si nos tenemos que mover
+    chdir(tokens);                           // Nos cambiamos de directorio
+    getcwd(directory, sizeof(directory));   // Guardamos la nueva ruta
 
-        //lstat(tokens[i], &st); // Cargamos en st, al archivo de tokens
+    lstat(tokens, &st); // Cargamos en st, al archivo de tokens
 
-        if((direct = opendir(directory)) == NULL) {
-            printf("Could not open %s: %s\n", &tokens[i], strerror(errno));
-            return -1;
-        } else {
-            printf("\n*** %s\n", &tokens[i]);
+    if((direct = opendir(directory)) == NULL) {
+        printf("Could not open %s: %s\n", tokens, strerror(errno));
+        return -1;
+    } else {
+        printf("\n*** %s\n", tokens);
 
-            entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
+        entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
 
-            do {
-                // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
-                if (!flags.hidFlag && (entrada->d_name[0] == '.')) {
-                    continue;
-                } else {
-                    printStatAndList(entrada->d_name, flags);
-                }
+        do {
+            // Si se escribe el parámetro -hid, y el nombre del archivo empieza por punto, se lo salta
+            if (!flags.hidFlag && (entrada->d_name[0] == '.')) {
+                continue;
+            } else {
+                printStatAndList(entrada->d_name, flags);
+            }
 
-            } while ((entrada = readdir(direct)) != NULL);
+        } while ((entrada = readdir(direct)) != NULL);
 
-            closedir(direct); // Cierra el directorio una vez se enseñó su contenido
-        }
-
-        chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+        closedir(direct); // Cierra el directorio una vez se enseñó su contenido
     }
+
+    chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+
     return 0;
 }
 
@@ -308,41 +306,55 @@ lista listaArbolCarpetas(lista *L, char *path, SStatListCommand flags) {
     DIR *directorio;
     struct dirent *entrada;
     char nuevaEntrada[MAX_LENGTH];
+//// Si no se tienen permisos para acceder a la carpeta, colapsa
+    //directorio = opendir(path);
 
-    directorio = opendir(path);
+    if((directorio = opendir(path)) != NULL) {
+        while((entrada = readdir(directorio)) != NULL) {
+            if(strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
+                continue;
+            }
+            if(strcmp(path, "/") == 0) {
+                strcat(strcpy(nuevaRuta, "/"),entrada->d_name);
+            } else {
+                strcpy(nuevaRuta, path);
+                strcat(strcat(nuevaRuta, "/"),entrada->d_name);
+            }
 
-    while((entrada = readdir(directorio)) != NULL) {
-        if(strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
-            continue;
-        }
-        strcpy(nuevaRuta, path);
-        strcat(strcat(nuevaRuta, "/"),entrada->d_name);
-        //printf("Nueva Ruta: %s\n", nuevaRuta);
-       // printf("d_name: %s\n", entrada->d_name);
+            //printf("Nueva Ruta: %s\n", nuevaRuta);
+            // printf("d_name: %s\n", entrada->d_name);
 
 
-        if(isDirectory(nuevaRuta)) {
-            strcpy(nuevaEntrada, entrada->d_name);
-            //printf("d_name: %c\n", nuevaEntrada[0]);
+            if(isDirectory(nuevaRuta)) {
+                strcpy(nuevaEntrada, entrada->d_name);
+                //printf("d_name: %c\n", nuevaEntrada[0]);
 
-            if(nuevaEntrada[0] != '.') {
-                insert(L, nuevaRuta);
-                printf("Insertado %s\n", nuevaRuta);
-                listaArbolCarpetas(L, nuevaRuta, flags);
+                if(nuevaEntrada[0] != '.') {
+                    //insert(L, nuevaRuta);
+                    if(flags.recbFlag) listaArbolCarpetas(L, nuevaRuta, flags);
+                    printf("Nueva ruta: %s\n", nuevaRuta);
+                    printStatAndList(nuevaRuta, flags);
+                    if(flags.recaFlag) listaArbolCarpetas(L, nuevaRuta, flags);
+
+
+                }
+
             }
 
         }
-
     }
+
     closedir(directorio);
 
     return *L;
 }
 
 int recursivaA(lista L, SStatListCommand flags) {
-    for(pos p = first(L); next(L, p) != NULL; p = next(L, p)) {
+    int contador = 0;
+    for(pos p = first(L); contador != elementsNumber(L); p = next(L, p)) {
         struct histData *path = get(L, p);
         printStatAndList(path->command, flags);
+        contador++;
     }
     return 0;
 }
