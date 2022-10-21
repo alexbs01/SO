@@ -27,7 +27,6 @@ int main() {
             continue;
         }
 
-        //strcpy(duplicateInput, input);
         duplicateInput = strdup(input);
         insert(&historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
 
