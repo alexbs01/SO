@@ -335,8 +335,7 @@ lista listaArbolCarpetas(lista *L, char *path, SStatListCommand flags) {
                     printf("Nueva ruta: %s\n", nuevaRuta);
                     printStatAndList(nuevaRuta, flags);
                     if(flags.recaFlag) listaArbolCarpetas(L, nuevaRuta, flags);
-
-
+                    
                 }
 
             }
