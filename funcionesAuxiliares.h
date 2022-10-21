@@ -25,12 +25,13 @@ int ayuda(char *tokens[], int ntokens, lista *lista);            // Muestra la a
 // Esta dos funciones pertenecen a las funciones de ayuda dadas en la página web de SO
 char LetraTF (mode_t m);
 char * ConvierteModo2 (mode_t m);
+
+// Funciones de la práctica 1
 off_t tamanoFichero(char *file);
 int printStatAndList(char *tokens, SStatListCommand flags);
 int isDirectory(char *tokens);
-int delete_item(char *path);
-int recAyB(char *path, SStatListCommand flags);
-int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens);
-int listaArbolCarpetas(char *path, SStatListCommand flags);
-int recursivaA(lista L, SStatListCommand flags);
+int delete_item(char *path); // Borra recursivamente, hecha a partir del código de París
+int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens); // Lista la carpeta
+int listaArbolCarpetas(char *path, SStatListCommand flags); // Lista carpetas de forma recursiva, hecha a partir del código de París
+
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

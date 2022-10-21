@@ -210,7 +210,7 @@ int create(char *tokens[], int ntokens, lista *listas) {
             printf("No se pudo crear %s: %s", tokens[0], strerror(errno));
 
         } else {
-            printf("Se creo la carpeta; %s", tokens[0]);
+            printf("Se creo la carpeta: %s", tokens[0]);
 
         }
 
@@ -307,7 +307,6 @@ int list(char *tokens[], int ntokens, lista *listas) {
             }
 
         } else {
-            lista listaCarpetas = createEmptyList();
             for(int i = 0 + numberFlags; i < ntokens; i++) {
                 if(flags.recaFlag) {
                     listarCarpeta(tokens[i], flags, ntokens);
@@ -350,12 +349,12 @@ int delete(char *tokens[], int ntokens, lista *listas) {
 }
 
 int deltree(char *tokens[], int ntokens, lista *listas) {
-    char error[] = "No se puede borrar\n";
+    char error[] = "No se puede borrar";
 
     if(ntokens != 0) {
         for(int i = 0; i < ntokens; i++) {
             if(isDirectory(tokens[i])) {
-                if(delete_item(tokens[i]) == -1 || remove(tokens[i])) {
+                if(delete_item(tokens[i]) == -1 && remove(tokens[i])) {
                     perror(error);
                 } else if(remove(tokens[i])) {
                     perror(error);

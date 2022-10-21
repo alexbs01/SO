@@ -87,12 +87,3 @@ void deleteList(lista *L) {
         free(p);
     }
 }
-
-void recorrerDe0aN(lista L) {
-    int contador = 0;
-    for(pos p = first(L); contador != elementsNumber(L); p = next(L, p)) {
-        struct histData *path = get(L, p);
-        printf("### %s\n", path->command); // Mostramos los N primeros comandos
-        contador++;
-    }
-}

@@ -5,22 +5,19 @@
     Nombre: Adrián Rego Criado
 */
 #include "cabeceras.h"
-//#include <stdio.h>
-//#include "funcionesAuxiliares.h"
-//#include "lista.h"
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64
 
 int main() {
-    char input[MAX_INPUT_SIZE], *duplicateInput;
+    char input[MAX_INPUT_SIZE], duplicateInput[MAX_LENGTH];
     char *tokens[MAX_TOKENS];
     int ntokens;
     int endShell = 0;
     lista historial = createEmptyList(); // Inicializamos una lista con cabecera
     insert(&historial, NULL);
 
-    while(!endShell) {
+    while(endShell != 1) {
 
         printf("\n> "); // Imprime el prompt
 
@@ -30,7 +27,7 @@ int main() {
             continue;
         }
 
-        duplicateInput = strdup(input);
+        strcpy(duplicateInput, input);
         insert(&historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
 
         ntokens = splitString(input, tokens); // Se almacenan el número de tokens que hay en la cadena
@@ -44,7 +41,6 @@ int main() {
     }
 
     deleteList(&historial); // Liberamos la memoria dinámica
-    free(duplicateInput);
     return 0;
 }
 

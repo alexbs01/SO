@@ -177,13 +177,8 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
 
         } else {
             printf("\n");
-
         }
-
-
     }
-
-
     return 0;
 }
 
@@ -219,44 +214,7 @@ int delete_item(char *path) {
         if(remove(nuevaRuta)) {
             return -1;
         }
-
     }
-    closedir(directorio);
-
-    return 0;
-}
-
-int recAyB(char *path, SStatListCommand flags) {
-    char nuevaRuta[MAX_LENGTH];
-    DIR *directorio;
-    struct dirent *entrada;
-
-    if((directorio = opendir(path)) == NULL) {
-        return -1;
-    }
-
-    printf("*** %s\n", path);
-
-    while((entrada = readdir(directorio)) != NULL && strcmp(&entrada->d_name[0], ".") != 0) {
-
-        if(strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
-            continue;
-        }
-
-        strcpy(nuevaRuta, path);
-        strcat(strcat(nuevaRuta, "/"),entrada->d_name);
-
-        if(flags.recbFlag) {
-            recAyB(nuevaRuta, flags);
-        }
-
-        printStatAndList(nuevaRuta, flags);
-
-        if(flags.recaFlag) {
-            recAyB(nuevaRuta, flags);
-        }
-    }
-
     closedir(directorio);
 
     return 0;
@@ -306,8 +264,6 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
     DIR *directorio;
     struct dirent *entrada;
     char nuevaEntrada[MAX_LENGTH];
-//// Si no se tienen permisos para acceder a la carpeta, colapsa
-    //directorio = opendir(path);
 
     if((directorio = opendir(path)) != NULL) {
         while((entrada = readdir(directorio)) != NULL) {
@@ -321,12 +277,8 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
                 strcat(strcat(nuevaRuta, "/"),entrada->d_name);
             }
 
-            //printf("Nueva Ruta: %s\n", nuevaRuta);
-            // printf("d_name: %s\n", entrada->d_name);
-
             if(isDirectory(nuevaRuta)) {
                 strcpy(nuevaEntrada, entrada->d_name);
-                //printf("d_name: %c\n", nuevaEntrada[0]);
 
                 if(nuevaEntrada[0] == '.' && !flags.hidFlag) {
                     continue;
@@ -345,15 +297,5 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
 
     closedir(directorio);
 
-    return 0;
-}
-
-int recursivaA(lista L, SStatListCommand flags) {
-    int contador = 0;
-    for(pos p = first(L); contador != elementsNumber(L); p = next(L, p)) {
-        struct histData *path = get(L, p);
-        printStatAndList(path->command, flags);
-        contador++;
-    }
     return 0;
 }
