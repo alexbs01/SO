@@ -309,13 +309,15 @@ int list(char *tokens[], int ntokens, lista *listas) {
         } else {
             lista listaCarpetas = createEmptyList();
             for(int i = 0 + numberFlags; i < ntokens; i++) {
-                listaArbolCarpetas(&listaCarpetas, tokens[i], flags);
-                recorrerDe0aN(listaCarpetas);
-                recursivaA(listaCarpetas, flags);
-                deleteList(&listaCarpetas);
+                if(flags.recaFlag) {
+                    listarCarpeta(tokens[i], flags, ntokens);
+                }
+                listaArbolCarpetas(tokens[i], flags);
+                if(flags.recbFlag) {
+                    listarCarpeta(tokens[i], flags, ntokens);
+                }
+
             }
-
-
 
         }
 

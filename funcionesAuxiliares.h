@@ -31,6 +31,6 @@ int isDirectory(char *tokens);
 int delete_item(char *path);
 int recAyB(char *path, SStatListCommand flags);
 int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens);
-lista listaArbolCarpetas(lista *L, char *path, SStatListCommand flags);
+int listaArbolCarpetas(char *path, SStatListCommand flags);
 int recursivaA(lista L, SStatListCommand flags);
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

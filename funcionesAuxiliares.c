@@ -300,7 +300,7 @@ int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
     return 0;
 }
 
-lista listaArbolCarpetas(lista *L, char *path, SStatListCommand flags) {
+int listaArbolCarpetas(char *path, SStatListCommand flags) {
     struct stat st;
     char nuevaRuta[MAX_LENGTH];
     DIR *directorio;
@@ -329,13 +329,14 @@ lista listaArbolCarpetas(lista *L, char *path, SStatListCommand flags) {
                 strcpy(nuevaEntrada, entrada->d_name);
                 //printf("d_name: %c\n", nuevaEntrada[0]);
 
-                if(nuevaEntrada[0] != '.') {
-                    //insert(L, nuevaRuta);
-                    if(flags.recbFlag) listaArbolCarpetas(L, nuevaRuta, flags);
-                    printf("Nueva ruta: %s\n", nuevaRuta);
-                    printStatAndList(nuevaRuta, flags);
-                    if(flags.recaFlag) listaArbolCarpetas(L, nuevaRuta, flags);
-                    
+                if(nuevaEntrada[0] == '.' && !flags.hidFlag) {
+                    continue;
+
+                } else {
+                    if(flags.recbFlag) listaArbolCarpetas(nuevaRuta, flags);
+                    //printf("Nueva ruta: %s\n", nuevaRuta);
+                    listarCarpeta(nuevaRuta, flags, 1);
+                    if(flags.recaFlag) listaArbolCarpetas(nuevaRuta, flags);
                 }
 
             }
@@ -345,7 +346,7 @@ lista listaArbolCarpetas(lista *L, char *path, SStatListCommand flags) {
 
     closedir(directorio);
 
-    return *L;
+    return 0;
 }
 
 int recursivaA(lista L, SStatListCommand flags) {
