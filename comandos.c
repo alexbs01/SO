@@ -266,6 +266,79 @@ int stats(char *tokens[], int ntokens, lista *lista) {
 
 int list(char *tokens[], int ntokens, lista *lista) {
     SStatListCommand flags = {false, false, false, false, false, false};
+    char directory[MAX_LENGTH], previousDirectory[MAX_LENGTH];
+    DIR *direct; // Tipo de variable para directorios
+    struct dirent *entrada;
+    int i = 0;
+
+    if (ntokens != 0) {
+        while (ntokens > 1 && i < ntokens && *tokens[i] == '-') {
+            if (strcmp(tokens[i], "-long") == 0) {
+                flags.longFlag = true;
+            } else if (strcmp(tokens[i], "-link") == 0) {
+                flags.linkFlag = true;
+            } else if (strcmp(tokens[i], "-acc") == 0) {
+                flags.accFlag = true;
+            } else if (strcmp(tokens[i], "-reca") == 0) {
+                flags.recaFlag = true;
+            } else if (strcmp(tokens[i], "-recb") == 0) {
+                flags.recbFlag = true;
+            } else if (strcmp(tokens[i], "-hid") == 0) {
+                flags.hidFlag = true;
+            } else {
+                printf("Error: %s no es un comando correcto.\n", tokens[i]);
+            }
+            i++;
+        }
+
+        if (flags.recbFlag && flags.recaFlag) {
+            flags.recbFlag = false;
+        }
+
+        if (i == 0 && ntokens >= 1) {
+
+            printf("Metiste algun -algo y una direccion - i= %d, ntokens = %d\n", i, ntokens);
+            for (i = i; i < ntokens; i++) {
+                rec_list(tokens[i], flags);
+            }
+            /*
+            printf("i tiene que ser 0 y ntokens 1 o 2 - i= %d, ntokens = %d", i, ntokens);
+            for (i = i; i < ntokens; i++) {
+                getcwd(previousDirectory,sizeof(previousDirectory));   // Guardamos el directorio actual para volver al final
+                chdir(tokens[i]);                                 // Nos cambiamos a donde nos dicen por entrada
+                getcwd(directory, sizeof(directory));         // Guardamos la ruta donde estamos en directory
+
+                if((direct = opendir(directory)) == NULL) {
+                    printf("Could not open %s: %s\n", tokens[i], strerror(errno));
+                    return -1;
+                } else {
+                    entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
+                    do {
+                        printStatAndList(entrada->d_name, flags);
+                    } while ((entrada = readdir(direct)) != NULL);
+
+                    closedir(direct); // Cierra el directorio una vez se enseñó su contenido
+                }
+
+                chdir(previousDirectory);  // Después de listar los archivos volvemos al directorio inicial
+            }
+             */
+        } else if (i < ntokens) {
+            printf("Metiste algun -algo y una direccion - i= %d, ntokens = %d", i, ntokens);
+            for (i = i; i < ntokens; i++) {
+                rec_list(tokens[i], flags);
+            }
+        } else {
+            printf("No se puede meter solo -algo");
+        }
+    } else {
+        printf("Has puesto list a secas.\n");
+        carpeta(NULL, 0, NULL); // Si solo se pone list sin ningún parámetro, muestra el directorio actual
+    }
+
+    return 0;
+}
+    /*SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
     struct stat st;
     char previousDirectory[MAX_LENGTH], directory[MAX_LENGTH];
@@ -317,7 +390,7 @@ int list(char *tokens[], int ntokens, lista *lista) {
                     printf("Could not open %s: %s\n", tokens[i], strerror(errno));
                     return -1;
                 } else {
-                    printf("\n*** %s\n", tokens[i]);
+                    printf("\n**** %s\n", tokens[i]);
 
                     entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
 
@@ -349,7 +422,7 @@ int list(char *tokens[], int ntokens, lista *lista) {
                     printf("Could not open %s: %s\n", tokens[i], strerror(errno));
                     return 0;
                 } else {
-                    printf("\n*** %s\n", tokens[i]);
+                    printf("\n**** %s\n", tokens[i]);
 
                     entrada = readdir(direct); // Guarda los datos del directorio direct en entrada
 
@@ -379,7 +452,7 @@ int list(char *tokens[], int ntokens, lista *lista) {
     free(entrada);
     return 0;
 }
-
+*/
 
 int delete(char *tokens[], int ntokens, lista *lista) {
     char error[] = "No se pudo borrar el fichero";

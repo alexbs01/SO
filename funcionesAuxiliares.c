@@ -226,16 +226,94 @@ int delete_item(char *path) {
     return 0;
 }
 
+void rec_list(char *tokens, SStatListCommand flags) {
+    DIR *directory;
+    struct dirent *entrada;
+    struct stat stats;
+    char *concat = malloc(MAX_LENGTH);
+    char format;
+    SStatListCommand nflags = flags;
+
+    if (!flags.recaFlag && !flags.recbFlag) {
+        printf("****%s\n", tokens);
+
+        directory = opendir(tokens);
+
+        if (directory == NULL) {
+            perror("Error");
+        }
+
+    } else {
+        if (flags.recaFlag) {
+            nflags.recaFlag = true;
+            rec_list(tokens, flags);
+        }
+
+        while ((entrada= readdir(directory)) != NULL) {
+            if ((strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) || flags.hidFlag) {
+                strcpy(concat, tokens);
+                if (strcmp(tokens, "/") != 0) {
+                    strcat(concat, "/");
+                }
+                strcat(concat, entrada->d_name);
+
+                if (lstat(concat, &stats) == 0) {
+                    format = LetraTF(stats.st_mode);
+
+                    if (!(flags.recaFlag || flags.recbFlag)) {
+                        //statprint(flags, entrada->d_name, concat, stats);
+                    } else if (format == 'd' && strcmp(entrada->d_name, ".") != 0 && strcmp(entrada->d_name, "..") != 0) {
+                        rec_list(concat, flags);
+                    }
+
+                } else perror("Error");
+            }
+        } if (closedir(directory) == 1) {
+            perror("Error");
+        }
+
+        if (flags.recbFlag) {
+            nflags.recbFlag = true;
+            rec_list(tokens, flags);
+        }
+
+    }
+
+}
+
+/*
 int recAyB(char *path, SStatListCommand flags) {
     char nuevaRuta[MAX_LENGTH];
     DIR *directorio;
     struct dirent *entrada;
 
     if((directorio = opendir(path)) == NULL) {
+        printf("ER-");
         return -1;
     }
 
     printf("*** %s\n", path);
+
+    if(flags.recbFlag) {
+        while ((entrada = readdir(directorio)) != NULL && strcmp(&entrada->d_name[0], ".") != 0) {
+
+            if (strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
+                continue;
+            }
+
+            strcpy(nuevaRuta, path);
+
+            if (isDirectory(entrada->d_name)) {
+
+                recAyB(strcat(strcat(nuevaRuta, "/"), entrada->d_name), flags);
+
+            }
+        }
+    }
+
+    if((directorio = opendir(path)) == NULL) {
+        return -1;
+    }
 
     while((entrada = readdir(directorio)) != NULL && strcmp(&entrada->d_name[0], ".") != 0) {
 
@@ -244,21 +322,34 @@ int recAyB(char *path, SStatListCommand flags) {
         }
 
         strcpy(nuevaRuta, path);
-        strcat(strcat(nuevaRuta, "/"),entrada->d_name);
-
-        if(flags.recbFlag) {
-            recAyB(nuevaRuta, flags);
-        }
 
         printStatAndList(nuevaRuta, flags);
 
-        if(flags.recaFlag) {
-            recAyB(nuevaRuta, flags);
-        }
     }
 
+    if((directorio = opendir(path)) == NULL) {
+        return -1;
+    }
+
+    if(flags.recaFlag) {
+        while ((entrada = readdir(directorio)) != NULL && strcmp(&entrada->d_name[0], ".") != 0) {
+
+            if (strcmp(entrada->d_name, ".") == 0 || strcmp(entrada->d_name, "..") == 0) {
+                continue;
+            }
+
+            strcpy(nuevaRuta, path);
+
+            if (isDirectory(entrada->d_name)) {
+
+                recAyB(strcat(strcat(nuevaRuta, "/"), entrada->d_name), flags);
+
+            }
+        }
+    }
 
     closedir(directorio);
 
     return 0;
 }
+*/
