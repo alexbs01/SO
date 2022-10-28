@@ -15,7 +15,7 @@ int main() {
     int ntokens;
     int endShell = 0;
     lista historial = createEmptyList(); // Inicializamos una lista con cabecera
-    insert(&historial, NULL);
+    //insert(&historial, NULL);
 
     while(endShell != 1) {
 
@@ -35,13 +35,11 @@ int main() {
         endShell = processInput(tokens, ntokens, &historial);
         if(isEmptyList(historial)) { // Si borramos el historial, volvemos a crearla y le insertamos la cabecera
             historial = createEmptyList();
-            insert(&historial, NULL);
         }
 
     }
 
-    free(duplicateInput);
-    deleteList(&historial); // Liberamos la memoria dinámica
+    deleteList(&historial, free); // Liberamos la memoria dinámica
     return 0;
 }
 

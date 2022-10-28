@@ -23,7 +23,7 @@ pos next(lista L, pos p);            // Retorna el elemento siguiente al indicad
 int at_end(lista L, pos p);          // Devuelve 1 si el elemento indicado es el último de la lista
 void *get(lista L, pos p);           // Nos permite obtener la información del nodo especificado
 int elementsNumber(lista L);         // Cuenta cuantos elementos hay en la lista
-void deleteList(lista *L);           // Elimina la lista entera, incluyendo la cabecera
+void deleteList(lista *L, void (* freedata)(void *));           // Elimina la lista entera, incluyendo la cabecera
 //pos prev(lista L,pos p);           // Retorna el elemento previo al indicado
 bool isEmptyList(lista L);           // Comprueba si una lista está vacía o no
 

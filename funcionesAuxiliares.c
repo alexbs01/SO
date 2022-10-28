@@ -46,6 +46,13 @@ struct cmd cmds[] = {
         {"list", list, "[] Lista el contenido de directorios. \n [-reca] Lo hace recursivamente antes. \n [-recb] Recursivamente después. \n [-hid] Muestra también los fichero ocultos. \n [-long] Usa el formato largo. \n [-acc] Modifica la hora del último acceso. \n [link] Si hay enlace simbólico, muestra a que hace referencia."},
         {"delete", delete, "[name1, name2...] Elimina los ficheros o directorios vacíos que se pasan como parámetro."},
         {"deltree", deltree, "[name1, name2...] Elimina los ficheros o directorios vacíos de forma recursiva."},
+        {"allocate", allocate, "[] Asigna un bloque de memoria. \n [-malloc tam] Asigna un bloque malloc de tamaño tam. \n [-shared cl] Asigna el bloque de memoria compartida (ya existe) de clave cl. \n [-createshared cl tam] Asigna (creando) el bloque de memoria compartida de clave cl y tamaño tam. \n [-nmap fich perm] mapea el fichero fich, perm son los permisos."},
+        {"deallocate", deallocate, "[] Desasigna un bloque de memoria. \n [-malloc tam] Desasigna un bloque malloc de tamano tam. \n [-shared cl] Desasigna (desmapea) el bloque de memoria compartida de clave cl. \n [-delkey cl] Elimina del sistema (sin desmapear) la clave de memoria cl. \n [-nmap fich] Desmapea el fichero mapeado fich. \n [-addr] Desasigna el bloque de memoria en la dirección adrr"},
+        {"i-o", io, "[-read fich addr cont] Lee cont bytes desde fich a addr. \n [-wirte [-o] fich addr cont] Escribe cont bytes desde addr a fich. -o para sobreescribir addr es una dirección de memoria."},
+        {"memdump", memdump, "[addr cont] Vuelca en pantallas los contenidos (cont bytes) de la posición de memoria adrr."},
+        {"memfill", memfill, "[addr cont byte] Llena la memoria a partir de addr con byte."},
+        {"memory", memory, "[] Muestra detalles de la memoria del proceso. \n [-blocks] Los bloques de memoria asignados. \n [-funcs] Las direcciones de las funciones. \n [-vars] Las direcciones de las variables. \n [-all] todo. \n [-pmap] Muestra la salida del comando pmap(o similar)."},
+        {"recurse", recurse, "[n] Invoca a la función recursiva n veces."},
         {NULL, NULL}
 };
 

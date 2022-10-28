@@ -37,4 +37,12 @@ int list(char *tokens[], int ntokens, lista *listas);     // Retorna los datos d
 int delete(char *tokens[], int ntokens, lista *listas);   // Elimina los ficheros o directorios vacíos que se pasan como parámetro.
 int deltree(char *tokens[], int ntokens, lista *listas);  // Elimina los ficheros o directorios vacíos de forma recursiva.
 
+int allocate(char *tokens[], int ntokens, lista *listas);
+int deallocate(char *tokens[], int ntokens, lista *listas);
+int io(char *tokens[], int ntokens, lista *listas);
+int memdump(char *tokens[], int ntokens, lista *listas);
+int memfill(char *tokens[], int ntokens, lista *listas);
+int memory(char *tokens[], int ntokens, lista *listas);
+int recurse(char *tokens[], int ntokens, lista *listas);
+
 #endif //SHELL_C_COMANDOS_H

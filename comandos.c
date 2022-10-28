@@ -109,14 +109,14 @@ int hist(char *tokens[], int ntokens, lista *listas) {
         int numero = atoi(tokens[0]) * -1; // Sacamos el número introducido y lo volvemos positivo
 
         if(strcmp(tokens[0], "-c") == 0  ) {    //Si hay [-c] se borrará la lista que guarda el historial de comandos.
-            deleteList(listas);
+            deleteList(listas, free);
 
         } else if(numero > 0 && numero < elementsNumber(*listas)) { // Coprobamos que el número esté dentro del número de elementos del historial
 
             int contador = 1;
             pos p;
 
-            for(p = second(*listas); contador != numero+1; p = next(*listas, p)) {
+            for(p = first(*listas); contador != numero+1; p = next(*listas, p)) {
                 struct histData *info = get(*listas, p);
                 printf("%d-> %s", contador, info->command); // Mostramos los N primeros comandos
                 contador++;
@@ -125,7 +125,7 @@ int hist(char *tokens[], int ntokens, lista *listas) {
         }
 
     } else if(ntokens == 0) { // Si hist no viene acompañado de [-c] o [-N] se mostrará por pantalla toda la lista de comandos usada.
-        for(pos p = second(*listas); !at_end(*listas, p); p = next(*listas, p)) {
+        for(pos p = first(*listas); !at_end(*listas, p); p = next(*listas, p)) {
             struct histData *info = get(*listas, p);
             printf("%d-> %s", position, info->command); // Mostramos los comandos desde el primero al último
             position++;
@@ -369,5 +369,55 @@ int deltree(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
+int allocate(char *tokens[], int ntokens, lista *listas) {
 
+    if(ntokens != 0) {
+        if(strcmp(tokens[0], "-malloc") == 0 && ntokens == 2) {
+
+        } else if(strcmp(tokens[0], "-shared") == 0 && ntokens == 2) {
+
+        } else if(strcmp(tokens[0], "-createshared") == 0 && ntokens == 3) {
+
+        } else if(strcmp(tokens[0], "-mmap") == 0 && ntokens == 3) {
+
+        } else {
+            printf("Uso: allocate [-malloc size | -shared | -createshared | -mmap] ...");
+        }
+    } else {
+        printf("*** Lista de bloque asignados para el proceso %d", getpid());
+
+    }
+
+
+    return 0;
+}
+int deallocate(char *tokens[], int ntokens, lista *listas) {
+
+    return 0;
+}
+
+int io(char *tokens[], int ntokens, lista *listas) {
+
+    return 0;
+}
+
+int memdump(char *tokens[], int ntokens, lista *listas) {
+
+    return 0;
+}
+
+int memfill(char *tokens[], int ntokens, lista *listas) {
+
+    return 0;
+}
+
+int memory(char *tokens[], int ntokens, lista *listas) {
+
+    return 0;
+}
+
+int recurse(char *tokens[], int ntokens, lista *listas) {
+
+    return 0;
+}
 

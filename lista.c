@@ -67,7 +67,7 @@ int elementsNumber(lista L) {
 }
 
 bool isEmptyList(lista L) {
-    return L == NULL;
+    return L->next == NULL;
 }
 
 /*pos prev(lista L,pos p) {
@@ -78,12 +78,14 @@ bool isEmptyList(lista L) {
 }
 */
 
-void deleteList(lista *L) {
-    pos p;
-
-    while(!isEmptyList(*L)) {
-        p = *L;
-        *L = (*L)->next;
-        free(p);
+void deleteList(lista *L, void (* freedata)(void *)) {
+    pos p = (*L)->next;
+    pos q;
+    while(p != NULL) {
+        q = p;
+        freedata(p->data);
+        p = p->next;
+        free(q);
     }
+    free(*L);
 }
