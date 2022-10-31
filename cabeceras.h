@@ -37,6 +37,14 @@ struct histData{ // Para obtener los commandos del historial
     char command[MAX_LENGTH];
 };
 
+struct listMemoryBlocks {
+    void *memoryAddress;
+    int size;
+    struct tm timeAllocation;
+    enum type {mallocMem, sharedMem, mappedFile} typeAllocation;
+    char otherInfo[MAX_LENGTH];
+};
+
 // Código de París
 /*
 int delete_item(char *path) {

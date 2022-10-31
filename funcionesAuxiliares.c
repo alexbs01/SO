@@ -206,6 +206,7 @@ int delete_item(char *path) {
     char nuevaRuta[MAX_LENGTH];
     DIR *directorio;
     struct dirent *entrada;
+    struct stat st;
 
     if((directorio = opendir(path)) == NULL) {
         return -1;
@@ -219,7 +220,9 @@ int delete_item(char *path) {
             continue;
         }
 
-        if(isDirectory(nuevaRuta)) {
+        lstat(nuevaRuta, &st);
+
+        if((st.st_mode & S_IFMT) == S_IFDIR) {
             delete_item(nuevaRuta);
         }
 
@@ -275,6 +278,7 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
     DIR *directorio;
     struct dirent *entrada;
     char nuevaEntrada[MAX_LENGTH];
+    struct stat st;
 
     if((directorio = opendir(path)) != NULL) {
         while((entrada = readdir(directorio)) != NULL) {
@@ -291,7 +295,9 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
                 strcat(strcat(nuevaRuta, "/"),entrada->d_name);
             }
 
-            if(isDirectory(nuevaRuta)) {
+            lstat(nuevaRuta, &st);
+
+            if((st.st_mode & S_IFMT) == S_IFDIR) {
                 strcpy(nuevaEntrada, entrada->d_name);
 
                 if(nuevaEntrada[0] == '.' && !flags.hidFlag) {

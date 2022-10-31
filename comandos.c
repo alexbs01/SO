@@ -148,7 +148,7 @@ int comando(char *tokens[], int ntokens, lista *listas) {
         if(numero > 0 && numero < elementsNumber(*listas)) {
             pos position;
 
-            for(position = second(*listas); contador != numero; position = next(*listas, position)) {
+            for(position = first(*listas); contador != numero; position = next(*listas, position)) {
                 contador++; // Guardamos en position, el comando que estamos buscando
             }
 
@@ -370,9 +370,22 @@ int deltree(char *tokens[], int ntokens, lista *listas) {
 }
 
 int allocate(char *tokens[], int ntokens, lista *listas) {
+    void *memoryAddress;
+    struct tm dateTime;
+    char typeOfAllocation[MAX_LENGTH];
+
+    struct listMemoryBlocks LMB;
 
     if(ntokens != 0) {
         if(strcmp(tokens[0], "-malloc") == 0 && ntokens == 2) {
+            int size = atoi(tokens[1]);
+            memoryAddress = malloc(*tokens[1]);
+
+            LMB.memoryAddress = memoryAddress;
+            LMB.size = size;
+            LMB.timeAllocation = dateTime;
+            LMB.typeAllocation = mallocMem;
+
 
         } else if(strcmp(tokens[0], "-shared") == 0 && ntokens == 2) {
 
