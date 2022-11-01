@@ -168,12 +168,23 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
         }
 
         // Guarda los datos de usuario, grupos y permisos
-        usuario = getpwuid(datos.st_uid);
-        grupo = getgrgid(datos.st_gid);
+        if(getpwuid(datos.st_uid) != NULL) {
+            usuario = getpwuid(datos.st_uid);
+        } else {
+            return -1;
+        }
+
+        if(getgrgid(datos.st_gid) != NULL) {
+            grupo = getgrgid(datos.st_gid);
+        } else {
+            return -1;
+        }
+
         permisos = ConvierteModo2(datos.st_mode);
 
         strftime(fecha, MAX_LENGTH, formatoFechaYHora, &fechaYHora);
-        printf("%s\t%ld \t(%8ld)\t%s    \t%s    \t%s\t%ld\t\t%s", fecha,
+        printf("%s\t%ld \t(%8ld)\t%s    \t%s    \t%s\t%ld\t\t%s",
+               fecha,
                datos.st_nlink,
                datos.st_ino,
                usuario->pw_name,
