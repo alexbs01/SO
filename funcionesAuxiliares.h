@@ -33,5 +33,5 @@ int isDirectory(char *tokens); // Comprueba que sea un directorio
 int delete_item(char *path); // Borra recursivamente, hecha a partir del código de París
 int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens); // Lista la carpeta
 int listaArbolCarpetas(char *path, SStatListCommand flags); // Lista carpetas de forma recursiva, hecha a partir del código de París
-
+struct fechaHora fechaYHora();
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

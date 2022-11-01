@@ -33,7 +33,7 @@ int main() {
         ntokens = splitString(input, tokens); // Se almacenan el número de tokens que hay en la cadena
 
         endShell = processInput(tokens, ntokens, &historial);
-        if(isEmptyList(historial)) { // Si borramos el historial, volvemos a crearla y le insertamos la cabecera
+        if(endShell == 2) { // Si borramos el historial se retornará un 2, y entonces se creará un nuevo historial
             historial = createEmptyList();
         }
 

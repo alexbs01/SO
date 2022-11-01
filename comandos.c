@@ -110,8 +110,8 @@ int hist(char *tokens[], int ntokens, lista *listas) {
 
         if(strcmp(tokens[0], "-c") == 0  ) {    //Si hay [-c] se borrará la lista que guarda el historial de comandos.
             deleteList(listas, free);
-
-        } else if(numero > 0 && numero < elementsNumber(*listas)) { // Coprobamos que el número esté dentro del número de elementos del historial
+            return 2;
+        } else if(numero > 0 && numero < elementsNumber(*listas)) { // Comprobamos que el número esté dentro del número de elementos del historial
 
             int contador = 1;
             pos p;
@@ -370,21 +370,26 @@ int deltree(char *tokens[], int ntokens, lista *listas) {
 }
 
 int allocate(char *tokens[], int ntokens, lista *listas) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
     void *memoryAddress;
-    struct tm dateTime;
+    struct fechaHora dateTime;
     char typeOfAllocation[MAX_LENGTH];
-
-    struct listMemoryBlocks LMB;
+    struct memoryBlocks LMB;
 
     if(ntokens != 0) {
         if(strcmp(tokens[0], "-malloc") == 0 && ntokens == 2) {
             int size = atoi(tokens[1]);
             memoryAddress = malloc(*tokens[1]);
-
+            dateTime = fechaYHora();
             LMB.memoryAddress = memoryAddress;
             LMB.size = size;
-            LMB.timeAllocation = dateTime;
+            LMB.timeAllocation = &tm;
             LMB.typeAllocation = mallocMem;
+
+            printf("Asignados %d bytes en %p", size, LMB.memoryAddress);
+
+            //insert(listas, LMB);
 
 
         } else if(strcmp(tokens[0], "-shared") == 0 && ntokens == 2) {

@@ -318,3 +318,33 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
     closedir(directorio);
     return 0;
 }
+
+struct fechaHora fechaYHora() {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    struct fechaHora dateTime;
+    char mes[MAX_LENGTH];
+
+    switch(tm.tm_mon + 1) {
+        case 1: strcpy(mes, "Jan"); break;
+        case 2: strcpy(mes, "Feb"); break;
+        case 3: strcpy(mes, "Mar"); break;
+        case 4: strcpy(mes, "Apr"); break;
+        case 5: strcpy(mes, "May"); break;
+        case 6: strcpy(mes, "Jun"); break;
+        case 7: strcpy(mes, "Jul"); break;
+        case 8: strcpy(mes, "Aug"); break;
+        case 9: strcpy(mes, "Sep"); break;
+        case 10: strcpy(mes, "Oct"); break;
+        case 11: strcpy(mes, "Nov"); break;
+        case 12: strcpy(mes, "Dec"); break;
+    }
+
+    strcpy(dateTime.mes, mes);
+    dateTime.dia = tm.tm_mday;
+    dateTime.hora = tm.tm_hour;
+    dateTime.min = tm.tm_min;
+
+    return dateTime;
+
+}

@@ -37,13 +37,25 @@ struct histData{ // Para obtener los commandos del historial
     char command[MAX_LENGTH];
 };
 
-struct listMemoryBlocks {
+struct fechaHora {
+    char mes[4];
+    int dia;
+    int hora;
+    int min;
+};
+
+struct memoryBlocks {
     void *memoryAddress;
     int size;
-    struct tm timeAllocation;
+    struct tm *timeAllocation;
     enum type {mallocMem, sharedMem, mappedFile} typeAllocation;
     char otherInfo[MAX_LENGTH];
 };
+
+typedef struct listas {
+    lista historial;
+    lista listMemoryBlocks;
+} listas;
 
 // Código de París
 /*
