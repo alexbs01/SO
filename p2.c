@@ -5,6 +5,7 @@
     Nombre: Adrián Rego Criado
 */
 #include "cabeceras.h"
+//#include "funcionesAuxiliares.h"
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64
@@ -16,6 +17,9 @@ int main() {
     int endShell = 0;
     lista historial = createEmptyList(); // Inicializamos una lista con cabecera
     lista listaMemoria = createEmptyList();
+    structListas listas;
+    listas.historial = historial;
+    listas.listMemoryBlocks = listaMemoria;
 
     while(endShell != 1) {
 
@@ -28,18 +32,19 @@ int main() {
         }
 
         duplicateInput = strdup(input);
-        insert(&historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
+        insert(&listas.historial, duplicateInput); // Duplicamos el string para incorporarlo al historial
 
         ntokens = splitString(input, tokens); // Se almacenan el número de tokens que hay en la cadena
 
-        endShell = processInput(tokens, ntokens, &historial);
+        endShell = processInput(tokens, ntokens, &listas);
         if(endShell == 2) { // Si borramos el historial se retornará un 2, y entonces se creará un nuevo historial
-            historial = createEmptyList();
+            listas.historial = createEmptyList();
         }
 
     }
-    deleteList(&listaMemoria, free);
-    deleteList(&historial, free); // Liberamos la memoria dinámica
+    
+    deleteList(&listas.listMemoryBlocks, free);
+    deleteList(&listas.historial, free); // Liberamos la memoria dinámica
     return 0;
 }
 

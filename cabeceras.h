@@ -7,6 +7,9 @@
 #ifndef SHELL_CABECERAS_H
 #define SHELL_CABECERAS_H
 
+#define MAX_LENGTH 255
+#define MAX_PATH 255
+
 #include <stdbool.h>
 typedef struct statCommand {
     bool longFlag;
@@ -16,7 +19,22 @@ typedef struct statCommand {
     bool recbFlag;
     bool hidFlag;
 } SStatListCommand;
+
 #include "lista.h"
+
+struct memoryBlocks {
+    void *memoryAddress;
+    int size;
+    struct tm *timeAllocation;
+    enum type {mallocMem, sharedMem, mappedFile} typeAllocation;
+    char otherInfo[MAX_LENGTH];
+};
+
+typedef struct listas {
+    lista historial;
+    lista listMemoryBlocks;
+} structListas;
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -30,8 +48,7 @@ typedef struct statCommand {
 
 #include "comandos.h"
 
-#define MAX_LENGTH 255
-#define MAX_PATH 255
+
 
 struct histData{ // Para obtener los commandos del historial
     char command[MAX_LENGTH];
@@ -44,18 +61,6 @@ struct fechaHora {
     int min;
 };
 
-struct memoryBlocks {
-    void *memoryAddress;
-    int size;
-    struct tm *timeAllocation;
-    enum type {mallocMem, sharedMem, mappedFile} typeAllocation;
-    char otherInfo[MAX_LENGTH];
-};
-
-typedef struct listas {
-    lista historial;
-    lista listMemoryBlocks;
-} listas;
 
 // Código de París
 /*

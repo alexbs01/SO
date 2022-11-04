@@ -25,7 +25,7 @@ int splitString(char *cadena, char *trozos[]) {
 
 struct cmd {
     char *cmdName; // Nombre con el que llamamos a una función
-    int (*cmdFunction)(char *tokens[], int ntokens, lista *listas); // Nombre de la función y sus parámetros
+    int (*cmdFunction)(char *tokens[], int ntokens, structListas *listas); // Nombre de la función y sus parámetros
     char *ayudaCmd[MAX_LENGTH]; // Almacena el mensaje de ayuda de cada comando
 };
 
@@ -56,12 +56,12 @@ struct cmd cmds[] = {
         {NULL, NULL}
 };
 
-int processInput(char *tokens[], int ntokens, lista *lista) {
+int processInput(char *tokens[], int ntokens, structListas *listas) {
     int exit = 0;
 
     for(int i = 0; cmds[i].cmdName != NULL; i++) { // Se busca el nombre del comando en el struct de arriba
         if(strcmp(tokens[0], cmds[i].cmdName) == 0) {
-            exit = cmds[i].cmdFunction(tokens + 1, ntokens - 1, lista); // Cuando se encuentra se ejecuta la función asociada
+            exit = cmds[i].cmdFunction(tokens + 1, ntokens - 1, listas); // Cuando se encuentra se ejecuta la función asociada
             return exit;
         }
     }
@@ -71,7 +71,7 @@ int processInput(char *tokens[], int ntokens, lista *lista) {
 }
 
 // Se hace el mismo proceso que con processInput, pero se muestra por pantalla lo almacenado en ayudaCmd
-int ayuda(char *tokens[], int ntokens, lista *lista) {
+int ayuda(char *tokens[], int ntokens, structListas *listas) {
     if(tokens[0] != NULL) {
         for(int i=0; cmds[i].cmdName != NULL; i++) {
             if(strcmp(tokens[0], cmds[i].cmdName) == 0) {

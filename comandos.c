@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "comandos.h"
 
-int autores(char *tokens[], int ntokens, lista *listas) {
+int autores(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 1) {                                          // Miramos si autores viene acompañado de [-l] o [-n]
         if(strcmp(tokens[0], "-l") == 0) {
             printf("Login: a.becerra");                 // En caso de [-l] damos por salida los logins de los autores
@@ -31,7 +31,7 @@ int autores(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int pid(char *tokens[], int ntokens, lista *listas) {
+int pid(char *tokens[], int ntokens, structListas *listas) {
     pid_t pid = getpid();
     pid_t ppid = getppid();
 
@@ -49,7 +49,7 @@ int pid(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int carpeta(char *tokens[], int ntokens, lista *listas) {
+int carpeta(char *tokens[], int ntokens, structListas *listas) {
     char previousDirectory[MAX_LENGTH]; // Creamos una variable con un tamaño máximo para el directorio actual y el previo
     char directory[MAX_LENGTH];
     char error[] = "No se pudo cambiar al directorio"; // Mensaje de error por si no puede cambiar de directorio
@@ -75,7 +75,7 @@ int carpeta(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int fecha(char *tokens[], int ntokens, lista *listas) {
+int fecha(char *tokens[], int ntokens, structListas *listas) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
 
@@ -101,7 +101,7 @@ int fecha(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int hist(char *tokens[], int ntokens, lista *listas) {
+int hist(char *tokens[], int ntokens, structListas *listas) {
     int position = 1;
 
     if(ntokens == 1) {  //Miramos si hist viene acompañado de un comando entre [] o no
@@ -109,15 +109,15 @@ int hist(char *tokens[], int ntokens, lista *listas) {
         int numero = atoi(tokens[0]) * -1; // Sacamos el número introducido y lo volvemos positivo
 
         if(strcmp(tokens[0], "-c") == 0  ) {    //Si hay [-c] se borrará la lista que guarda el historial de comandos.
-            deleteList(listas, free);
+            deleteList(&listas->historial, free);
             return 2;
-        } else if(numero > 0 && numero < elementsNumber(*listas)) { // Comprobamos que el número esté dentro del número de elementos del historial
+        } else if(numero > 0 && numero < elementsNumber(listas->historial)) { // Comprobamos que el número esté dentro del número de elementos del historial
 
             int contador = 1;
             pos p;
 
-            for(p = first(*listas); contador != numero+1; p = next(*listas, p)) {
-                struct histData *info = get(*listas, p);
+            for(p = first(listas->historial); contador != numero+1; p = next(listas->historial, p)) {
+                struct histData *info = get(listas->historial, p);
                 printf("%d-> %s", contador, info->command); // Mostramos los N primeros comandos
                 contador++;
             }
@@ -125,8 +125,8 @@ int hist(char *tokens[], int ntokens, lista *listas) {
         }
 
     } else if(ntokens == 0) { // Si hist no viene acompañado de [-c] o [-N] se mostrará por pantalla toda la lista de comandos usada.
-        for(pos p = first(*listas); !at_end(*listas, p); p = next(*listas, p)) {
-            struct histData *info = get(*listas, p);
+        for(pos p = first(listas->historial); !at_end(listas->historial, p); p = next(listas->historial, p)) {
+            struct histData *info = get(listas->historial, p);
             printf("%d-> %s", position, info->command); // Mostramos los comandos desde el primero al último
             position++;
         }
@@ -138,21 +138,21 @@ int hist(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int comando(char *tokens[], int ntokens, lista *listas) {
+int comando(char *tokens[], int ntokens, structListas *listas) {
 
     if(ntokens == 1) {
 
         int numero = atoi(tokens[0]) * -1; // El número introducido lo volvemos positivo
         int contador = 1;
 
-        if(numero > 0 && numero < elementsNumber(*listas)) {
+        if(numero > 0 && numero < elementsNumber(listas->historial)) {
             pos position;
 
-            for(position = first(*listas); contador != numero; position = next(*listas, position)) {
+            for(position = first(listas->historial); contador != numero; position = next(listas->historial, position)) {
                 contador++; // Guardamos en position, el comando que estamos buscando
             }
 
-            struct histData *command = get(*listas, position);
+            struct histData *command = get(listas->historial, position);
             char *tokensHist[MAX_TOKENS];
             int numeroTokens = splitString(command->command, tokensHist);
             processInput(tokensHist, numeroTokens, listas); // Con el comando encontrado, los procesamos para ejecutarlo
@@ -168,7 +168,7 @@ int comando(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int infosis(char *tokens[], int ntokens, lista *listas) {
+int infosis(char *tokens[], int ntokens, structListas *listas) {
     char error[] = "Uname function fail";   // Mensaje que mostraremos de salida por si la función uname falla
     struct utsname systeminfo;              // Gracias a la librería <sys/utsname.h> creamos una variable de
                                             // tiempo struct utsname donde se guardan los datos del dispositivo
@@ -188,19 +188,19 @@ int infosis(char *tokens[], int ntokens, lista *listas) {
 
 
 
-int fin(char *tokens[], int ntokens, lista *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int fin(char *tokens[], int ntokens, structListas *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int salir(char *tokens[], int ntokens, lista *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int salir(char *tokens[], int ntokens, structListas *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int bye(char *tokens[], int ntokens, lista *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
+int bye(char *tokens[], int ntokens, structListas *listas) { // Función para acabar la ejecución del programa, hace que se devuelva 1
     return 1;
 }
 
-int create(char *tokens[], int ntokens, lista *listas) {
+int create(char *tokens[], int ntokens, structListas *listas) {
     int errorNumber;
 
     if(ntokens == 1) {
@@ -229,7 +229,7 @@ int create(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int stats(char *tokens[], int ntokens, lista *listas) {
+int stats(char *tokens[], int ntokens, structListas *listas) {
     SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
 
@@ -264,7 +264,7 @@ int stats(char *tokens[], int ntokens, lista *listas) {
 }
 
 
-int list(char *tokens[], int ntokens, lista *listas) {
+int list(char *tokens[], int ntokens, structListas *listas) {
     SStatListCommand flags = {false, false, false, false, false, false};
     int numberFlags = 0;
 
@@ -328,7 +328,7 @@ int list(char *tokens[], int ntokens, lista *listas) {
 }
 
 
-int delete(char *tokens[], int ntokens, lista *listas) {
+int delete(char *tokens[], int ntokens, structListas *listas) {
     char error[] = "No se pudo borrar el fichero";
     int i = 0;
 
@@ -348,7 +348,7 @@ int delete(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int deltree(char *tokens[], int ntokens, lista *listas) {
+int deltree(char *tokens[], int ntokens, structListas *listas) {
     char error[] = "No se puede borrar";
 
     if(ntokens != 0) {
@@ -369,7 +369,7 @@ int deltree(char *tokens[], int ntokens, lista *listas) {
     return 0;
 }
 
-int allocate(char *tokens[], int ntokens, lista *listas) {
+int allocate(char *tokens[], int ntokens, structListas *listas) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
     void *memoryAddress;
@@ -409,32 +409,32 @@ int allocate(char *tokens[], int ntokens, lista *listas) {
 
     return 0;
 }
-int deallocate(char *tokens[], int ntokens, lista *listas) {
+int deallocate(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
 
-int io(char *tokens[], int ntokens, lista *listas) {
+int io(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
 
-int memdump(char *tokens[], int ntokens, lista *listas) {
+int memdump(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
 
-int memfill(char *tokens[], int ntokens, lista *listas) {
+int memfill(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
 
-int memory(char *tokens[], int ntokens, lista *listas) {
+int memory(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
 
-int recurse(char *tokens[], int ntokens, lista *listas) {
+int recurse(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
