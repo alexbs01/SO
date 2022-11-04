@@ -22,17 +22,34 @@ typedef struct statCommand {
 
 #include "lista.h"
 
-struct memoryBlocks {
+struct allocateMalloc {
     void *memoryAddress;
     int size;
     struct tm *timeAllocation;
-    enum type {mallocMem, sharedMem, mappedFile} typeAllocation;
-    char otherInfo[MAX_LENGTH];
+    char typeAllocation[MAX_LENGTH];
+};
+
+struct allocateShared {
+    void *memoryAddress;
+    int size;
+    struct tm *timeAllocation;
+    char typeAllocation[MAX_LENGTH];
+    int key;
+};
+
+struct allocateMmap {
+    void *memoryAddress;
+    int size;
+    struct tm *timeAllocation;
+    char typeAllocation[MAX_LENGTH];
+    char descritor[MAX_LENGTH];
 };
 
 typedef struct listas {
     lista historial;
-    lista listMemoryBlocks;
+    lista allocateMalloc;
+    lista allocateShared;
+    lista allocateMmap;
 } structListas;
 
 #include <stdio.h>

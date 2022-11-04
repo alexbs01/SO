@@ -375,21 +375,23 @@ int allocate(char *tokens[], int ntokens, structListas *listas) {
     void *memoryAddress;
     struct fechaHora dateTime;
     char typeOfAllocation[MAX_LENGTH];
-    struct memoryBlocks LMB;
+
 
     if(ntokens != 0) {
         if(strcmp(tokens[0], "-malloc") == 0 && ntokens == 2) {
+            struct allocateMalloc LMB;
+
             int size = atoi(tokens[1]);
             memoryAddress = malloc(*tokens[1]);
             dateTime = fechaYHora();
             LMB.memoryAddress = memoryAddress;
             LMB.size = size;
             LMB.timeAllocation = &tm;
-            LMB.typeAllocation = mallocMem;
+            strcpy(LMB.typeAllocation, "malloc");
 
             printf("Asignados %d bytes en %p", size, LMB.memoryAddress);
 
-            //insert(listas, LMB);
+            insert(&listas->allocateMalloc, LMB);
 
 
         } else if(strcmp(tokens[0], "-shared") == 0 && ntokens == 2) {
