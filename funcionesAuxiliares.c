@@ -130,6 +130,12 @@ char * ConvierteModo2 (mode_t m)
     return permisos;
 }
 
+/**
+ * Calcula el tamaño del fichero y lo retorna
+ *
+ * @param file - Fichero del que queremos calcular el tamaño
+ * @return El tamaño del fichero
+ */
 off_t tamanoFichero(char *file) {     //Returns size of one file
     struct stat size;
 
@@ -140,6 +146,13 @@ off_t tamanoFichero(char *file) {     //Returns size of one file
     return size.st_size;
 }
 
+/**
+ * Imprime la información de la ruta que le pasemos como parámtetro por tokens
+ * @param tokens - Ruta para imprimir la información
+ * @param flags - Parámetros que mostrarán una información u otra
+ * @return 0 si todo fue correcto, -1 si el fichero no existe o si los usuarios furon borrados
+ * , o 1 si no se pudieron cargar los datos del archivo
+ */
 int printStatAndList(char *tokens, SStatListCommand flags) {
     char fecha[MAX_LENGTH];
     struct tm fechaYHora;
@@ -213,6 +226,11 @@ int isDirectory(char *tokens) { // Comprueba si tokens es un directorio
     return isDirectory;
 }
 
+/**
+ *
+ * @param path - Ruta a eliminar
+ * @return 0 si todo fue correcto, -1 si no se puede abrir el directorio
+ */
 int delete_item(char *path) {
     char nuevaRuta[MAX_LENGTH];
     DIR *directorio;
@@ -246,6 +264,13 @@ int delete_item(char *path) {
     return 0;
 }
 
+/**
+ * Lista el contenido de la ruta introducida
+ * @param tokens - Nombre de la ruta introducida
+ * @param flags - Parámetros para mostrar la información
+ * @param ntokens - Cantidad de rutas que hay en el comando
+ * @return 0 si todo es correcto, -1 si no se puede abrir la ruta
+ */
 int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
     struct stat st;
     char previousDirectory[MAX_LENGTH], directory[MAX_LENGTH];
@@ -284,6 +309,13 @@ int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens) {
     return 0;
 }
 
+/**
+ * Lista todos los archivos de forma recursiva que hay en el arbol de directrios
+ * a partir del path introducido.
+ * @param path - Ruta de una carpeta
+ * @param flags - Struct con los parámetros que se usarán para mostrar información
+ * @return 0 si todo es correcto
+ */
 int listaArbolCarpetas(char *path, SStatListCommand flags) {
     char nuevaRuta[MAX_LENGTH];
     DIR *directorio;
@@ -330,32 +362,138 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
     return 0;
 }
 
-struct fechaHora fechaYHora() {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    struct fechaHora dateTime;
-    char mes[MAX_LENGTH];
+/**
+ * Esta función lista todos los elementos que hay guardados
+ * en la lista de malloc, y con un formato específico
+ *
+ * @param L Lista introducida para lista el malloc
+ */
+void mostrarListaMalloc(structListas L) {
+    for(pos p = first(L.allocateMalloc); !at_end(L.allocateMalloc, p); p = next(L.allocateMalloc, p)) {
+        struct allocateMalloc *LMB = get(L.allocateMalloc, p);
+        char fecha[MAX_LENGTH];
+        strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
 
-    switch(tm.tm_mon + 1) {
-        case 1: strcpy(mes, "Jan"); break;
-        case 2: strcpy(mes, "Feb"); break;
-        case 3: strcpy(mes, "Mar"); break;
-        case 4: strcpy(mes, "Apr"); break;
-        case 5: strcpy(mes, "May"); break;
-        case 6: strcpy(mes, "Jun"); break;
-        case 7: strcpy(mes, "Jul"); break;
-        case 8: strcpy(mes, "Aug"); break;
-        case 9: strcpy(mes, "Sep"); break;
-        case 10: strcpy(mes, "Oct"); break;
-        case 11: strcpy(mes, "Nov"); break;
-        case 12: strcpy(mes, "Dec"); break;
+        printf("\n%p\t\t%ld %s malloc", LMB->memoryAddress, LMB->size, fecha);
+    }
+}
+
+void mostrarListaShared(structListas L) {
+    for(pos p = first(L.allocateShared); !at_end(L.allocateShared, p); p = next(L.allocateShared, p)) {
+        struct allocateShared *LMB = get(L.allocateShared, p);
+        char fecha[MAX_LENGTH];
+        strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
+
+        printf("\n%p\t\t%ld %s shared (key %d)", LMB->memoryAddress, LMB->size, fecha, LMB->key);
+    }
+}
+
+void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
+    void * p;
+    int aux,id,flags=0777;
+    struct shmid_ds s;
+    time_t t = time(NULL);
+
+    if(tam) {    /*tam distito de 0 indica crear */
+        flags = flags | IPC_CREAT | IPC_EXCL;
     }
 
-    strcpy(dateTime.mes, mes);
-    dateTime.dia = tm.tm_mday;
-    dateTime.hora = tm.tm_hour;
-    dateTime.min = tm.tm_min;
+    if(clave == IPC_PRIVATE) { /*no nos vale*/
+        errno = EINVAL;
+        return NULL;
+    }
 
-    return dateTime;
+    if((id = shmget(clave, tam, flags)) == -1) {
+        return (NULL);
+    }
 
+    if((p = shmat(id,NULL,0)) == (void*) -1) {
+        aux = errno;
+
+        if(tam) {
+            shmctl(id,IPC_RMID,NULL);
+        }
+        errno = aux;
+        return (NULL);
+    }
+
+    shmctl(id,IPC_STAT,&s);
+    /* Guardar en la lista   InsertarNodoShared (&L, p, s.shm_segsz, clave); */
+    struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
+    LMB->memoryAddress = p;
+    LMB->size = (long int) tam;
+    LMB->tm = localtime(&t);
+    LMB->key = clave;
+
+    insert(&L->allocateShared, LMB);
+
+    return (p);
+}
+
+void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L) {
+    void * p;
+    int aux,id,flags=0777;
+    struct shmid_ds s;
+    time_t t = time(NULL);
+    shmctl(id,IPC_STAT,&s);
+
+    if(s.shm_segsz) {    /*tam distito de 0 indica crear */
+        flags = flags | IPC_CREAT | IPC_EXCL;
+    }
+
+    if(clave == IPC_PRIVATE) { /*no nos vale*/
+        errno = EINVAL;
+        return NULL;
+    }
+
+    if((id = shmget(clave, s.shm_segsz, flags)) == -1) {
+        return (NULL);
+    }
+
+    if((p = shmat(id,NULL,0)) == (void*) -1) {
+        aux = errno;
+
+        if(s.shm_segsz) {
+            shmctl(id,IPC_RMID,NULL);
+        }
+        errno = aux;
+        return (NULL);
+    }
+
+    shmctl(id,IPC_STAT,&s);
+    /* Guardar en la lista   InsertarNodoShared (&L, p, s.shm_segsz, clave); */
+    struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
+    LMB->memoryAddress = p;
+    LMB->size = (long int) s.shm_segsz;
+    LMB->tm = localtime(&t);
+    LMB->key = clave;
+
+    insert(&L->allocateShared, LMB);
+
+    return (p);
+}
+
+void do_AllocateCreateshared (char *tr[], structListas L)
+{
+    key_t cl;
+    size_t tam;
+    void *p;
+
+    if (tr[1]==NULL || tr[2]==NULL) {
+        mostrarListaShared(L);
+        return;
+    }
+
+    cl=(key_t)  strtoul(tr[1],NULL,10);
+    tam=(size_t) strtoul(tr[2],NULL,10);
+    if (tam==0) {
+        printf ("No se asignan bloques de 0 bytes\n");
+        return;
+    }
+    if ((p=ObtenerMemoriaShmget(cl,tam, &L))!=NULL) {
+        printf ("Asignados %lu bytes en %p\n",(unsigned long) tam, p);
+    } else {
+        printf("Imposible asignar memoria compartida clave %lu:%s\n",
+               (unsigned long) cl, strerror(errno));
+    }
 }

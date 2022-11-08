@@ -26,5 +26,5 @@ int elementsNumber(lista L);         // Cuenta cuantos elementos hay en la lista
 void deleteList(lista *L, void (* freedata)(void *));           // Elimina la lista entera, incluyendo la cabecera
 //pos prev(lista L,pos p);           // Retorna el elemento previo al indicado
 bool isEmptyList(lista L);           // Comprueba si una lista está vacía o no
-
+pos find(lista L, void *p);
 #endif //SHELL_C_lista_H

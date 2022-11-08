@@ -24,24 +24,21 @@ typedef struct statCommand {
 
 struct allocateMalloc {
     void *memoryAddress;
-    int size;
-    struct tm *timeAllocation;
-    char typeAllocation[MAX_LENGTH];
+    long int size;
+    struct tm *tm;
 };
 
 struct allocateShared {
     void *memoryAddress;
-    int size;
-    struct tm *timeAllocation;
-    char typeAllocation[MAX_LENGTH];
+    long int size;
+    struct tm *tm;
     int key;
 };
 
 struct allocateMmap {
     void *memoryAddress;
-    int size;
-    struct tm *timeAllocation;
-    char typeAllocation[MAX_LENGTH];
+    long int size;
+    struct tm *tm;
     char descritor[MAX_LENGTH];
 };
 
@@ -61,6 +58,8 @@ typedef struct listas {
 #include <sys/utsname.h> // Utilizada por la función infosis
 #include <sys/stat.h>
 #include <dirent.h>
+#include <sys/types.h>
+#include <sys/shm.h>
 //#include "funcionesAuxiliares.h"
 
 #include "comandos.h"
@@ -70,14 +69,6 @@ typedef struct listas {
 struct histData{ // Para obtener los commandos del historial
     char command[MAX_LENGTH];
 };
-
-struct fechaHora {
-    char mes[4];
-    int dia;
-    int hora;
-    int min;
-};
-
 
 // Código de París
 /*

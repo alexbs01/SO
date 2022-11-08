@@ -16,10 +16,10 @@ int main() {
     int ntokens;
     int endShell = 0;
     lista historial = createEmptyList(); // Inicializamos una lista con cabecera
-    lista listaMemoria = createEmptyList();
-    structListas listas;
-    listas.historial = historial;
-    listas.listMemoryBlocks = listaMemoria;
+    lista allocateMalloc = createEmptyList();
+    lista allocateShared = createEmptyList();
+    lista allocateMmap = createEmptyList();
+    structListas listas = {historial, allocateMalloc, allocateShared, allocateMmap};
 
     while(endShell != 1) {
 
@@ -43,7 +43,7 @@ int main() {
 
     }
     
-    deleteList(&listas.listMemoryBlocks, free);
+    deleteList(&listas.allocateMalloc, free);
     deleteList(&listas.historial, free); // Liberamos la memoria dinámica
     return 0;
 }

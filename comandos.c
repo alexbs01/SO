@@ -373,39 +373,50 @@ int allocate(char *tokens[], int ntokens, structListas *listas) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
     void *memoryAddress;
-    struct fechaHora dateTime;
     char typeOfAllocation[MAX_LENGTH];
 
 
     if(ntokens != 0) {
-        if(strcmp(tokens[0], "-malloc") == 0 && ntokens == 2) {
-            struct allocateMalloc LMB;
+        if(strcmp(tokens[0], "-malloc") == 0) {
+            if(ntokens == 2) {
+                struct allocateMalloc *LMB = malloc(sizeof(struct allocateMalloc));
+                int size = atoi(tokens[1]);
+                memoryAddress = malloc(*tokens[1]);
+                LMB->memoryAddress = memoryAddress;
+                LMB->size = size;
+                LMB->tm = localtime(&t);
 
-            int size = atoi(tokens[1]);
-            memoryAddress = malloc(*tokens[1]);
-            dateTime = fechaYHora();
-            LMB.memoryAddress = memoryAddress;
-            LMB.size = size;
-            LMB.timeAllocation = &tm;
-            strcpy(LMB.typeAllocation, "malloc");
+                printf("Asignados %d bytes en %p", size, LMB->memoryAddress);
 
-            printf("Asignados %d bytes en %p", size, LMB.memoryAddress);
-
-            insert(&listas->allocateMalloc, LMB);
-
+                insert(&listas->allocateMalloc, LMB);
+            } else if(ntokens == 1) {
+                printf("*** Lista de bloques asignados con malloc para el proceso %d", getpid());
+                mostrarListaMalloc(*listas);
+            }
 
         } else if(strcmp(tokens[0], "-shared") == 0 && ntokens == 2) {
+            //struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
+            key_t key = atoi(tokens[1]);
+            //void *tamano = get(listas->allocateShared, find(listas->allocateShared, tokens[1]));
+
+            void *ptr = ObtenerMemoriaShmget(key,0 , listas);
+
+            printf("Memoria compartida de clave %d en %p", key, ptr);
 
         } else if(strcmp(tokens[0], "-createshared") == 0 && ntokens == 3) {
-
+            int key = atoi(tokens[1]);
+            long int size = atoi(tokens[2]);
+            //ObtenerMemoriaShmget(key, size, listas);
+            do_AllocateCreateshared(tokens, *listas);
         } else if(strcmp(tokens[0], "-mmap") == 0 && ntokens == 3) {
 
         } else {
             printf("Uso: allocate [-malloc size | -shared | -createshared | -mmap] ...");
         }
     } else {
-        printf("*** Lista de bloque asignados para el proceso %d", getpid());
-
+        printf("*** Lista de bloques asignados para el proceso %d", getpid());
+        mostrarListaMalloc(*listas);
+        mostrarListaShared(*listas);
     }
 
 

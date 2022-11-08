@@ -89,3 +89,10 @@ void deleteList(lista *L, void (* freedata)(void *)) {
     }
     free(*L);
 }
+
+pos find(lista L, void *p) {
+    pos position;
+    for(position = second(L); position->next != NULL && position != p; position = next(L, position));
+
+    return position;
+}
