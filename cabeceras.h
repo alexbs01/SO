@@ -60,6 +60,8 @@ typedef struct listas {
 #include <dirent.h>
 #include <sys/types.h>
 #include <sys/shm.h>
+#include <sys/mman.h>
+#include <fcntl.h>
 //#include "funcionesAuxiliares.h"
 
 #include "comandos.h"

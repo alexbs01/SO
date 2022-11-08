@@ -388,6 +388,16 @@ void mostrarListaShared(structListas L) {
     }
 }
 
+void mostrarListaMmap(structListas L) {
+    for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
+        struct allocateMmap *LMB = get(L.allocateMmap, p);
+        char fecha[MAX_LENGTH];
+        strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
+
+        printf("\n%p\t\t%ld %s shared (key %s)", LMB->memoryAddress, LMB->size, fecha, LMB->descritor);
+    }
+}
+
 void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
     void * p;
     int aux,id,flags=0777;
@@ -436,9 +446,9 @@ void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L) {
     struct shmid_ds s;
     time_t t = time(NULL);
     shmctl(id,IPC_STAT,&s);
-
-    if(s.shm_segsz) {    /*tam distito de 0 indica crear */
-        flags = flags | IPC_CREAT | IPC_EXCL;
+    size_t tam = 0;
+    if(tam) {    /* tam distito de 0 indica crear */
+        //flags = flags | IPC_CREAT | IPC_EXCL;
     }
 
     if(clave == IPC_PRIVATE) { /*no nos vale*/
@@ -446,14 +456,14 @@ void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L) {
         return NULL;
     }
 
-    if((id = shmget(clave, s.shm_segsz, flags)) == -1) {
+    if((id = shmget(clave, (size_t) NULL, flags)) == -1) {
         return (NULL);
     }
 
     if((p = shmat(id,NULL,0)) == (void*) -1) {
         aux = errno;
 
-        if(s.shm_segsz) {
+        if(tam) {
             shmctl(id,IPC_RMID,NULL);
         }
         errno = aux;
@@ -464,7 +474,7 @@ void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L) {
     /* Guardar en la lista   InsertarNodoShared (&L, p, s.shm_segsz, clave); */
     struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
     LMB->memoryAddress = p;
-    LMB->size = (long int) s.shm_segsz;
+    LMB->size = (long int) tam;
     LMB->tm = localtime(&t);
     LMB->key = clave;
 
@@ -480,6 +490,7 @@ void do_AllocateCreateshared (char *tr[], structListas L)
     void *p;
 
     if (tr[1]==NULL || tr[2]==NULL) {
+        printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
         mostrarListaShared(L);
         return;
     }
@@ -496,4 +507,49 @@ void do_AllocateCreateshared (char *tr[], structListas L)
         printf("Imposible asignar memoria compartida clave %lu:%s\n",
                (unsigned long) cl, strerror(errno));
     }
+}
+
+void * MapearFichero (char * fichero, int protection, structListas *L)
+{
+    int df, map=MAP_PRIVATE,modo=O_RDONLY;
+    struct stat s;
+    void *p;
+    time_t t = time(NULL);
+
+    if(protection&PROT_WRITE)
+        modo=O_RDWR;
+    if (stat(fichero,&s) == -1 || (df=open(fichero, modo))==-1)
+        return NULL;
+    if ((p=mmap (NULL,s.st_size, protection,map,df,0))==MAP_FAILED)
+        return NULL;
+/* Guardar en la lista    InsertarNodoMmap (&L,p, s.st_size,df,fichero); */
+    struct allocateMmap *LMB = malloc(sizeof(struct allocateMmap));
+    LMB->memoryAddress = p;
+    LMB->size = s.st_size;
+    LMB->tm = localtime(&t);
+    strcpy(LMB->descritor, fichero);
+    insert(&L->allocateMmap, LMB);
+    return p;
+}
+
+void do_AllocateMmap(char *arg[], structListas L)
+{
+    char *perm;
+    void *p;
+    int protection=0;
+
+    if (arg[1]==NULL) {
+        printf("*** Lista de bloques asignados con mmap para el proceso %d", getpid());
+        mostrarListaMmap(L);
+        return;
+    }
+    if ((perm=arg[2])!=NULL && strlen(perm)<4) {
+        if (strchr(perm,'r')!=NULL) protection|=PROT_READ;
+        if (strchr(perm,'w')!=NULL) protection|=PROT_WRITE;
+        if (strchr(perm,'x')!=NULL) protection|=PROT_EXEC;
+    }
+    if ((p=MapearFichero(arg[1],protection, &L))==NULL)
+        perror ("Imposible mapear fichero");
+    else
+        printf ("fichero %s mapeado en %p\n", arg[1], p);
 }

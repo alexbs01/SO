@@ -34,10 +34,13 @@ int isDirectory(char *tokens); // Comprueba que sea un directorio
 int delete_item(char *path); // Borra recursivamente, hecha a partir del código de París
 int listarCarpeta(char *tokens, SStatListCommand flags, int ntokens); // Lista la carpeta
 int listaArbolCarpetas(char *path, SStatListCommand flags); // Lista carpetas de forma recursiva, hecha a partir del código de París
+
 void mostrarListaMalloc(structListas L);
 void mostrarListaShared(structListas L);
+void mostrarListaMmap(structListas L);
 void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L);
 void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L);
 void do_AllocateCreateshared (char *tr[], structListas L);
-
+void * MapearFichero (char * fichero, int protection, structListas *L);
+void do_AllocateMmap(char *arg[], structListas L);
 #endif //SHELL_C_FUNCIONESAUXILIARES_H
