@@ -395,20 +395,38 @@ int allocate(char *tokens[], int ntokens, structListas *listas) {
             }
 
         } else if(strcmp(tokens[0], "-shared") == 0) {
-            //struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
-            key_t key = atoi(tokens[1]);
-            //void *tamano = get(listas->allocateShared, find(listas->allocateShared, tokens[1]));
-            //printf("Memoria compartida de clave %d en %p", key, ptr);
+            if(ntokens == 2) {
+                struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
+                key_t key = atoi(tokens[1]);
+                void *tamano = get(listas->allocateShared, find(listas->allocateShared, tokens[1]));
+                void * ptr = ObtenerMemoriaShmget(key, (size_t) tamano, listas);
+                printf("Memoria compartida de clave %d en %p", key, ptr);
+
+            } else if(ntokens == 1) {
+                printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
+                mostrarListaShared(*listas);
+            }
 
         } else if(strcmp(tokens[0], "-createshared") == 0) {
-            int key = atoi(tokens[1]);
-            long int size = atoi(tokens[2]);
-            //ObtenerMemoriaShmget(key, size, listas);
-            do_AllocateCreateshared(tokens, *listas);
+            if(ntokens == 3) {
+                int key = atoi(tokens[1]);
+                long int size = atoi(tokens[2]);
+                //ObtenerMemoriaShmget(key, size, listas);
+                do_AllocateCreateshared(tokens, *listas);
+
+            } else if(ntokens == 1) {
+                printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
+                mostrarListaShared(*listas);
+            }
 
         } else if(strcmp(tokens[0], "-mmap") == 0) {
-            do_AllocateMmap(tokens, *listas);
+            if(ntokens == 2) {
+                do_AllocateMmap(tokens, *listas);
 
+            } else if(ntokens == 1) {
+                printf("*** Lista de bloques asignados con mmap para el proceso %d", getpid());
+                mostrarListaMmap(*listas);
+            }
         } else {
             printf("Uso: allocate [-malloc size | -shared | -createshared | -mmap] ...");
         }
@@ -419,15 +437,65 @@ int allocate(char *tokens[], int ntokens, structListas *listas) {
         mostrarListaMmap(*listas);
     }
 
-
     return 0;
 }
 int deallocate(char *tokens[], int ntokens, structListas *listas) {
+    if (ntokens != 0) {
+        if (strcmp(tokens[0], "-malloc") == 0) {
+            if (ntokens == 2) {
+                deallocateMalloc(*listas, atoi(tokens[1]));
+
+            } else if (ntokens == 1) {
+                printf("*** Lista de bloques asignados con malloc para el proceso %d", getpid());
+                mostrarListaMalloc(*listas);
+            }
+
+        } else if (strcmp(tokens[0], "-shared") == 0) {
+            if (ntokens == 2) {
+                //// Liberar Shared
+
+            } else if (ntokens == 1) {
+                printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
+                mostrarListaShared(*listas);
+            }
+
+        } else if (strcmp(tokens[0], "-createshared") == 0) {
+            if (ntokens == 2) {
+                //// Liberar Shared
+
+            } else if (ntokens == 1) {
+                printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
+                mostrarListaShared(*listas);
+            }
+
+        } else if (strcmp(tokens[0], "-mmap") == 0) {
+            if (ntokens == 2) {
+                //// Liberar Mmap
+
+            } else if (ntokens == 1) {
+                printf("*** Lista de bloques asignados con mmap para el proceso %d", getpid());
+                mostrarListaMmap(*listas);
+            }
+
+        } else {
+            printf("[] Desasigna un bloque de memoria. \n [-malloc tam] Desasigna un bloque malloc de tamano tam. \n [-shared cl] Desasigna (desmapea) el bloque de memoria compartida de clave cl. \n [-delkey cl] Elimina del sistema (sin desmapear) la clave de memoria cl. \n [-nmap fich] Desmapea el fichero mapeado fich. \n [-addr] Desasigna el bloque de memoria en la dirección adrr");
+        }
+    } else {
+        printf("*** Lista de bloques asignados para el proceso %d", getpid());
+        mostrarListaMalloc(*listas);
+        mostrarListaShared(*listas);
+        mostrarListaMmap(*listas);
+    }
 
     return 0;
 }
 
 int io(char *tokens[], int ntokens, structListas *listas) {
+    if(strcmp(tokens[0], "-read") == 0) {
+        do_I_O_read(tokens);
+    } else if(strcmp(tokens[0], "-write") == 0) {
+        do_I_O_write(tokens);
+    }
 
     return 0;
 }

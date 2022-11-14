@@ -96,3 +96,11 @@ pos find(lista L, void *p) {
 
     return position;
 }
+
+void deletepos(lista *L, pos p) {
+    if(!isEmptyList(*L)) {
+        if(p == first(*L)) {
+            *L = next(*L,p);
+        } else if(p == )
+    }
+}

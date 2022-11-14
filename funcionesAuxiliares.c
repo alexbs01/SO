@@ -164,7 +164,9 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
     char linkSimbolico[MAX_LENGTH];
     long espacio = tamanoFichero(tokens);
 
-    lstat(tokens, &datos); // Carga en datos la dirección
+    if(lstat(tokens, &datos) == -1) { // Carga en datos la información del archivo
+        return 1;
+    }
 
     if(!flags.longFlag) {
         if(espacio == -1) {
@@ -176,9 +178,6 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
     } else {
         (flags.accFlag)? (localtime_r(&datos.st_atime, &fechaYHora)) : (localtime_r(&datos.st_mtime, &fechaYHora));
 
-        if(lstat(tokens, &datos) == -1) { // Carga en datos la información del archivo
-            return 1;
-        }
 
         // Guarda los datos de usuario, grupos y permisos
         if(getpwuid(datos.st_uid) != NULL) {
@@ -209,6 +208,7 @@ int printStatAndList(char *tokens, SStatListCommand flags) {
         // Si el flag de links simbólicos y la función readlink dan true, mostrará el link
         // Cuando readlink falla retorna un -1
         if(flags.linkFlag && (readlink(tokens, linkSimbolico, MAX_LENGTH) != -1)) {
+            strcat(linkSimbolico, "\0");
             printf(" --> %s\n", linkSimbolico);
 
         } else {
@@ -394,7 +394,7 @@ void mostrarListaMmap(structListas L) {
         char fecha[MAX_LENGTH];
         strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
 
-        printf("\n%p\t\t%ld %s shared (key %s)", LMB->memoryAddress, LMB->size, fecha, LMB->descritor);
+        printf("\n%p\t\t%ld %s %s (key %s)", LMB->memoryAddress, LMB->size, fecha, LMB->descritor, LMB->descritor);
     }
 }
 
@@ -446,9 +446,9 @@ void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L) {
     struct shmid_ds s;
     time_t t = time(NULL);
     shmctl(id,IPC_STAT,&s);
-    size_t tam = 0;
+    size_t tam = 100;
     if(tam) {    /* tam distito de 0 indica crear */
-        //flags = flags | IPC_CREAT | IPC_EXCL;
+        flags = flags | IPC_CREAT | IPC_EXCL;
     }
 
     if(clave == IPC_PRIVATE) { /*no nos vale*/
@@ -552,4 +552,116 @@ void do_AllocateMmap(char *arg[], structListas L)
         perror ("Imposible mapear fichero");
     else
         printf ("fichero %s mapeado en %p\n", arg[1], p);
+}
+
+void deallocateMalloc(structListas L, int tam) {
+    for(pos p = first(L.allocateMalloc); !at_end(L.allocateMalloc, p); p = next(L.allocateMalloc, p)) {
+        struct allocateMalloc *LMB = get(L.allocateMalloc, p);
+
+        if (LMB->size == tam) {
+            free(LMB->memoryAddress);
+        }
+    }
+}
+
+
+void do_DeallocateDelkey (char *args[])
+{
+    key_t clave;
+    int id;
+    char *key=args[1];
+
+    if (key==NULL || (clave=(key_t) strtoul(key,NULL,10))==IPC_PRIVATE){
+        printf ("      delkey necesita clave_valida\n");
+        return;
+    }
+    if ((id=shmget(clave,0,0666))==-1){
+        perror ("shmget: imposible obtener memoria compartida");
+        return;
+    }
+    if (shmctl(id,IPC_RMID,NULL)==-1)
+        perror ("shmctl: imposible eliminar memoria compartida\n");
+}
+
+ssize_t LeerFichero (char *f, void *p, size_t cont)
+{
+    struct stat s;
+    ssize_t  n;
+    int df,aux;
+
+    if (stat (f,&s)==-1 || (df=open(f,O_RDONLY))==-1)
+        return -1;
+    if (cont==-1)   /* si pasamos -1 como bytes a leer lo leemos entero*/
+        cont=s.st_size;
+    if ((n=read(df,p,cont))==-1){
+        aux=errno;
+        close(df);
+        errno=aux;
+        return -1;
+    }
+    close (df);
+    return n;
+}
+
+void do_I_O_read (char *ar[])
+{
+    void *p;
+    size_t cont=-1;
+    ssize_t n;
+    if (ar[1]==NULL || ar[2]==NULL){
+        printf ("faltan parametros\n");
+        return;
+    }
+    p=/*cadtop(ar[1])*/(void *) ar[2];  /*convertimos de cadena a puntero*/
+    if (ar[3]!=NULL)
+        cont=(size_t) atoll(ar[3]);
+
+    if ((n=LeerFichero(ar[1],p,cont))==-1)
+        perror ("Imposible leer fichero");
+    else
+        printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[1],p);
+}
+
+ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite)
+{
+    ssize_t  n;
+    int df,aux, flags=O_CREAT | O_EXCL | O_WRONLY;
+
+    if (overwrite)
+        flags=O_CREAT | O_WRONLY | O_TRUNC;
+
+    if ((df=open(f,flags,0777))==-1)
+        return -1;
+
+    if ((n=write(df,p,cont))==-1){
+        aux=errno;
+        close(df);
+        errno=aux;
+        return -1;
+    }
+    close (df);
+    return n;
+}
+
+void do_I_O_write (char *ar[])
+{
+    void *p;
+    size_t cont=-1;
+    ssize_t n;
+    int overwrite = 0;
+
+    if(strcmp(ar[1], "-o") == 0) overwrite = 1;
+
+    if (ar[2]==NULL || ar[3]==NULL){
+        printf ("Faltan parámetros\n");
+        return;
+    }
+    p=/*cadtop(ar[1])*/(void *) ar[3];  /*convertimos de cadena a puntero*/
+    if (ar[4]!=NULL)
+        cont=(size_t) atoll(ar[4]);
+
+    if ((n=EscribirFichero(ar[2],p,cont, overwrite))==-1)
+        perror ("Imposible escribir fichero");
+    else
+        printf ("Escritos %lld bytes de %s en %p\n",(long long) n,ar[2],p);
 }
