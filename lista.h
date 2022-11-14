@@ -24,8 +24,8 @@ int at_end(lista L, pos p);          // Devuelve 1 si el elemento indicado es el
 void *get(lista L, pos p);           // Nos permite obtener la información del nodo especificado
 int elementsNumber(lista L);         // Cuenta cuantos elementos hay en la lista
 void deleteList(lista *L, void (* freedata)(void *));           // Elimina la lista entera, incluyendo la cabecera
-//pos prev(lista L,pos p);           // Retorna el elemento previo al indicado
+pos prev(lista L,pos p);           // Retorna el elemento previo al indicado
 bool isEmptyList(lista L);           // Comprueba si una lista está vacía o no
 pos find(lista L, void *p);
-void deletepos(lista *L, pos p);     // Elimina la posición dada de la lista.
+void deleteAtPosition(pos p, lista *L) ;     // Elimina la posición dada de la lista.
 #endif //SHELL_C_lista_H

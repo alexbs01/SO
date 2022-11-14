@@ -559,7 +559,7 @@ void deallocateMalloc(structListas L, int tam) {
         struct allocateMalloc *LMB = get(L.allocateMalloc, p);
 
         if (LMB->size == tam) {
-            free(LMB->memoryAddress);
+            deleteAtPosition(L.allocateMalloc, &p);
         }
     }
 }
@@ -646,22 +646,39 @@ ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite)
 void do_I_O_write (char *ar[])
 {
     void *p;
+    char *ptr;
     size_t cont=-1;
     ssize_t n;
     int overwrite = 0;
 
     if(strcmp(ar[1], "-o") == 0) overwrite = 1;
 
-    if (ar[2]==NULL || ar[3]==NULL){
+   /* if (ar[2]==NULL || ar[3]==NULL){
         printf ("Faltan parámetros\n");
         return;
-    }
-    p=/*cadtop(ar[1])*/(void *) ar[3];  /*convertimos de cadena a puntero*/
-    if (ar[4]!=NULL)
+    }*/
+   // p=/*cadtop(ar[1])*/(void *) ar[3];  /*convertimos de cadena a puntero*/
+   /* if (ar[4]!=NULL)
         cont=(size_t) atoll(ar[4]);
 
     if ((n=EscribirFichero(ar[2],p,cont, overwrite))==-1)
         perror ("Imposible escribir fichero");
     else
-        printf ("Escritos %lld bytes de %s en %p\n",(long long) n,ar[2],p);
+        printf ("Escritos %lld bytes de %s en %p\n",(long long) n,ar[2],p);*/
+
+
+    if((strcmp(ar[1], "-o")==0)){
+        creat(ar[2], 0666);
+        long addr = strtoul(ar[3],&ptr,16);
+        if(EscribirFichero(ar[2], (long *)addr, atoi(ar[4]), overwrite) == -1)
+            perror("error de escritura");
+        else {
+
+        }
+    }else if(open(ar[1],O_RDWR)==-1){
+        creat(ar[1], 0666);
+        long addr = strtoul(ar[2],&ptr,16);
+        if(EscribirFichero(ar[1], (long *)addr, atoi(ar[3]), overwrite) == -1)
+            perror("error de escritura");
+    }
 }

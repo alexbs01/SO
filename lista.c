@@ -70,13 +70,13 @@ bool isEmptyList(lista L) {
     return L->next == NULL;
 }
 
-/*pos prev(lista L,pos p) {
+pos prev(lista L,pos p) {
     pos q;
     for(q = first(L); q -> next != p; q = next(L,q)) {
     }
     return q;
 }
-*/
+
 
 void deleteList(lista *L, void (* freedata)(void *)) {
     pos p = (*L)->next;
@@ -97,10 +97,25 @@ pos find(lista L, void *p) {
     return position;
 }
 
-void deletepos(lista *L, pos p) {
-    if(!isEmptyList(*L)) {
-        if(p == first(*L)) {
-            *L = next(*L,p);
-        } else if(p == )
+void deleteAtPosition(pos p, lista *L) {
+    /* p elemento a eliminar
+     * q elemento siguiente al eliminado */
+    pos q;
+
+    if(p == *L) { // Eliminado en la primera posición de la lista
+        *L = (*L)->next;
+
+    } else if(p->next == NULL) { // Eliminado en la última posición
+        for(q = *L; q->next->next != NULL; q = q->next);
+        q->next = NULL;
+
+    } else { // Eliminado de un elemento que no se encuentra en los extremos
+        q = p->next;
+        p->data = q->data;
+        p->next = q->next;
+        p = q;
     }
+
+    free(p);
+    printf("\nSe hizo free correctamente");
 }
