@@ -46,8 +46,8 @@ struct cmd cmds[] = {
         {"list", list, "[] Lista el contenido de directorios. \n [-reca] Lo hace recursivamente antes. \n [-recb] Recursivamente después. \n [-hid] Muestra también los fichero ocultos. \n [-long] Usa el formato largo. \n [-acc] Modifica la hora del último acceso. \n [link] Si hay enlace simbólico, muestra a que hace referencia."},
         {"delete", delete, "[name1, name2...] Elimina los ficheros o directorios vacíos que se pasan como parámetro."},
         {"deltree", deltree, "[name1, name2...] Elimina los ficheros o directorios vacíos de forma recursiva."},
-        {"allocate", allocate, "[] Asigna un bloque de memoria. \n [-malloc tam] Asigna un bloque malloc de tamaño tam. \n [-shared cl] Asigna el bloque de memoria compartida (ya existe) de clave cl. \n [-createshared cl tam] Asigna (creando) el bloque de memoria compartida de clave cl y tamaño tam. \n [-nmap fich perm] mapea el fichero fich, perm son los permisos."},
-        {"deallocate", deallocate, "[] Desasigna un bloque de memoria. \n [-malloc tam] Desasigna un bloque malloc de tamano tam. \n [-shared cl] Desasigna (desmapea) el bloque de memoria compartida de clave cl. \n [-delkey cl] Elimina del sistema (sin desmapear) la clave de memoria cl. \n [-nmap fich] Desmapea el fichero mapeado fich. \n [-addr] Desasigna el bloque de memoria en la dirección adrr"},
+        {"allocate", allocate, "[] Asigna un bloque de memoria. \n [-malloc tam] Asigna un bloque malloc de tamaño tam. \n [-shared cl] Asigna el bloque de memoria compartida (ya existe) de clave cl. \n [-createshared cl tam] Asigna (creando) el bloque de memoria compartida de clave cl y tamaño tam. \n [-mmap fich perm] mapea el fichero fich, perm son los permisos."},
+        {"deallocate", deallocate, "[] Desasigna un bloque de memoria. \n [-malloc tam] Desasigna un bloque malloc de tamano tam. \n [-shared cl] Desasigna (desmapea) el bloque de memoria compartida de clave cl. \n [-delkey cl] Elimina del sistema (sin desmapear) la clave de memoria cl. \n [-mmap fich] Desmapea el fichero mapeado fich. \n [-addr] Desasigna el bloque de memoria en la dirección addr."},
         {"i-o", io, "[-read fich addr cont] Lee cont bytes desde fich a addr. \n [-wirte [-o] fich addr cont] Escribe cont bytes desde addr a fich. -o para sobreescribir addr es una dirección de memoria."},
         {"memdump", memdump, "[addr cont] Vuelca en pantallas los contenidos (cont bytes) de la posición de memoria adrr."},
         {"memfill", memfill, "[addr cont byte] Llena la memoria a partir de addr con byte."},
@@ -394,7 +394,7 @@ void mostrarListaMmap(structListas L) {
         char fecha[MAX_LENGTH];
         strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
 
-        printf("\n%p\t\t%ld %s %s (key %s)", LMB->memoryAddress, LMB->size, fecha, LMB->descritor, LMB->descritor);
+        printf("\n%p\t\t%ld %s %s (descriptor %d)", LMB->memoryAddress, LMB->size, fecha, LMB->fich, LMB->descritor);
     }
 }
 
@@ -527,7 +527,8 @@ void * MapearFichero (char * fichero, int protection, structListas *L)
     LMB->memoryAddress = p;
     LMB->size = s.st_size;
     LMB->tm = localtime(&t);
-    strcpy(LMB->descritor, fichero);
+    LMB->descritor = df;
+    strcpy(LMB->fich, fichero);
     insert(&L->allocateMmap, LMB);
     return p;
 }
@@ -578,8 +579,7 @@ void deallocateShared(structListas L, key_t key) {
     }
 }
 
-void do_DeallocateDelkey (char *args[])
-{
+void do_DeallocateDelkey (char *args[]) {
     key_t clave;
     int id;
     char *key=args[1];
@@ -595,7 +595,18 @@ void do_DeallocateDelkey (char *args[])
     if (shmctl(id,IPC_RMID,NULL)==-1)
         perror ("shmctl: imposible eliminar memoria compartida\n");
 
+}
 
+void deallocateMmap(structListas L, char *args[]) {
+    for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
+        struct allocateMmap *LMB = get(L.allocateMmap, p);
+
+        if(strcmp(LMB->fich, args[1]) == 0) {
+            munmap(LMB->memoryAddress, LMB->size);
+            deleteAtPosition(&L.allocateMmap, p);
+            break;
+        }
+    }
 }
 
 ssize_t LeerFichero (char *f, void *p, size_t cont)
@@ -671,7 +682,7 @@ void do_I_O_write (char *ar[])
     if (ar[3]!=NULL)
         cont=(size_t) atoll(ar[3]);
 
-    if ((n=EscribirFichero(ar[1],p,cont, ))==-1)
+    if ((n=LeerFichero(ar[1],p,cont))==-1)
         perror ("Imposible leer fichero");
     else
         printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[1],p);

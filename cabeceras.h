@@ -39,7 +39,8 @@ struct allocateMmap {
     void *memoryAddress;
     long int size;
     struct tm *tm;
-    char descritor[MAX_LENGTH];
+    int descritor;
+    char fich[MAX_LENGTH];
 };
 
 typedef struct listas {

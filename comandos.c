@@ -377,7 +377,6 @@ int allocate(char *tokens[], int ntokens, structListas *listas) {
     void *memoryAddress;
     char typeOfAllocation[MAX_LENGTH];
 
-
     if(ntokens != 0) {
         if(strcmp(tokens[0], "-malloc") == 0) {
             if(ntokens == 2) {
@@ -472,10 +471,19 @@ int deallocate(char *tokens[], int ntokens, structListas *listas) {
 
         } else if (strcmp(tokens[0], "-mmap") == 0) {
             if (ntokens == 2) {
-                //// Liberar Mmap
+                deallocateMmap(*listas, tokens);
 
             } else if (ntokens == 1) {
                 printf("*** Lista de bloques asignados con mmap para el proceso %d", getpid());
+                mostrarListaMmap(*listas);
+            }
+
+        } else if (strcmp(tokens[0], "-addr") == 0) {
+            if (ntokens == 2) {
+                //// Liberar addr
+
+            } else if (ntokens == 1) {
+                printf("*** Lista de bloques asignados con addr para el proceso %d", getpid());
                 mostrarListaMmap(*listas);
             }
 
@@ -562,6 +570,8 @@ int recurse(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 1) {
         Recursiva(atoi(tokens[0]));
     }
+
     return 0;
 }
+
 
