@@ -39,7 +39,6 @@ void mostrarListaMalloc(structListas L);
 void mostrarListaShared(structListas L);
 void mostrarListaMmap(structListas L);
 void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L);
-void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L);
 void do_AllocateCreateshared (char *tr[], structListas L);
 void * MapearFichero (char * fichero, int protection, structListas *L);
 void do_AllocateMmap(char *arg[], structListas L);

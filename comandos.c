@@ -329,7 +329,6 @@ int list(char *tokens[], int ntokens, structListas *listas) {
     return 0;
 }
 
-
 int delete(char *tokens[], int ntokens, structListas *listas) {
     char error[] = "No se pudo borrar el fichero";
     int i = 0;
@@ -344,6 +343,7 @@ int delete(char *tokens[], int ntokens, structListas *listas) {
             }
             i++;
         } while(i < ntokens);
+
     } else {
         carpeta(NULL, 0, NULL);
     }
@@ -371,6 +371,15 @@ int deltree(char *tokens[], int ntokens, structListas *listas) {
     return 0;
 }
 
+/**
+ * Reserva memoria para malloc, para una zona de memoria compartida y para
+ * mapear ficheros
+ *
+ * @param tokens - Parámetros para reservar memoria
+ * @param ntokens - Número de tokens
+ * @param listas - Lista en la que se insertarán los datos
+ * @return 0 si todo es correcto
+ */
 int allocate(char *tokens[], int ntokens, structListas *listas) {
     time_t t = time(NULL);
     struct tm tm = *localtime(&t);
@@ -440,6 +449,15 @@ int allocate(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
+
+/**
+ * Libera la memoria indicada a través de los parámetros
+ *
+ * @param tokens - Parámetros para liberar memoria
+ * @param ntokens - Número de tokens
+ * @param listas - Lista en la que se insertarán los datos
+ * @return 0 si todo es correcto
+ */
 int deallocate(char *tokens[], int ntokens, structListas *listas) {
     if (ntokens != 0) {
         if (strcmp(tokens[0], "-malloc") == 0) {
@@ -479,12 +497,8 @@ int deallocate(char *tokens[], int ntokens, structListas *listas) {
             }
 
         } else if (strcmp(tokens[0], "-addr") == 0) {
-            if (ntokens == 2) {
-                //// Liberar addr
-
-            } else if (ntokens == 1) {
-                printf("*** Lista de bloques asignados con addr para el proceso %d", getpid());
-                mostrarListaMmap(*listas);
+            if (ntokens == 1) {
+               // deallocateAdrr(*listas, tokens[0]);
             }
 
         } else {
@@ -531,6 +545,7 @@ int memfill(char *tokens[], int ntokens, structListas *listas) {
 int memory(char *tokens[], int ntokens, structListas *listas) {
     int local1 = 1, local2 = 2, local3 = 3;
     int static static1 = 1, static2 = 2, static3 = 3;
+
     if(strcmp(tokens[0], "-blocks") == 0) {
         printf("*** Lista de bloques asignados para el proceso %d", getpid());
         mostrarListaMalloc(*listas);
@@ -540,10 +555,12 @@ int memory(char *tokens[], int ntokens, structListas *listas) {
     } else if(strcmp(tokens[0], "-funcs") == 0) {
         printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
         printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
+
     } else if(strcmp(tokens[0], "-vars") == 0) {
         printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
         printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
         printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
+
     } else if(strcmp(tokens[0], "-all") == 0) {
         printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
         printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
@@ -557,11 +574,11 @@ int memory(char *tokens[], int ntokens, structListas *listas) {
 
     } else if(strcmp(tokens[0], "-pmap") == 0) {
         Do_pmap();
+
     } else {
         printf("Parámetro no válido");
+
     }
-
-
 
     return 0;
 }

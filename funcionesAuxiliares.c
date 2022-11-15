@@ -378,6 +378,12 @@ void mostrarListaMalloc(structListas L) {
     }
 }
 
+/**
+ * Esta función lista todos los elementos que hay guardados
+ * en la lista de shared, y con un formato específico
+ *
+ * @param L Lista introducida para lista el shared
+ */
 void mostrarListaShared(structListas L) {
     for(pos p = first(L.allocateShared); !at_end(L.allocateShared, p); p = next(L.allocateShared, p)) {
         struct allocateShared *LMB = get(L.allocateShared, p);
@@ -388,6 +394,12 @@ void mostrarListaShared(structListas L) {
     }
 }
 
+/**
+ * Esta función lista todos los elementos que hay guardados
+ * en la lista de mmap, y con un formato específico
+ *
+ * @param L Lista introducida para lista el mmap
+ */
 void mostrarListaMmap(structListas L) {
     for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
         struct allocateMmap *LMB = get(L.allocateMmap, p);
@@ -398,13 +410,21 @@ void mostrarListaMmap(structListas L) {
     }
 }
 
+/**
+ * Crea una zona de memoria compartida a partir de una clave
+ *
+ * @param clave - Clave de la memoria compartida
+ * @param tam - Tamaño de la memoria, si es 0 no se crea una clave nueva
+ * @param L - Lista en la que se insertarán los datos
+ * @return
+ */
 void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
     void * p;
     int aux,id,flags=0777;
     struct shmid_ds s;
     time_t t = time(NULL);
 
-    if(tam) {    /*tam distito de 0 indica crear */
+    if(tam) {    /*tam distinto de 0 indica crear */
         flags = flags | IPC_CREAT | IPC_EXCL;
     }
 
@@ -440,49 +460,13 @@ void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
     return (p);
 }
 
-void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L) {
-    void * p;
-    int aux,id,flags=0777;
-    struct shmid_ds s;
-    time_t t = time(NULL);
-    shmctl(id,IPC_STAT,&s);
-    size_t tam = 100;
-    if(tam) {    /* tam distito de 0 indica crear */
-        flags = flags | IPC_CREAT | IPC_EXCL;
-    }
-
-    if(clave == IPC_PRIVATE) { /*no nos vale*/
-        errno = EINVAL;
-        return NULL;
-    }
-
-    if((id = shmget(clave, (size_t) NULL, flags)) == -1) {
-        return (NULL);
-    }
-
-    if((p = shmat(id,NULL,0)) == (void*) -1) {
-        aux = errno;
-
-        if(tam) {
-            shmctl(id,IPC_RMID,NULL);
-        }
-        errno = aux;
-        return (NULL);
-    }
-
-    shmctl(id,IPC_STAT,&s);
-    /* Guardar en la lista   InsertarNodoShared (&L, p, s.shm_segsz, clave); */
-    struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
-    LMB->memoryAddress = p;
-    LMB->size = (long int) tam;
-    LMB->tm = localtime(&t);
-    LMB->key = clave;
-
-    insert(&L->allocateShared, LMB);
-
-    return (p);
-}
-
+/**
+ *  Crea una zona de memoria compartida a partir de una clave introducida
+ *  por el usuario
+ *
+ * @param tr - Parámetros para crear la clave, key tamaño
+ * @param L - Lista en la que se insertará la información del bloque
+ */
 void do_AllocateCreateshared (char *tr[], structListas L)
 {
     key_t cl;
@@ -509,6 +493,14 @@ void do_AllocateCreateshared (char *tr[], structListas L)
     }
 }
 
+/**
+ * Mapea un archivo con los permisos indicados
+ *
+ * @param fichero - Nombre del fichero a mapear
+ * @param protection - Permisos del fichero
+ * @param L - Lista en la que se insertarán los datos correspondientes
+ * @return - Dirección en la que se mapea el archivo
+ */
 void * MapearFichero (char * fichero, int protection, structListas *L)
 {
     int df, map=MAP_PRIVATE,modo=O_RDONLY;
@@ -533,6 +525,12 @@ void * MapearFichero (char * fichero, int protection, structListas *L)
     return p;
 }
 
+/**
+ * Función principal del mapeo de un fichero
+ *
+ * @param arg - Parámetros para el mapeo
+ * @param L - Lista en la que se insertarán los datos del mapeo
+ */
 void do_AllocateMmap(char *arg[], structListas L)
 {
     char *perm;
@@ -555,6 +553,12 @@ void do_AllocateMmap(char *arg[], structListas L)
         printf ("fichero %s mapeado en %p\n", arg[1], p);
 }
 
+/**
+ * Libera el primer malloc que tenga el tamaño indicado en la entrada
+ *
+ * @param L - Lista en la que buscará la memoria d liberar
+ * @param tam - Tamaño que se liberará
+ */
 void deallocateMalloc(structListas L, long int tam) {
     for(pos p = first(L.allocateMalloc); !at_end(L.allocateMalloc, p); p = next(L.allocateMalloc, p)) {
         struct allocateMalloc *LMB = get(L.allocateMalloc, p);
@@ -567,6 +571,12 @@ void deallocateMalloc(structListas L, long int tam) {
     }
 }
 
+/**
+ * Desmapea la primera zona de memoria compartida que tenga la memoria indicada
+ *
+ * @param L - Lista en la que buscará la memoria d liberar
+ * @param key - Clave que se buscará
+ */
 void deallocateShared(structListas L, key_t key) {
     for(pos p = first(L.allocateShared); !at_end(L.allocateShared, p); p = next(L.allocateShared, p)) {
         struct allocateShared *LMB = get(L.allocateShared, p);
@@ -579,6 +589,11 @@ void deallocateShared(structListas L, key_t key) {
     }
 }
 
+/**
+ * Crea una clave y una zona de memoria compartida con el tamaño indicado
+ *
+ * @param args - Parámetros de entrada, clave tamaño
+ */
 void do_DeallocateDelkey (char *args[]) {
     key_t clave;
     int id;
@@ -597,6 +612,12 @@ void do_DeallocateDelkey (char *args[]) {
 
 }
 
+/**
+ * Despmapea al archivo escrito en la entrada
+ *
+ * @param L - Lista sobre la que se buscará la dirección
+ * @param args - Fichero para despmapear
+ */
 void deallocateMmap(structListas L, char *args[]) {
     for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
         struct allocateMmap *LMB = get(L.allocateMmap, p);
@@ -674,71 +695,91 @@ void do_I_O_write (char *ar[])
     void *p;
     size_t cont=-1;
     ssize_t n;
-    if (ar[1]==NULL || ar[2]==NULL){
+    int overwrite = 0;
+    if(strcmp(ar[1], "-o") == 0) {
+        overwrite = 1;
+    }
+    if (ar[1 + overwrite]==NULL || ar[2 + overwrite]==NULL){
         printf ("faltan parametros\n");
         return;
     }
-    p=/*cadtop(ar[1])*/(void *) ar[2];  /*convertimos de cadena a puntero*/
-    if (ar[3]!=NULL)
-        cont=(size_t) atoll(ar[3]);
+    p=/*cadtop(ar[1])*/(void *) ar[2 + overwrite];  /*convertimos de cadena a puntero*/
+    if (ar[3 + overwrite]!=NULL)
+        cont=(size_t) atoll(ar[3 + overwrite]);
 
-    if ((n=LeerFichero(ar[1],p,cont))==-1)
+    if ((n=EscribirFichero(ar[1 + overwrite], p, cont, overwrite)) == -1)
         perror ("Imposible leer fichero");
     else
-        printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[1],p);
+        printf ("leidos %lld bytes de %s en %p\n",(long long) n, ar[1 + overwrite], p);
 }
 
-void LlenarMemoria (void *p, size_t cont, unsigned char byte)
-{
-
+/**
+ * Llena una zona de memoria desde p y cont bytes, con el byte escrito por la
+ * entrada
+ *
+ * @param p - Dirección de memoria que comenzará a llenarse
+ * @param cont - Cantidad de bytes que se llenarán
+ * @param byte - El byte con el que se llenará la dirección indicada
+ */
+void LlenarMemoria (void *p, size_t cont, unsigned char byte) {
     unsigned char *arr = (unsigned char *) p;
     size_t i;
 
-    for (i=0; i<cont;i++) {
-        arr[i]=byte;
+    for(i=0; i<cont; i++) {
+        arr[i] = byte;
     }
 
     printf("Llenando %lu bytes de memoria con el byte (%u) a partir de la dirección %p", i, byte, arr);
 
 }
 
-void Do_pmap (void) /*sin argumentos*/
-{ pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
+void Do_pmap(void) {/*sin argumentos*/
+    pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
     char elpid[32];
     char *argv[4]={"pmap",elpid,NULL};
 
     sprintf (elpid,"%d", (int) getpid());
-    if ((pid=fork())==-1){
+    if((pid=fork())==-1){
         perror ("Imposible crear proceso");
         return;
     }
-    if (pid==0){
-        if (execvp(argv[0],argv)==-1)
+
+    if(pid==0){
+        if(execvp(argv[0],argv)==-1) {
             perror("cannot execute pmap (linux, solaris)");
+        }
 
         argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;
-        if (execvp(argv[0],argv)==-1)/*No hay pmap, probamos procstat FreeBSD */
+        if(execvp(argv[0],argv)==-1) {/*No hay pmap, probamos procstat FreeBSD */
             perror("cannot execute procstat (FreeBSD)");
+        }
 
         argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;
-        if (execvp(argv[0],argv)==-1)  /*probamos procmap OpenBSD*/
+        if(execvp(argv[0],argv)==-1) { /*probamos procmap OpenBSD*/
             perror("cannot execute procmap (OpenBSD)");
+        }
 
         argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
-        if (execvp(argv[0],argv)==-1) /*probamos vmmap Mac-OS*/
+        if(execvp(argv[0],argv)==-1) {/*probamos vmmap Mac-OS*/
             perror("cannot execute vmmap (Mac-OS)");
+        }
         exit(1);
     }
-    waitpid (pid,NULL,0);
+    waitpid(pid,NULL,0);
 }
 
-void Recursiva (int n)
-{
+/**
+ * Muestra un printf que enseña direcciones de memoria de forma recursiva
+ * @param n - Número de veces que queremos que se repita la función recursiva
+ */
+void Recursiva(int n) {
     char automatico[MAX_LENGTH];
     static char estatico[MAX_LENGTH];
 
-    printf ("parametro:%3d(%p) array %p, arr estatico %p\n",n,&n,automatico, estatico);
+    printf("parametro:%3d(%p) array %p, arr estatico %p\n", n, &n, automatico, estatico);
 
-    if (n>0)
+    if(n>0) {
         Recursiva(n-1);
+    }
+
 }
