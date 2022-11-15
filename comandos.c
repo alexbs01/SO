@@ -8,6 +8,8 @@
 #include <stdlib.h>
 #include "comandos.h"
 
+int global1 = 1, global2 = 2, global3 = 3;
+
 int autores(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 1) {                                          // Miramos si autores viene acompañado de [-l] o [-n]
         if(strcmp(tokens[0], "-l") == 0) {
@@ -396,10 +398,10 @@ int allocate(char *tokens[], int ntokens, structListas *listas) {
 
         } else if(strcmp(tokens[0], "-shared") == 0) {
             if(ntokens == 2) {
-                struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
+                //struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
                 key_t key = atoi(tokens[1]);
-                void *tamano = get(listas->allocateShared, find(listas->allocateShared, tokens[1]));
-                void * ptr = ObtenerMemoriaShmget(key, (size_t) tamano, listas);
+                //void *tamano = get(listas->allocateShared, find(listas->allocateShared, tokens[1]));
+                void * ptr = ObtenerMemoriaShmget(key, 0, listas);
                 printf("Memoria compartida de clave %d en %p", key, ptr);
 
             } else if(ntokens == 1) {
@@ -443,7 +445,7 @@ int deallocate(char *tokens[], int ntokens, structListas *listas) {
     if (ntokens != 0) {
         if (strcmp(tokens[0], "-malloc") == 0) {
             if (ntokens == 2) {
-                deallocateMalloc(*listas, atoi(tokens[1]));
+                deallocateMalloc(*listas, (long int) atoi(tokens[1]));
 
             } else if (ntokens == 1) {
                 printf("*** Lista de bloques asignados con malloc para el proceso %d", getpid());
@@ -452,16 +454,16 @@ int deallocate(char *tokens[], int ntokens, structListas *listas) {
 
         } else if (strcmp(tokens[0], "-shared") == 0) {
             if (ntokens == 2) {
-                //// Liberar Shared
+                //deallocateShared();
 
             } else if (ntokens == 1) {
                 printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
                 mostrarListaShared(*listas);
             }
 
-        } else if (strcmp(tokens[0], "-createshared") == 0) {
+        } else if (strcmp(tokens[0], "-delkey") == 0) {
             if (ntokens == 2) {
-                //// Liberar Shared
+                do_DeallocateDelkey (tokens);
 
             } else if (ntokens == 1) {
                 printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
@@ -511,12 +513,47 @@ int memfill(char *tokens[], int ntokens, structListas *listas) {
 }
 
 int memory(char *tokens[], int ntokens, structListas *listas) {
+    int local1 = 1, local2 = 2, local3 = 3;
+    int static static1 = 1, static2 = 2, static3 = 3;
+    if(strcmp(tokens[0], "-blocks") == 0) {
+        printf("*** Lista de bloques asignados para el proceso %d", getpid());
+        mostrarListaMalloc(*listas);
+        mostrarListaShared(*listas);
+        mostrarListaMmap(*listas);
+
+    } else if(strcmp(tokens[0], "-funcs") == 0) {
+        printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
+        printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
+    } else if(strcmp(tokens[0], "-vars") == 0) {
+        printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
+        printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
+        printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
+    } else if(strcmp(tokens[0], "-all") == 0) {
+        printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
+        printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
+        printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
+        printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
+        printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
+        printf("*** Lista de bloques asignados para el proceso %d", getpid());
+        mostrarListaMalloc(*listas);
+        mostrarListaShared(*listas);
+        mostrarListaMmap(*listas);
+
+    } else if(strcmp(tokens[0], "-pmap") == 0) {
+        Do_pmap();
+    } else {
+        printf("Parámetro no válido");
+    }
+
+
 
     return 0;
 }
 
 int recurse(char *tokens[], int ntokens, structListas *listas) {
-
+    if(ntokens == 1) {
+        Recursiva(atoi(tokens[0]));
+    }
     return 0;
 }
 

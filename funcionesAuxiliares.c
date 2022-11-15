@@ -431,7 +431,7 @@ void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
     /* Guardar en la lista   InsertarNodoShared (&L, p, s.shm_segsz, clave); */
     struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
     LMB->memoryAddress = p;
-    LMB->size = (long int) tam;
+    LMB->size = s.shm_segsz;
     LMB->tm = localtime(&t);
     LMB->key = clave;
 
@@ -554,12 +554,14 @@ void do_AllocateMmap(char *arg[], structListas L)
         printf ("fichero %s mapeado en %p\n", arg[1], p);
 }
 
-void deallocateMalloc(structListas L, int tam) {
+void deallocateMalloc(structListas L, long int tam) {
     for(pos p = first(L.allocateMalloc); !at_end(L.allocateMalloc, p); p = next(L.allocateMalloc, p)) {
         struct allocateMalloc *LMB = get(L.allocateMalloc, p);
 
-        if (LMB->size == tam) {
-            deleteAtPosition(L.allocateMalloc, &p);
+        if(LMB->size == tam) {
+            free(LMB->memoryAddress);
+            deleteAtPosition(&L.allocateMalloc, p);
+            break;
         }
     }
 }
@@ -581,6 +583,8 @@ void do_DeallocateDelkey (char *args[])
     }
     if (shmctl(id,IPC_RMID,NULL)==-1)
         perror ("shmctl: imposible eliminar memoria compartida\n");
+
+
 }
 
 ssize_t LeerFichero (char *f, void *p, size_t cont)
@@ -681,4 +685,45 @@ void do_I_O_write (char *ar[])
         if(EscribirFichero(ar[1], (long *)addr, atoi(ar[3]), overwrite) == -1)
             perror("error de escritura");
     }
+}
+
+void Do_pmap (void) /*sin argumentos*/
+{ pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
+    char elpid[32];
+    char *argv[4]={"pmap",elpid,NULL};
+
+    sprintf (elpid,"%d", (int) getpid());
+    if ((pid=fork())==-1){
+        perror ("Imposible crear proceso");
+        return;
+    }
+    if (pid==0){
+        if (execvp(argv[0],argv)==-1)
+            perror("cannot execute pmap (linux, solaris)");
+
+        argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;
+        if (execvp(argv[0],argv)==-1)/*No hay pmap, probamos procstat FreeBSD */
+            perror("cannot execute procstat (FreeBSD)");
+
+        argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;
+        if (execvp(argv[0],argv)==-1)  /*probamos procmap OpenBSD*/
+            perror("cannot execute procmap (OpenBSD)");
+
+        argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
+        if (execvp(argv[0],argv)==-1) /*probamos vmmap Mac-OS*/
+            perror("cannot execute vmmap (Mac-OS)");
+        exit(1);
+    }
+    waitpid (pid,NULL,0);
+}
+
+void Recursiva (int n)
+{
+    char automatico[MAX_LENGTH];
+    static char estatico[MAX_LENGTH];
+
+    printf ("parametro:%3d(%p) array %p, arr estatico %p\n",n,&n,automatico, estatico);
+
+    if (n>0)
+        Recursiva(n-1);
 }

@@ -43,7 +43,7 @@ pos next(lista L, pos p) {
     if(p->next != NULL) {
         return p->next;
     }
-    return p;
+    return NULL;
 }
 
 int at_end(lista L, pos p) {
@@ -54,6 +54,7 @@ void *get(lista L, pos p) {
     if(p->next != NULL) {
         return p->next->data;
     }
+
     return NULL;
 }
 
@@ -71,10 +72,34 @@ bool isEmptyList(lista L) {
 }
 
 pos prev(lista L,pos p) {
-    pos q;
-    for(q = first(L); q -> next != p; q = next(L,q)) {
+    /*funci ́on Buscar Anterior ( x, L ) :
+        p := L;
+        mientras pˆ.Siguiente <> nil y pˆ.Siguienteˆ.Elemento <> x hacer
+            p := pˆ.Siguiente;
+        devolver p
+    fin funci ́on*/
+
+    pos q = L;
+    while(q->next != NULL && q->next->data != p) {
+        q = q->next;
     }
+
     return q;
+
+    /*pos q;
+    for(q = second(L); q -> next != p; q = next(L,q));
+    return q;
+    */
+    /*pos q; // q es el elemento previo
+
+    if(p == L) {
+        return NULL;
+    }
+    else {
+        for(q = L; q->next != p; q = q->next);
+        // Mientras el siguiente elemento a q sea distinto al introducido, se seguirá ejecutando el bucle
+        return q;
+    }*/
 }
 
 
@@ -97,25 +122,82 @@ pos find(lista L, void *p) {
     return position;
 }
 
-void deleteAtPosition(pos p, lista *L) {
+void deleteAtPosition(lista *L, pos p) {
     /* p elemento a eliminar
-     * q elemento siguiente al eliminado */
-    pos q;
-
-    if(p == *L) { // Eliminado en la primera posición de la lista
-        *L = (*L)->next;
+     * q elemento previo al eliminado */
+    pos i;
+    if(p == (*L)->next) { // Eliminado en la primera posición de la lista
+        (*L)->next = (*L)->next->next;
+        printf("\n Esta en el primer elemento de la lista.");
 
     } else if(p->next == NULL) { // Eliminado en la última posición
-        for(q = *L; q->next->next != NULL; q = q->next);
-        q->next = NULL;
+        for(i = (*L)->next; i->next->next != NULL; i = i->next);
+        i->next = NULL;
+        printf("\n Esta en al último elemento de la lista.");
+
+    } else { // Eliminado de un elemento que no se encuentra en los del medio
+        for(i = next(*L, *L); i->next != p; i = i->next);
+        i->next = p->next;
+        printf("\nEsta en el medio de la lista.");
+    }
+
+    free(i);
+    free(p);
+
+    printf("\nSe hizo free correctamente");
+    /*pos i = (*L)->next;
+    if(p == i) { // Eliminado en la primera posición de la lista
+        (*L)->next = p->next;
+        printf("\n Esta en el primer elemento de la lista.");
+
+    } else if(p->next == NULL) { // Eliminado en la última posición
+        for(i = next(*L, *L); i->next->next != NULL; i = i->next);
+        i->next = NULL;
+        printf("\n Esta en al último elemento de la lista.");
 
     } else { // Eliminado de un elemento que no se encuentra en los extremos
+        for(i = next(*L, *L); i->next != p; i = i->next);
+        i->next = p->next;
+        printf("\nEsta en el medio de la lista.");
+    }
+
+    free(i);
+    free(p);
+
+    printf("\nSe hizo free correctamente");
+}*/
+
+
+
+    /*pos q;
+
+    if(at_end(*L, p)) {
+        q = prev(*L, p);
+        q->next = NULL;
+        free(p);
+
+    } else {
         q = p->next;
         p->data = q->data;
         p->next = q->next;
         p = q;
-    }
 
-    free(p);
-    printf("\nSe hizo free correctamente");
+        free(p);
+
+    }*/
+
+    /*pos q = prev(*L, *p);
+    if(!at_end(*L, q)) {
+        pos tmp = q->next;
+        q->next = tmp->next;
+        free(tmp);
+    }*/
+    /*
+        p := Buscar Anterior ( x, L );
+        si  ́Ultimo Elemento ( p ) entonces error No encontrado
+        sino tmp := pˆ.Siguiente;
+            pˆ.Siguiente := tmpˆ.Siguiente;
+            liberar ( tmp )
+     */
+
 }

@@ -43,11 +43,15 @@ void * ObtenerMemoriaShmgetShared (key_t clave, structListas *L);
 void do_AllocateCreateshared (char *tr[], structListas L);
 void * MapearFichero (char * fichero, int protection, structListas *L);
 void do_AllocateMmap(char *arg[], structListas L);
+void deallocateMalloc(structListas L, long int tam);
+void do_DeallocateDelkey (char *args[]);
 ssize_t LeerFichero (char *f, void *p, size_t cont);
 void do_I_O_read (char *ar[]);
 ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite);
 void do_I_O_write (char *ar[]);
 
 
-void deallocateMalloc(structListas L, int tam);
+void Do_pmap (void);
+void Recursiva (int n);
+
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

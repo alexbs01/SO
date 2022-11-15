@@ -27,5 +27,14 @@ void deleteList(lista *L, void (* freedata)(void *));           // Elimina la li
 pos prev(lista L,pos p);           // Retorna el elemento previo al indicado
 bool isEmptyList(lista L);           // Comprueba si una lista está vacía o no
 pos find(lista L, void *p);
-void deleteAtPosition(pos p, lista *L) ;     // Elimina la posición dada de la lista.
+void deleteAtPosition(lista *L, pos p);     // Elimina la posición dada de la lista.
 #endif //SHELL_C_lista_H
+/*
+allocate -malloc 100
+allocate -malloc 150
+allocate -malloc 150
+allocate -malloc 150
+allocate -malloc 100
+allocate
+
+ */
