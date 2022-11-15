@@ -687,6 +687,19 @@ void do_I_O_write (char *ar[])
     }
 }
 
+void LlenarMemoria (void *p, size_t cont, unsigned char byte)
+{
+    unsigned char *arr = (unsigned char *) p;
+    size_t i;
+
+    for (i=0; i<cont;i++) {
+        arr[i]=byte;
+    }
+
+    printf("Llenando %lu bytes de memoria con el byte (%c) a partir de la dirección %p", cont, byte, p);
+
+}
+
 void Do_pmap (void) /*sin argumentos*/
 { pid_t pid;       /*hace el pmap (o equivalente) del proceso actual*/
     char elpid[32];

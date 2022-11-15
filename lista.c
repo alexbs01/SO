@@ -51,6 +51,7 @@ int at_end(lista L, pos p) {
 }
 
 void *get(lista L, pos p) {
+    /*return p->data;*/
     if(p->next != NULL) {
         return p->next->data;
     }
@@ -61,10 +62,16 @@ void *get(lista L, pos p) {
 int elementsNumber(lista L) {
     pos position;
     int cantidadElementos = 0;
-    for(position = second(L); position->next != NULL; position = next(L, position)) {
+    for(position = L; position->next != NULL; position = position->next) {
         cantidadElementos++;
     }
     return cantidadElementos;
+    /*pos position;
+    int cantidadElementos = 0;
+    for(position = second(L); position->next != NULL; position = next(L, position)) {
+        cantidadElementos++;
+    }
+    return cantidadElementos;*/
 }
 
 bool isEmptyList(lista L) {
@@ -80,7 +87,7 @@ pos prev(lista L,pos p) {
     fin funci ́on*/
 
     pos q = L;
-    while(q->next != NULL && q->next->data != p) {
+    while(q->next != NULL && q->next != p) {
         q = q->next;
     }
 

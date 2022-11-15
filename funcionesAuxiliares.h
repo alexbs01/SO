@@ -50,7 +50,7 @@ void do_I_O_read (char *ar[]);
 ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite);
 void do_I_O_write (char *ar[]);
 
-
+void LlenarMemoria (void *p, size_t cont, unsigned char byte);
 void Do_pmap (void);
 void Recursiva (int n);
 

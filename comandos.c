@@ -508,7 +508,12 @@ int memdump(char *tokens[], int ntokens, structListas *listas) {
 }
 
 int memfill(char *tokens[], int ntokens, structListas *listas) {
-
+    char *ptr;
+    unsigned long addr = strtoul(tokens[0], &ptr, 16);
+    unsigned long cont = strtoul(tokens[1], &ptr, 10);
+    unsigned long byte = strtoul(tokens[2], &ptr, 10);
+    LlenarMemoria(&addr, cont, byte);
+    
     return 0;
 }
 
