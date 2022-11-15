@@ -132,6 +132,7 @@ pos find(lista L, void *p) {
 void deleteAtPosition(lista *L, pos p) {
     /* p elemento a eliminar
      * q elemento previo al eliminado */
+    p = p->next;
     pos i;
     if(p == (*L)->next) { // Eliminado en la primera posición de la lista
         (*L)->next = (*L)->next->next;

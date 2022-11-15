@@ -564,6 +564,20 @@ void deallocateMalloc(structListas L, long int tam) {
             break;
         }
     }
+    /*
+    pos p = first(L.allocateMalloc);
+    while(!at_end(L.allocateMalloc, p)) {
+        struct allocateMalloc *LMB = get(L.allocateMalloc, p);
+
+        if(LMB->size == tam) {
+            free(LMB->memoryAddress);
+            deleteAtPosition(&L.allocateMalloc, p);
+            break;
+        } else {
+            p = next(L.allocateMalloc, p);
+        }
+    }
+    */
 }
 
 
@@ -689,6 +703,7 @@ void do_I_O_write (char *ar[])
 
 void LlenarMemoria (void *p, size_t cont, unsigned char byte)
 {
+
     unsigned char *arr = (unsigned char *) p;
     size_t i;
 
@@ -696,7 +711,7 @@ void LlenarMemoria (void *p, size_t cont, unsigned char byte)
         arr[i]=byte;
     }
 
-    printf("Llenando %lu bytes de memoria con el byte (%c) a partir de la dirección %p", cont, byte, p);
+    printf("Llenando %lu bytes de memoria con el byte (%u) a partir de la dirección %p", i, byte, arr);
 
 }
 
