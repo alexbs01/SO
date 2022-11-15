@@ -454,7 +454,7 @@ int deallocate(char *tokens[], int ntokens, structListas *listas) {
 
         } else if (strcmp(tokens[0], "-shared") == 0) {
             if (ntokens == 2) {
-                //deallocateShared();
+                deallocateShared(*listas, (key_t) atoi(tokens[1]));
 
             } else if (ntokens == 1) {
                 printf("*** Lista de bloques asignados con shared para el proceso %d", getpid());
