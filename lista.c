@@ -130,8 +130,7 @@ pos find(lista L, void *p) {
 }
 
 void deleteAtPosition(lista *L, pos p) {
-    /* p elemento a eliminar
-     * q elemento previo al eliminado */
+
     p = p->next;
     pos i;
     if(p == (*L)->next) { // Eliminado en la primera posición de la lista
@@ -149,7 +148,7 @@ void deleteAtPosition(lista *L, pos p) {
         printf("\nEsta en el medio de la lista.");
     }
 
-    free(i);
+    //free(i);
     free(p);
 
     printf("\nSe hizo free correctamente");
