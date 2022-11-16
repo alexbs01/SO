@@ -22,7 +22,7 @@ int processInput(char *tokens[], int ntokens, structListas *listas);     // Proc
 
 int ayuda(char *tokens[], int ntokens, structListas *listas);            // Muestra la ayuda de cada comando
 
-// Esta dos funciones pertenecen a las funciones de ayuda dadas en la página web de SO
+// Estas dos funciones pertenecen a las funciones de ayuda dadas en la página web de SO
 char LetraTF (mode_t m);
 char * ConvierteModo2 (mode_t m);
 
@@ -38,15 +38,20 @@ int listaArbolCarpetas(char *path, SStatListCommand flags); // Lista carpetas de
 void mostrarListaMalloc(structListas L);
 void mostrarListaShared(structListas L);
 void mostrarListaMmap(structListas L);
-void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L);
+
+void do_AllocateMalloc(char *tokens[], structListas *L);
 void do_AllocateCreateshared (char *tr[], structListas L);
-void * MapearFichero (char * fichero, int protection, structListas *L);
 void do_AllocateMmap(char *arg[], structListas L);
+
+void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L);
+void * MapearFichero (char * fichero, int protection, structListas *L);
+
 void deallocateMalloc(structListas L, long int tam);
 void deallocateShared(structListas L, key_t key);
 void do_DeallocateDelkey (char *args[]);
 void deallocateMmap(structListas L, char *args[]);
 void deallocateAddr(structListas L, void *n);
+
 ssize_t LeerFichero (char *f, void *p, size_t cont);
 void do_I_O_read (char *ar[]);
 ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite);

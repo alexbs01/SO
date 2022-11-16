@@ -381,24 +381,10 @@ int deltree(char *tokens[], int ntokens, structListas *listas) {
  * @return 0 si todo es correcto
  */
 int allocate(char *tokens[], int ntokens, structListas *listas) {
-    time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
-    void *memoryAddress;
-    char typeOfAllocation[MAX_LENGTH];
-
     if(ntokens != 0) {
         if(strcmp(tokens[0], "-malloc") == 0) {
             if(ntokens == 2) {
-                struct allocateMalloc *LMB = malloc(sizeof(struct allocateMalloc));
-                int size = atoi(tokens[1]);
-                memoryAddress = malloc(*tokens[1]);
-                LMB->memoryAddress = memoryAddress;
-                LMB->size = size;
-                LMB->tm = localtime(&t);
-
-                printf("Asignados %d bytes en %p", size, LMB->memoryAddress);
-
-                insert(&listas->allocateMalloc, LMB);
+                do_AllocateMalloc(tokens, listas);
             } else if(ntokens == 1) {
                 printf("*** Lista de bloques asignados con malloc para el proceso %d", getpid());
                 mostrarListaMalloc(*listas);

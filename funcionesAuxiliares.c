@@ -410,6 +410,24 @@ void mostrarListaMmap(structListas L) {
     }
 }
 
+void do_AllocateMalloc(char *tokens[], structListas *L) {
+    time_t t = time(NULL);
+    struct tm tm = *localtime(&t);
+    void *memoryAddress;
+    char typeOfAllocation[MAX_LENGTH];
+
+    struct allocateMalloc *LMB = malloc(sizeof(struct allocateMalloc));
+    int size = atoi(tokens[1]);
+    memoryAddress = malloc(*tokens[1]);
+    LMB->memoryAddress = memoryAddress;
+    LMB->size = size;
+    LMB->tm = localtime(&t);
+
+    printf("Asignados %d bytes en %p", size, LMB->memoryAddress);
+
+    insert(&L->allocateMalloc, LMB);
+}
+
 /**
  * Crea una zona de memoria compartida a partir de una clave
  *
