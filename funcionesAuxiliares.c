@@ -630,6 +630,36 @@ void deallocateMmap(structListas L, char *args[]) {
     }
 }
 
+void deallocateAddr(structListas L, void *n) {
+    for(pos p = first(L.allocateMalloc); !at_end(L.allocateMalloc, p); p = next(L.allocateMalloc, p)) {
+        struct allocateMalloc *LMB = get(L.allocateMalloc, p);
+
+        if(LMB->memoryAddress == n) {
+            free(LMB->memoryAddress);
+            deleteAtPosition(&L.allocateMalloc, p);
+            break;
+        }
+    }
+    for(pos p = first(L.allocateShared); !at_end(L.allocateShared, p); p = next(L.allocateShared, p)) {
+        struct allocateShared *LMB = get(L.allocateShared, p);
+
+        if(LMB->memoryAddress == n) {
+            shmdt(LMB->memoryAddress);
+            deleteAtPosition(&L.allocateShared, p);
+            break;
+        }
+    }
+    for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
+        struct allocateMmap *LMB = get(L.allocateMmap, p);
+
+        if(LMB->memoryAddress == n) {
+            munmap(LMB->memoryAddress, LMB->size);
+            deleteAtPosition(&L.allocateMmap, p);
+            break;
+        }
+    }
+}
+
 ssize_t LeerFichero (char *f, void *p, size_t cont)
 {
     struct stat s;

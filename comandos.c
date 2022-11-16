@@ -496,11 +496,10 @@ int deallocate(char *tokens[], int ntokens, structListas *listas) {
                 mostrarListaMmap(*listas);
             }
 
-        } else if (strcmp(tokens[0], "-addr") == 0) {
-            if (ntokens == 1) {
-               // deallocateAdrr(*listas, tokens[0]);
-            }
-
+        } else if (ntokens == 1) {
+            void * voidptr;
+            voidptr = (void *) strtoul(tokens[1], NULL, 16);
+            deallocateAddr(*listas, voidptr);
         } else {
             printf("[] Desasigna un bloque de memoria. \n [-malloc tam] Desasigna un bloque malloc de tamano tam. \n [-shared cl] Desasigna (desmapea) el bloque de memoria compartida de clave cl. \n [-delkey cl] Elimina del sistema (sin desmapear) la clave de memoria cl. \n [-nmap fich] Desmapea el fichero mapeado fich. \n [-addr] Desasigna el bloque de memoria en la dirección adrr");
         }
