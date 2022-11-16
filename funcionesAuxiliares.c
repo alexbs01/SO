@@ -508,6 +508,7 @@ void * MapearFichero (char * fichero, int protection, structListas *L)
     void *p;
     time_t t = time(NULL);
 
+
     if(protection&PROT_WRITE)
         modo=O_RDWR;
     if (stat(fichero,&s) == -1 || (df=open(fichero, modo))==-1)
@@ -630,6 +631,14 @@ void deallocateMmap(structListas L, char *args[]) {
     }
 }
 
+/**
+ * Reibiendo una dirección n, libera el espacio en memoria y elimina el su
+ * registro de la lista correspondiente. Si no está en la lista muestra un
+ * mensaje explicativo.
+ *
+ * @param L - Listas en las que se mirará si está o no
+ * @param n - Dirección a eliminar
+ */
 void deallocateAddr(structListas L, void *n) {
     for(pos p = first(L.allocateMalloc); !at_end(L.allocateMalloc, p); p = next(L.allocateMalloc, p)) {
         struct allocateMalloc *LMB = get(L.allocateMalloc, p);
@@ -637,7 +646,7 @@ void deallocateAddr(structListas L, void *n) {
         if(LMB->memoryAddress == n) {
             free(LMB->memoryAddress);
             deleteAtPosition(&L.allocateMalloc, p);
-            break;
+            return;
         }
     }
     for(pos p = first(L.allocateShared); !at_end(L.allocateShared, p); p = next(L.allocateShared, p)) {
@@ -646,7 +655,7 @@ void deallocateAddr(structListas L, void *n) {
         if(LMB->memoryAddress == n) {
             shmdt(LMB->memoryAddress);
             deleteAtPosition(&L.allocateShared, p);
-            break;
+            return;
         }
     }
     for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
@@ -655,48 +664,57 @@ void deallocateAddr(structListas L, void *n) {
         if(LMB->memoryAddress == n) {
             munmap(LMB->memoryAddress, LMB->size);
             deleteAtPosition(&L.allocateMmap, p);
-            break;
+            return;
         }
     }
+
+    printf("La dirección dada no se encontró para poder ejecutar deallocate.");
+
 }
 
-ssize_t LeerFichero (char *f, void *p, size_t cont)
-{
+ssize_t LeerFichero(char *f, void *p, size_t cont) {
     struct stat s;
     ssize_t  n;
     int df,aux;
 
-    if (stat (f,&s)==-1 || (df=open(f,O_RDONLY))==-1)
+    if(stat (f,&s)==-1 || (df=open(f,O_RDONLY))==-1) {
         return -1;
-    if (cont==-1)   /* si pasamos -1 como bytes a leer lo leemos entero*/
-        cont=s.st_size;
-    if ((n=read(df,p,cont))==-1){
+    }
+
+    if(cont==-1) { /* si pasamos -1 como bytes a leer lo leemos entero*/
+        cont = s.st_size;
+    }
+    if((n=read(df,p,cont))==-1) {
         aux=errno;
         close(df);
         errno=aux;
         return -1;
     }
+
     close (df);
     return n;
 }
 
-void do_I_O_read (char *ar[])
-{
+void do_I_O_read (char *ar[]) {
     void *p;
-    size_t cont=-1;
+    size_t cont = -1;
     ssize_t n;
-    if (ar[1]==NULL || ar[2]==NULL){
+
+    if(ar[1] == NULL || ar[2] == NULL) {
         printf ("faltan parametros\n");
         return;
     }
-    p=/*cadtop(ar[1])*/(void *) ar[2];  /*convertimos de cadena a puntero*/
-    if (ar[3]!=NULL)
-        cont=(size_t) atoll(ar[3]);
+    p = (void *) ar[2];  /*convertimos de cadena a puntero*/
+    if(ar[3] != NULL) {
+        cont = (size_t) atoll(ar[3]);
+    }
 
-    if ((n=LeerFichero(ar[1],p,cont))==-1)
-        perror ("Imposible leer fichero");
-    else
-        printf ("leidos %lld bytes de %s en %p\n",(long long) n,ar[1],p);
+    if((n = LeerFichero(ar[1], p, cont)) == -1) {
+        perror("Imposible leer fichero");
+
+    } else {
+        printf("leidos %lld bytes de %s en %p\n", (long long) n, ar[1], p);
+    }
 }
 
 ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite)
