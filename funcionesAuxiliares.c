@@ -722,7 +722,9 @@ void do_I_O_read (char *ar[]) {
         printf ("faltan parametros\n");
         return;
     }
-    p = (void *) ar[2];  /*convertimos de cadena a puntero*/
+
+    p = (void *) strtoul(ar[2], NULL, 16); /*convertimos de cadena a puntero*/
+    
     if(ar[3] != NULL) {
         cont = (size_t) atoll(ar[3]);
     }
@@ -735,48 +737,54 @@ void do_I_O_read (char *ar[]) {
     }
 }
 
-ssize_t EscribirFichero (char *f, void *p, size_t cont,int overwrite)
-{
+ssize_t EscribirFichero(char *f, void *p, size_t cont,int overwrite) {
     ssize_t  n;
     int df,aux, flags=O_CREAT | O_EXCL | O_WRONLY;
 
-    if (overwrite)
-        flags=O_CREAT | O_WRONLY | O_TRUNC;
+    if(overwrite) {
+        flags = O_CREAT | O_WRONLY | O_TRUNC;
+    }
 
-    if ((df=open(f,flags,0777))==-1)
+    if((df=open(f,flags,0777))==-1) {
         return -1;
+    }
 
-    if ((n=write(df,p,cont))==-1){
+    if((n=write(df,p,cont))==-1) {
         aux=errno;
         close(df);
         errno=aux;
         return -1;
     }
+
     close (df);
     return n;
 }
 
-void do_I_O_write (char *ar[])
-{
+void do_I_O_write(char *ar[]) {
     void *p;
     size_t cont=-1;
     ssize_t n;
     int overwrite = 0;
+
     if(strcmp(ar[1], "-o") == 0) {
         overwrite = 1;
     }
-    if (ar[1 + overwrite]==NULL || ar[2 + overwrite]==NULL){
+
+    if(ar[1 + overwrite]==NULL || ar[2 + overwrite]==NULL) {
         printf ("faltan parametros\n");
         return;
     }
-    p=/*cadtop(ar[1])*/(void *) ar[2 + overwrite];  /*convertimos de cadena a puntero*/
-    if (ar[3 + overwrite]!=NULL)
-        cont=(size_t) atoll(ar[3 + overwrite]);
 
-    if ((n=EscribirFichero(ar[1 + overwrite], p, cont, overwrite)) == -1)
-        perror ("Imposible leer fichero");
-    else
-        printf ("leidos %lld bytes de %s en %p\n",(long long) n, ar[1 + overwrite], p);
+    p = (void *) strtoul(ar[2 + overwrite], NULL, 16);  /*convertimos de cadena a puntero*/
+    if(ar[3 + overwrite]!=NULL) {
+        cont = (size_t) atoll(ar[3 + overwrite]);
+    }
+
+    if((n=EscribirFichero(ar[1 + overwrite], p, cont, overwrite)) == -1) {
+        perror("Imposible escribir fichero");
+    } else {
+        printf("Escritos %lld bytes de %s en %p", (long long) n, ar[1 + overwrite], p);
+    }
 }
 
 /**
