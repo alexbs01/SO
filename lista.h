@@ -35,6 +35,13 @@ allocate -malloc 150
 allocate -malloc 150
 allocate -malloc 150
 allocate -malloc 100
+allocate -shared 1
+allocate -shared 1
+allocate -shared 1
+allocate -shared 1
+allocate -mmap p2.c
+allocate -mmap comandos.c
+allocate -mmap lista.c
 allocate
 
 

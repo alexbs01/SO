@@ -867,3 +867,17 @@ void Recursiva(int n) {
     }
 
 }
+
+void liberarMalloc(void *ptr) {
+    struct allocateMalloc *liberar = ptr;
+
+    free(liberar->memoryAddress);
+    free(liberar);
+}
+
+void liberarMmap(void *ptr) {
+    struct allocateMmap *liberar = ptr;
+
+    munmap(liberar->memoryAddress, liberar->size);
+    free(liberar);
+}

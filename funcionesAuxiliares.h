@@ -60,5 +60,6 @@ void do_I_O_write (char *ar[]);
 void LlenarMemoria (void *p, size_t cont, unsigned char byte);
 void Do_pmap (void);
 void Recursiva (int n);
-
+void liberarMalloc(void *ptr);
+void liberarMmap(void *ptr);
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

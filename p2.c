@@ -5,7 +5,7 @@
     Nombre: Adrián Rego Criado
 */
 #include "cabeceras.h"
-//#include "funcionesAuxiliares.h"
+#include "funcionesAuxiliares.h"
 
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64
@@ -43,8 +43,11 @@ int main() {
 
     }
     
-    deleteList(&listas.allocateMalloc, free);
+    deleteList(&listas.allocateMalloc, liberarMalloc);
+    deleteList(&listas.allocateShared, free);
+    deleteList(&listas.allocateMmap, liberarMmap);
     deleteList(&listas.historial, free); // Liberamos la memoria dinámica
     return 0;
 }
-
+//
+// Tiene tres funciones para liberar memoria, una para cada una

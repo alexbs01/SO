@@ -500,9 +500,9 @@ int deallocate(char *tokens[], int ntokens, structListas *listas) {
 }
 
 int io(char *tokens[], int ntokens, structListas *listas) {
-    if(strcmp(tokens[0], "-read") == 0) {
+    if(strcmp(tokens[0], "read") == 0) {
         do_I_O_read(tokens);
-    } else if(strcmp(tokens[0], "-write") == 0) {
+    } else if(strcmp(tokens[0], "write") == 0) {
         do_I_O_write(tokens);
     }
 
@@ -565,39 +565,52 @@ int memory(char *tokens[], int ntokens, structListas *listas) {
     int local1 = 1, local2 = 2, local3 = 3;
     int static static1 = 1, static2 = 2, static3 = 3;
 
-    if(strcmp(tokens[0], "-blocks") == 0) {
+    if(ntokens != 0) {
+        if(strcmp(tokens[0], "-blocks") == 0) {
+                printf("*** Lista de bloques asignados para el proceso %d", getpid());
+                mostrarListaMalloc(*listas);
+                mostrarListaShared(*listas);
+                mostrarListaMmap(*listas);
+
+        } else if(strcmp(tokens[0], "-funcs") == 0) {
+            printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
+            printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
+
+        } else if(strcmp(tokens[0], "-vars") == 0) {
+            printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
+            printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
+            printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
+
+        } else if(strcmp(tokens[0], "-all") == 0) {
+            printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
+            printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
+            printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
+            printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
+            printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
+            printf("*** Lista de bloques asignados para el proceso %d", getpid());
+            mostrarListaMalloc(*listas);
+            mostrarListaShared(*listas);
+            mostrarListaMmap(*listas);
+
+        } else if(strcmp(tokens[0], "-pmap") == 0) {
+                Do_pmap();
+
+        } else {
+                printf("Parámetro no válido");
+        }
+
+    } else { // memory sin ningún parámtro muestra lo mismo que "memory -all"
+        printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
+        printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
+        printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
+        printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
+        printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
         printf("*** Lista de bloques asignados para el proceso %d", getpid());
         mostrarListaMalloc(*listas);
         mostrarListaShared(*listas);
         mostrarListaMmap(*listas);
-
-    } else if(strcmp(tokens[0], "-funcs") == 0) {
-        printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
-        printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
-
-    } else if(strcmp(tokens[0], "-vars") == 0) {
-        printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
-        printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
-        printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
-
-    } else if(strcmp(tokens[0], "-all") == 0) {
-        printf("Variables locales\t %p,\t %p,\t %p \n", &local1, &local2, &local3);
-        printf("Variables globales\t %p,\t %p,\t %p \n", &global1, &global2, &global3);
-        printf("Variables estaticas\t %p,\t %p,\t %p \n", &static1, &static2, &static3);
-        printf("Funciones programa\t %p,\t %p,\t %p \n", memory, autores, pid);
-        printf("Funciones librería\t %p,\t %p,\t %p \n", printf, scanf, strcmp);
-        printf("*** Lista de bloques asignados para el proceso %d", getpid());
-        mostrarListaMalloc(*listas);
-        mostrarListaShared(*listas);
-        mostrarListaMmap(*listas);
-
-    } else if(strcmp(tokens[0], "-pmap") == 0) {
-        Do_pmap();
-
-    } else {
-        printf("Parámetro no válido");
-
     }
+
 
     return 0;
 }
@@ -609,5 +622,3 @@ int recurse(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
-
-
