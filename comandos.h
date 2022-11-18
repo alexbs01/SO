@@ -37,12 +37,12 @@ int list(char *tokens[], int ntokens, structListas *listas);     // Retorna los 
 int delete(char *tokens[], int ntokens, structListas *listas);   // Elimina los ficheros o directorios vacíos que se pasan como parámetro.
 int deltree(char *tokens[], int ntokens, structListas *listas);  // Elimina los ficheros o directorios de forma recursiva.
 
-int allocate(char *tokens[], int ntokens, structListas *listas);
-int deallocate(char *tokens[], int ntokens, structListas *listas);
-int io(char *tokens[], int ntokens, structListas *listas);
-int memdump(char *tokens[], int ntokens, structListas *listas);
-int memfill(char *tokens[], int ntokens, structListas *listas);
-int memory(char *tokens[], int ntokens, structListas *listas);
-int recurse(char *tokens[], int ntokens, structListas *listas);
+int allocate(char *tokens[], int ntokens, structListas *listas); // Reserva memoria
+int deallocate(char *tokens[], int ntokens, structListas *listas); // Libera memoria
+int io(char *tokens[], int ntokens, structListas *listas);       // Lee o escribe en una dirección de memoria
+int memdump(char *tokens[], int ntokens, structListas *listas);  // Vuelva una dirección de memoria y muestra su contenido
+int memfill(char *tokens[], int ntokens, structListas *listas);  // Rellena una cantidad de memoria con un byte indicado
+int memory(char *tokens[], int ntokens, structListas *listas);   // Muestra direcciones de memoria
+int recurse(char *tokens[], int ntokens, structListas *listas);  // Muestra una las direcciones de memoria de una función recursiva
 
 #endif //SHELL_C_COMANDOS_H

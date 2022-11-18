@@ -42,12 +42,11 @@ int main() {
         }
 
     }
-    
+
+    // Liberamos la memoria de las listas antes de finalizar el programa
     deleteList(&listas.allocateMalloc, liberarMalloc);
-    deleteList(&listas.allocateShared, free);
+    deleteList(&listas.allocateShared, liberarShared);
     deleteList(&listas.allocateMmap, liberarMmap);
-    deleteList(&listas.historial, free); // Liberamos la memoria dinámica
+    deleteList(&listas.historial, free);
     return 0;
 }
-//
-// Tiene tres funciones para liberar memoria, una para cada una

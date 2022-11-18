@@ -519,24 +519,16 @@ int memdump(char *tokens[], int ntokens, structListas *listas) {
             size = atoi(tokens[1]);
         }
 
-        printf("Volcando %d bytes desde la direccion %s\n", size, tokens[0]);
+        printf("Volcando %d bytes desde la dirección %s", size, tokens[0]);
 
         for(int cnt = 0; cnt < size; cnt++) {
             printf("  %c", arr[cnt]);
         }
         printf("\n");
         for(int cnt = 0; cnt < size; cnt++) {
-            printf(" %X", arr[cnt]);
+            printf(" %02X", arr[cnt]);
         }
 
-        /*
-        unsigned char *arr = (unsigned char *) p;
-        size_t i;
-
-        for(i=0; i<cont; i++) {
-          arr[i] = byte;
-        }
-        */
     }
     return 0;
 }
@@ -549,15 +541,16 @@ int memfill(char *tokens[], int ntokens, structListas *listas) {
         size_t cont = 128;
         unsigned char byte = 65;
         LlenarMemoria(addr, cont, byte);
+
     } else {
         // Pasamos todos los datos de tokens a su tipo de dato correspondiente
         void * addr = (void *) strtoul(tokens[0], &ptr, 16);
         size_t cont = strtoul(tokens[1], &ptr, 10);
         unsigned char byte = strtoul(tokens[2], &ptr, 10);
         LlenarMemoria(addr, cont, byte);
+
     }
 
-    
     return 0;
 }
 
@@ -610,7 +603,6 @@ int memory(char *tokens[], int ntokens, structListas *listas) {
         mostrarListaShared(*listas);
         mostrarListaMmap(*listas);
     }
-
 
     return 0;
 }

@@ -25,14 +25,12 @@ typedef struct statCommand {
 struct allocateMalloc {
     void *memoryAddress;
     long int size;
-    //struct tm *tm;
     char fecha[MAX_LENGTH];
 };
 
 struct allocateShared {
     void *memoryAddress;
     long int size;
-    //struct tm *tm;
     char fecha[MAX_LENGTH];
     int key;
 };
@@ -40,7 +38,6 @@ struct allocateShared {
 struct allocateMmap {
     void *memoryAddress;
     long int size;
-    //struct tm *tm;
     char fecha[MAX_LENGTH];
     int descritor;
     char fich[MAX_LENGTH];

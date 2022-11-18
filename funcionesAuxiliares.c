@@ -48,11 +48,11 @@ struct cmd cmds[] = {
         {"deltree", deltree, "[name1, name2...] Elimina los ficheros o directorios vacíos de forma recursiva."},
         {"allocate", allocate, "[] Asigna un bloque de memoria. \n [-malloc tam] Asigna un bloque malloc de tamaño tam. \n [-shared cl] Asigna el bloque de memoria compartida (ya existe) de clave cl. \n [-createshared cl tam] Asigna (creando) el bloque de memoria compartida de clave cl y tamaño tam. \n [-mmap fich perm] mapea el fichero fich, perm son los permisos."},
         {"deallocate", deallocate, "[] Desasigna un bloque de memoria. \n [-malloc tam] Desasigna un bloque malloc de tamano tam. \n [-shared cl] Desasigna (desmapea) el bloque de memoria compartida de clave cl. \n [-delkey cl] Elimina del sistema (sin desmapear) la clave de memoria cl. \n [-mmap fich] Desmapea el fichero mapeado fich. \n [-addr] Desasigna el bloque de memoria en la dirección addr."},
-        {"i-o", io, "[-read fich addr cont] Lee cont bytes desde fich a addr. \n [-wirte [-o] fich addr cont] Escribe cont bytes desde addr a fich. -o para sobreescribir addr es una dirección de memoria."},
-        {"memdump", memdump, "[addr cont] Vuelca en pantallas los contenidos (cont bytes) de la posición de memoria adrr."},
-        {"memfill", memfill, "[addr cont byte] Llena la memoria a partir de addr con byte."},
+        {"i-o", io, "[read <fich> <addr> <cont>] Lee cont bytes desde fich a addr. \n [write [-o] <fich> <addr> <cont>] Escribe cont bytes desde addr a fich. -o para sobreescribir addr es una dirección de memoria."},
+        {"memdump", memdump, "[<addr> <cont>] Vuelca en pantallas los contenidos (cont bytes) de la posición de memoria adrr."},
+        {"memfill", memfill, "[<addr> <cont> <byte>] Llena la memoria a partir de addr con byte."},
         {"memory", memory, "[] Muestra detalles de la memoria del proceso. \n [-blocks] Los bloques de memoria asignados. \n [-funcs] Las direcciones de las funciones. \n [-vars] Las direcciones de las variables. \n [-all] todo. \n [-pmap] Muestra la salida del comando pmap(o similar)."},
-        {"recurse", recurse, "[n] Invoca a la función recursiva n veces."},
+        {"recurse", recurse, "[N] Invoca a la función recursiva N veces."},
         {NULL, NULL}
 };
 
@@ -147,7 +147,7 @@ off_t tamanoFichero(char *file) {     //Returns size of one file
 }
 
 /**
- * Imprime la información de la ruta que le pasemos como parámtetro por tokens
+ * Imprime la información de la ruta que le pasemos como parámetro por tokens
  * @param tokens - Ruta para imprimir la información
  * @param flags - Parámetros que mostrarán una información u otra
  * @return 0 si todo fue correcto, -1 si el fichero no existe o si los usuarios furon borrados
@@ -413,16 +413,13 @@ void mostrarListaMmap(structListas L) {
 void do_AllocateMalloc(char *tokens[], structListas *L) {
     time_t t = time(NULL);
     char fecha[MAX_LENGTH];
-    //struct tm tm = *localtime(&t);
     void *memoryAddress;
-    //char typeOfAllocation[MAX_LENGTH];
 
     struct allocateMalloc *LMB = malloc(sizeof(struct allocateMalloc));
     int size = atoi(tokens[1]);
     memoryAddress = malloc(*tokens[1]);
     LMB->memoryAddress = memoryAddress;
     LMB->size = size;
-    //LMB->tm = localtime(&t);
 
     strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", localtime(&t));
     strcpy(LMB->fecha,fecha);
@@ -475,7 +472,6 @@ void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
     struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
     LMB->memoryAddress = p;
     LMB->size = s.shm_segsz;
-    //LMB->tm = localtime(&t);
     strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", localtime(&t));
     strcpy(LMB->fecha,fecha);
     LMB->key = clave;
@@ -507,11 +503,11 @@ void do_AllocateCreateshared (char *tr[], structListas L)
     cl=(key_t)  strtoul(tr[1],NULL,10);
     tam=(size_t) strtoul(tr[2],NULL,10);
     if (tam==0) {
-        printf ("No se asignan bloques de 0 bytes\n");
+        printf ("No se asignan bloques de 0 bytes");
         return;
     }
     if ((p=ObtenerMemoriaShmget(cl,tam, &L))!=NULL) {
-        printf ("Asignados %lu bytes en %p\n",(unsigned long) tam, p);
+        printf ("Asignados %lu bytes en %p",(unsigned long) tam, p);
     } else {
         printf("Imposible asignar memoria compartida clave %lu:%s\n",
                (unsigned long) cl, strerror(errno));
@@ -526,31 +522,37 @@ void do_AllocateCreateshared (char *tr[], structListas L)
  * @param L - Lista en la que se insertarán los datos correspondientes
  * @return - Dirección en la que se mapea el archivo
  */
-void * MapearFichero (char * fichero, int protection, structListas *L)
-{
+void * MapearFichero(char * fichero, int protection, structListas *L) {
     int df, map=MAP_PRIVATE,modo=O_RDONLY;
     struct stat s;
     void *p;
     time_t t = time(NULL);
     char fecha[MAX_LENGTH];
 
+    if(protection&PROT_WRITE) {
+        modo = O_RDWR;
+    }
 
-    if(protection&PROT_WRITE)
-        modo=O_RDWR;
-    if (stat(fichero,&s) == -1 || (df=open(fichero, modo))==-1)
+    if(stat(fichero,&s) == -1 || (df=open(fichero, modo))==-1) {
         return NULL;
-    if ((p=mmap (NULL,s.st_size, protection,map,df,0))==MAP_FAILED)
+    }
+
+    if((p=mmap (NULL,s.st_size, protection,map,df,0))==MAP_FAILED) {
         return NULL;
-/* Guardar en la lista    InsertarNodoMmap (&L,p, s.st_size,df,fichero); */
+    }
+
+    /* Guardar en la lista    InsertarNodoMmap (&L,p, s.st_size,df,fichero); */
     struct allocateMmap *LMB = malloc(sizeof(struct allocateMmap));
+
     LMB->memoryAddress = p;
     LMB->size = s.st_size;
-    //LMB->tm = localtime(&t);
     strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", localtime(&t));
     strcpy(LMB->fecha,fecha);
     LMB->descritor = df;
     strcpy(LMB->fich, fichero);
+
     insert(&L->allocateMmap, LMB);
+
     return p;
 }
 
@@ -560,26 +562,26 @@ void * MapearFichero (char * fichero, int protection, structListas *L)
  * @param arg - Parámetros para el mapeo
  * @param L - Lista en la que se insertarán los datos del mapeo
  */
-void do_AllocateMmap(char *arg[], structListas L)
-{
+void do_AllocateMmap(char *arg[], structListas L) {
     char *perm;
     void *p;
     int protection=0;
 
-    if (arg[1]==NULL) {
+    if(arg[1]==NULL) {
         printf("*** Lista de bloques asignados con mmap para el proceso %d", getpid());
         mostrarListaMmap(L);
         return;
     }
-    if ((perm=arg[2])!=NULL && strlen(perm)<4) {
+    if((perm=arg[2])!=NULL && strlen(perm)<4) {
         if (strchr(perm,'r')!=NULL) protection|=PROT_READ;
         if (strchr(perm,'w')!=NULL) protection|=PROT_WRITE;
         if (strchr(perm,'x')!=NULL) protection|=PROT_EXEC;
     }
-    if ((p=MapearFichero(arg[1],protection, &L))==NULL)
-        perror ("Imposible mapear fichero");
-    else
-        printf ("fichero %s mapeado en %p\n", arg[1], p);
+    if((p=MapearFichero(arg[1],protection, &L))==NULL) {
+        perror("Imposible mapear fichero");
+    } else {
+        printf("fichero %s mapeado en %p", arg[1], p);
+    }
 }
 
 /**
@@ -632,10 +634,12 @@ void do_DeallocateDelkey (char *args[]) {
         printf ("      delkey necesita clave_valida\n");
         return;
     }
+
     if ((id=shmget(clave,0,0666))==-1){
         perror ("shmget: imposible obtener memoria compartida");
         return;
     }
+
     if (shmctl(id,IPC_RMID,NULL)==-1)
         perror ("shmctl: imposible eliminar memoria compartida\n");
 
@@ -677,6 +681,7 @@ void deallocateAddr(structListas L, void *n) {
             return;
         }
     }
+
     for(pos p = first(L.allocateShared); !at_end(L.allocateShared, p); p = next(L.allocateShared, p)) {
         struct allocateShared *LMB = get(L.allocateShared, p);
 
@@ -686,6 +691,7 @@ void deallocateAddr(structListas L, void *n) {
             return;
         }
     }
+
     for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
         struct allocateMmap *LMB = get(L.allocateMmap, p);
 
@@ -705,14 +711,15 @@ ssize_t LeerFichero(char *f, void *p, size_t cont) {
     ssize_t  n;
     int df,aux;
 
-    if(stat (f,&s)==-1 || (df=open(f,O_RDONLY))==-1) {
+    if(stat(f,&s) == -1 || (df = open(f,O_RDONLY)) == -1) {
         return -1;
     }
 
-    if(cont==-1) { /* si pasamos -1 como bytes a leer lo leemos entero*/
+    if(cont == -1) { /* si pasamos -1 como bytes a leer lo leemos entero*/
         cont = s.st_size;
     }
-    if((n=read(df,p,cont))==-1) {
+
+    if((n = read(df,p,cont)) == -1) {
         aux=errno;
         close(df);
         errno=aux;
@@ -755,11 +762,11 @@ ssize_t EscribirFichero(char *f, void *p, size_t cont,int overwrite) {
         flags = O_CREAT | O_WRONLY | O_TRUNC;
     }
 
-    if((df=open(f,flags,0777))==-1) {
+    if((df=open(f,flags,0777)) == -1) {
         return -1;
     }
 
-    if((n=write(df,p,cont))==-1) {
+    if((n=write(df,p,cont)) == -1) {
         aux=errno;
         close(df);
         errno=aux;
@@ -829,24 +836,25 @@ void Do_pmap(void) {/*sin argumentos*/
     }
 
     if(pid==0){
-        if(execvp(argv[0],argv)==-1) {
+        if(execvp(argv[0],argv) == -1) {
             perror("cannot execute pmap (linux, solaris)");
         }
 
-        argv[0]="procstat"; argv[1]="vm"; argv[2]=elpid; argv[3]=NULL;
+        argv[0] = "procstat"; argv[1] = "vm"; argv[2] = elpid; argv[3] = NULL;
         if(execvp(argv[0],argv)==-1) {/*No hay pmap, probamos procstat FreeBSD */
             perror("cannot execute procstat (FreeBSD)");
         }
 
-        argv[0]="procmap",argv[1]=elpid;argv[2]=NULL;
-        if(execvp(argv[0],argv)==-1) { /*probamos procmap OpenBSD*/
+        argv[0] = "procmap", argv[1] = elpid; argv[2] = NULL;
+        if(execvp(argv[0], argv) == -1) { /*probamos procmap OpenBSD*/
             perror("cannot execute procmap (OpenBSD)");
         }
 
-        argv[0]="vmmap"; argv[1]="-interleave"; argv[2]=elpid;argv[3]=NULL;
-        if(execvp(argv[0],argv)==-1) {/*probamos vmmap Mac-OS*/
+        argv[0] = "vmmap"; argv[1] = "-interleave"; argv[2] = elpid; argv[3] = NULL;
+        if(execvp(argv[0], argv) == -1) {/*probamos vmmap Mac-OS*/
             perror("cannot execute vmmap (Mac-OS)");
         }
+
         exit(1);
     }
     waitpid(pid,NULL,0);
@@ -860,7 +868,7 @@ void Recursiva(int n) {
     char automatico[MAX_LENGTH];
     static char estatico[MAX_LENGTH];
 
-    printf("parametro:%3d(%p) array %p, arr estatico %p\n", n, &n, automatico, estatico);
+    printf("parametro:%3d(%p) array %p, arr estatico %p", n, &n, automatico, estatico);
 
     if(n>0) {
         Recursiva(n-1);
@@ -868,16 +876,38 @@ void Recursiva(int n) {
 
 }
 
-void liberarMalloc(void *ptr) {
-    struct allocateMalloc *liberar = ptr;
+/**
+ * Libera memoria de la lista
+ * @param - addr Dirección que usará el deleteList para liberar la lista
+ */
+void liberarMalloc(void *addr) {
+    struct allocateMalloc *liberar = addr;
 
+    // Liberamos la dirección de memoria de los malloc con free
     free(liberar->memoryAddress);
     free(liberar);
 }
 
-void liberarMmap(void *ptr) {
-    struct allocateMmap *liberar = ptr;
+/**
+ * Libera memoria de la lista
+ * @param - addr Dirección que usará el deleteList para liberar la lista
+ */
+void liberarShared(void *addr) {
+    struct allocateShared *liberar = addr;
 
+    // Liberamos la dirección de memoria de la zona compartida con shmdt
+    shmdt(liberar->memoryAddress);
+    free(liberar);
+}
+
+/**
+ * Libera memoria de la lista
+ * @param - addr Dirección que usará el deleteList para liberar la lista
+ */
+void liberarMmap(void *addr) {
+    struct allocateMmap *liberar = addr;
+
+    // Liberamos la dirección de memoria de los ficheros mapeados con mmap
     munmap(liberar->memoryAddress, liberar->size);
     free(liberar);
 }
