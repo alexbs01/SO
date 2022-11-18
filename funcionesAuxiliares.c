@@ -371,10 +371,10 @@ int listaArbolCarpetas(char *path, SStatListCommand flags) {
 void mostrarListaMalloc(structListas L) {
     for(pos p = first(L.allocateMalloc); !at_end(L.allocateMalloc, p); p = next(L.allocateMalloc, p)) {
         struct allocateMalloc *LMB = get(L.allocateMalloc, p);
-        char fecha[MAX_LENGTH];
-        strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
+        //char fecha[MAX_LENGTH];
+        //strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
 
-        printf("\n%p\t\t%ld %s malloc", LMB->memoryAddress, LMB->size, fecha);
+        printf("\n%p\t\t%ld %s malloc", LMB->memoryAddress, LMB->size, LMB->fecha);
     }
 }
 
@@ -387,10 +387,10 @@ void mostrarListaMalloc(structListas L) {
 void mostrarListaShared(structListas L) {
     for(pos p = first(L.allocateShared); !at_end(L.allocateShared, p); p = next(L.allocateShared, p)) {
         struct allocateShared *LMB = get(L.allocateShared, p);
-        char fecha[MAX_LENGTH];
-        strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
+        //char fecha[MAX_LENGTH];
+        //strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
 
-        printf("\n%p\t\t%ld %s shared (key %d)", LMB->memoryAddress, LMB->size, fecha, LMB->key);
+        printf("\n%p\t\t%ld %s shared (key %d)", LMB->memoryAddress, LMB->size, LMB->fecha, LMB->key);
     }
 }
 
@@ -403,25 +403,29 @@ void mostrarListaShared(structListas L) {
 void mostrarListaMmap(structListas L) {
     for(pos p = first(L.allocateMmap); !at_end(L.allocateMmap, p); p = next(L.allocateMmap, p)) {
         struct allocateMmap *LMB = get(L.allocateMmap, p);
-        char fecha[MAX_LENGTH];
-        strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
+        //char fecha[MAX_LENGTH];
+        //strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", LMB->tm);
 
-        printf("\n%p\t\t%ld %s %s (descriptor %d)", LMB->memoryAddress, LMB->size, fecha, LMB->fich, LMB->descritor);
+        printf("\n%p\t\t%ld %s %s (descriptor %d)", LMB->memoryAddress, LMB->size, LMB->fecha, LMB->fich, LMB->descritor);
     }
 }
 
 void do_AllocateMalloc(char *tokens[], structListas *L) {
     time_t t = time(NULL);
-    struct tm tm = *localtime(&t);
+    char fecha[MAX_LENGTH];
+    //struct tm tm = *localtime(&t);
     void *memoryAddress;
-    char typeOfAllocation[MAX_LENGTH];
+    //char typeOfAllocation[MAX_LENGTH];
 
     struct allocateMalloc *LMB = malloc(sizeof(struct allocateMalloc));
     int size = atoi(tokens[1]);
     memoryAddress = malloc(*tokens[1]);
     LMB->memoryAddress = memoryAddress;
     LMB->size = size;
-    LMB->tm = localtime(&t);
+    //LMB->tm = localtime(&t);
+
+    strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", localtime(&t));
+    strcpy(LMB->fecha,fecha);
 
     printf("Asignados %d bytes en %p", size, LMB->memoryAddress);
 
@@ -440,6 +444,7 @@ void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
     void * p;
     int aux,id,flags=0777;
     struct shmid_ds s;
+    char fecha[MAX_LENGTH];
     time_t t = time(NULL);
 
     if(tam) {    /*tam distinto de 0 indica crear */
@@ -470,7 +475,9 @@ void * ObtenerMemoriaShmget (key_t clave, size_t tam, structListas *L) {
     struct allocateShared *LMB = malloc(sizeof(struct allocateShared));
     LMB->memoryAddress = p;
     LMB->size = s.shm_segsz;
-    LMB->tm = localtime(&t);
+    //LMB->tm = localtime(&t);
+    strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", localtime(&t));
+    strcpy(LMB->fecha,fecha);
     LMB->key = clave;
 
     insert(&L->allocateShared, LMB);
@@ -525,6 +532,7 @@ void * MapearFichero (char * fichero, int protection, structListas *L)
     struct stat s;
     void *p;
     time_t t = time(NULL);
+    char fecha[MAX_LENGTH];
 
 
     if(protection&PROT_WRITE)
@@ -537,7 +545,9 @@ void * MapearFichero (char * fichero, int protection, structListas *L)
     struct allocateMmap *LMB = malloc(sizeof(struct allocateMmap));
     LMB->memoryAddress = p;
     LMB->size = s.st_size;
-    LMB->tm = localtime(&t);
+    //LMB->tm = localtime(&t);
+    strftime(fecha, MAX_LENGTH,"%b %d %H:%M ", localtime(&t));
+    strcpy(LMB->fecha,fecha);
     LMB->descritor = df;
     strcpy(LMB->fich, fichero);
     insert(&L->allocateMmap, LMB);
@@ -803,7 +813,7 @@ void LlenarMemoria (void *p, size_t cont, unsigned char byte) {
         arr[i] = byte;
     }
 
-    printf("Llenando %lu bytes de memoria con el byte (%u) a partir de la dirección %p", i, byte, arr);
+    printf("Llenando %lu bytes de memoria con el byte %c(%02X) a partir de la dirección %p", i, byte, byte, arr);
 
 }
 
