@@ -513,22 +513,20 @@ int memdump(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens != 0) {
         int size = 25;
         long direccion = strtol(tokens[0], NULL, 16);
-        long arr = direccion;
+        unsigned char *arr = (unsigned char *) direccion;
 
         if(ntokens == 2) {
             size = atoi(tokens[1]);
         }
 
-        printf("Volcando %d bytes desde la dirección %s\n", size, tokens[0]);
+        printf("Volcando %d bytes desde la direccion %s\n", size, tokens[0]);
 
         for(int cnt = 0; cnt < size; cnt++) {
-            printf("  %c", (*(char *)arr == '\n')? ' ' : *(char *)arr);
+            printf("  %c", arr[cnt]);
         }
-
         printf("\n");
-
         for(int cnt = 0; cnt < size; cnt++) {
-            printf(" %02X", *(char *) direccion);
+            printf(" %X", arr[cnt]);
         }
 
         /*
