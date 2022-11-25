@@ -616,19 +616,34 @@ int recurse(char *tokens[], int ntokens, structListas *listas) {
 
 int priority(char *tokens[], int ntokens, structListas *listas) {
     char errorParametrosDeMas[] = "Deben de ser 2 parámetros o menos";
-    char errorNoExistePid[] = "Imposible encontrar pid";
+    char errorNoExistePid[] = "Imposible encontrar pid ";
+    char errorNoSeCambioPrioridad[] = "No se pudo cambiar la prioridad del proceso ";
 
-    if(ntokens == 0) {
+    if(ntokens == 0) { // Sin parámetros usa el pid del shell
         printf("Prioridad del proceso %d es %d", getpid(), getpriority(PRIO_PROCESS, getpid()));
-    } else if(ntokens == 1) {
+
+    } else if(ntokens == 1) { // Con un parámtro muestra la prioridad del proceso indicado
         int pid = atoi(tokens[0]);
+
         if(getpriority(PRIO_PROCESS, pid) < 0) {
+            strcat(errorNoExistePid, tokens[0]);
             perror(errorNoExistePid);
+
         } else {
             printf("Prioridad del proceso %d es %d", pid, getpriority(PRIO_PROCESS, pid));
         }
         
-    } else if(ntokens == 2) {
+    } else if(ntokens == 2) { // Cambiar prioridad del pid indicado
+        int pid = atoi(tokens[0]);
+        int prioridad = atoi(tokens[1]);
+
+        if(setpriority(PRIO_PROCESS, pid, prioridad)) { // Si no se pudo cambiar de prioridad da error
+            strcat(errorNoSeCambioPrioridad, tokens[0]);
+            perror(errorNoSeCambioPrioridad);
+
+        } else { // Si se cambia de prioridad, se muestra mensaje informativo
+            printf("Prioridad del proceso %d cambiada a %d", pid, prioridad);
+        }
 
     } else {
         perror(errorParametrosDeMas);
