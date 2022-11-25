@@ -7,8 +7,10 @@
 #ifndef SHELL_C_COMANDOS_H
 #define SHELL_C_COMANDOS_H
 
-#include "funcionesAuxiliares.h"
 #include "cabeceras.h"
+#include "funcionesAuxiliares.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <libgen.h> // Para el comando <list>
 #include <grp.h>    // Para el comando <list>
 #include <pwd.h>    // Para el comando <list>
@@ -45,4 +47,13 @@ int memfill(char *tokens[], int ntokens, structListas *listas);  // Rellena una 
 int memory(char *tokens[], int ntokens, structListas *listas);   // Muestra direcciones de memoria
 int recurse(char *tokens[], int ntokens, structListas *listas);  // Muestra una las direcciones de memoria de una función recursiva
 
+int priority(char *tokens[], int ntokens, structListas *listas);
+int showvar(char *tokens[], int ntokens, structListas *listas);
+int changevar(char *tokens[], int ntokens, structListas *listas);
+int showenv(char *tokens[], int ntokens, structListas *listas);
+int forkA(char *tokens[], int ntokens, structListas *listas);
+int execute(char *tokens[], int ntokens, structListas *listas);
+int listjobs(char *tokens[], int ntokens, structListas *listas);
+int deljobs(char *tokens[], int ntokens, structListas *listas);
+int job(char *tokens[], int ntokens, structListas *listas);
 #endif //SHELL_C_COMANDOS_H

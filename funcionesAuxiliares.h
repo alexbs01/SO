@@ -13,7 +13,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h> // strdup para el historial, es un strcpy pero con malloc incluido
-
+#include <stdio.h>
+#include "lista.h"
 #include "comandos.h"
 #include "lista.h"
 

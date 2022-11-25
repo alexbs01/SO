@@ -4,10 +4,8 @@
     Nombre: Alejandro Becerra Suarez
     Nombre: Adrián Rego Criado
 */
-#include <stdio.h>
+
 #include "funcionesAuxiliares.h"
-#include "lista.h"
-#include "cabeceras.h"
 
 int splitString(char *cadena, char *trozos[]) {
     int i=1;
@@ -53,8 +51,34 @@ struct cmd cmds[] = {
         {"memfill", memfill, "[<addr> <cont> <byte>] Llena la memoria a partir de addr con byte."},
         {"memory", memory, "[] Muestra detalles de la memoria del proceso. \n [-blocks] Los bloques de memoria asignados. \n [-funcs] Las direcciones de las funciones. \n [-vars] Las direcciones de las variables. \n [-all] todo. \n [-pmap] Muestra la salida del comando pmap(o similar)."},
         {"recurse", recurse, "[N] Invoca a la función recursiva N veces."},
+        {"priority", priority, "[pid] [valor]\tMuestra o cambia la prioridad del proceso <pid> a <valor>"},
+        {"showvar", showvar, "<var>\tMuestra el valor y las direcciones de la variable de entorno var"},
+        {"changevar", changevar, "[-a|-e|-p] var valor\tCambia el valor de una variable de entorno\n\t-a: accede por el tercer arg de main\n\t-e: accede mediante environ\n\t-p: accede mediante putenv"},
+        {"showenv", showenv, "[-environ|-addr] \t Muestra el entorno del proceso\n\t-environ: accede usando environ (en lugar del tercer arg de main)\n\t-addr: muestra el valor y donde se almacenan environ y el 3er arg main"},
+        {"fork", forkA, "\tEl shell hace fork y queda en espera a que su hijo termine"},
+        {"execute", execute, "VAR1 VAR2 ..prog args....[@pri]\tEjecuta, sin crear proceso,prog con argumentos\n\t en un entorno que contiene solo las variables VAR1, VAR2..."},
+        {"listjobs", listjobs, "\tLista los procesos en segundo plano"},
+        {"deljobs", deljobs, "[-term][-sig]\tElimina los procesos de la lista procesos en sp\n\t-term: los terminados\n\t-sig: los terminados por senal"},
+        {"job", job, "[-fg] pid\tMuestra informacion del proceso pid.\n\t\t-fg: lo pasa a primer plano"},
         {NULL, NULL}
 };
+
+/*
+-> ayuda fork
+fork 	El shell hace fork y queda en espera a que su hijo termine
+-> ayuda execute
+execute VAR1 VAR2 ..prog args....[@pri]	Ejecuta, sin crear proceso,prog con argumentos
+	 en un entorno que contiene solo las variables VAR1, VAR2...
+-> ayuda listjobs
+listjobs 	Lista los procesos en segundo plano
+-> ayuda deljobs
+deljobs [-term][-sig]	Elimina los procesos de la lista procesos en sp
+	-term: los terminados
+	-sig: los terminados por senal
+-> ayuda job
+job [-fg] pid	Muestra informacion del proceso pid.
+		-fg: lo pasa a primer plano
+ */
 
 int processInput(char *tokens[], int ntokens, structListas *listas) {
     int exit = 0;

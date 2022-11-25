@@ -65,6 +65,7 @@ typedef struct listas {
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/resource.h>
 //#include "funcionesAuxiliares.h"
 
 #include "comandos.h"

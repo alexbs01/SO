@@ -1,4 +1,4 @@
-EXECUTABLE = p2
+EXECUTABLE = p3
 
 all:main
 

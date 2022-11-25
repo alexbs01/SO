@@ -4,8 +4,7 @@
     Nombre: Alejandro Becerra Suarez
     Nombre: Adrián Rego Criado
 */
-#include <stdio.h>
-#include <stdlib.h>
+
 #include "comandos.h"
 
 int global1 = 1, global2 = 2, global3 = 3;
@@ -611,6 +610,75 @@ int recurse(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 1) {
         Recursiva(atoi(tokens[0]));
     }
+
+    return 0;
+}
+
+int priority(char *tokens[], int ntokens, structListas *listas) {
+    char errorParametrosDeMas[] = "Deben de ser 2 parámetros o menos";
+    char errorNoExistePid[] = "Imposible encontrar pid";
+
+    if(ntokens == 0) {
+        printf("Prioridad del proceso %d es %d", getpid(), getpriority(PRIO_PROCESS, getpid()));
+    } else if(ntokens == 1) {
+        int pid = atoi(tokens[0]);
+        if(getpriority(PRIO_PROCESS, pid) < 0) {
+            perror(errorNoExistePid);
+        } else {
+            printf("Prioridad del proceso %d es %d", pid, getpriority(PRIO_PROCESS, pid));
+        }
+        
+    } else if(ntokens == 2) {
+
+    } else {
+        perror(errorParametrosDeMas);
+    }
+
+    return 0;
+}
+
+int showvar(char *tokens[], int ntokens, structListas *listas) {
+
+    return 0;
+}
+
+int changevar(char *tokens[], int ntokens, structListas *listas) {
+
+    return 0;
+}
+
+
+int showenv(char *tokens[], int ntokens, structListas *listas) {
+
+    return 0;
+}
+
+
+int forkA(char *tokens[], int ntokens, structListas *listas) {
+
+    return 0;
+}
+
+
+int execute(char *tokens[], int ntokens, structListas *listas) {
+
+    return 0;
+}
+
+
+int listjobs(char *tokens[], int ntokens, structListas *listas) {
+
+    return 0;
+}
+
+
+int deljobs(char *tokens[], int ntokens, structListas *listas) {
+
+    return 0;
+}
+
+
+int job(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
