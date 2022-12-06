@@ -653,6 +653,11 @@ int priority(char *tokens[], int ntokens, structListas *listas) {
 }
 
 int showvar(char *tokens[], int ntokens, structListas *listas) {
+    if(ntokens == 0) { // Mostramos todas las variables de entorno
+        extern char **environ;
+
+
+    }
 
     return 0;
 }
@@ -670,8 +675,15 @@ int showenv(char *tokens[], int ntokens, structListas *listas) {
 
 
 int forkA(char *tokens[], int ntokens, structListas *listas) {
+    pid_t pid;
 
-    return 0;
+    if((pid = fork()) == 0) {
+/*		VaciarListaProcesos(&LP); Depende de la implementación de cada uno*/
+        printf("ejecutando proceso %d\n", getpid());
+
+    } else if(pid != -1) {
+        waitpid(pid, NULL, 0);
+    }
 }
 
 

@@ -10,7 +10,7 @@
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64
 
-int main() {
+int main(int argc, char *argv[], char **env) {
     char input[MAX_INPUT_SIZE], *duplicateInput;
     char *tokens[MAX_TOKENS];
     int ntokens;
