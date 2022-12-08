@@ -8,6 +8,7 @@
 #define SHELL_C_FUNCIONESAUXILIARES_H
 
 #define MAX_LENGTH 255
+#define MAXVAR 200
 
 #include "cabeceras.h"
 #include <stdlib.h>
@@ -64,4 +65,7 @@ void Recursiva (int n);
 void liberarMalloc(void *addr);
 void liberarMmap(void *addr);
 void liberarShared(void *addr);
+
+int BuscarVariable (char * var, char *e[]);
+int CambiarVariable(char * var, char * valor, char *e[]);
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

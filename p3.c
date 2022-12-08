@@ -10,7 +10,7 @@
 #define MAX_INPUT_SIZE 1024
 #define MAX_TOKENS 64
 
-int main(int argc, char *argv[], char **env) {
+int main(int argc, char *argv[], char *envp[]) {
     char input[MAX_INPUT_SIZE], *duplicateInput;
     char *tokens[MAX_TOKENS];
     int ntokens;
@@ -19,7 +19,8 @@ int main(int argc, char *argv[], char **env) {
     lista allocateMalloc = createEmptyList();
     lista allocateShared = createEmptyList();
     lista allocateMmap = createEmptyList();
-    structListas listas = {historial, allocateMalloc, allocateShared, allocateMmap};
+
+    structListas listas = {historial, allocateMalloc, allocateShared, allocateMmap, envp};
 
     while(endShell != 1) {
 

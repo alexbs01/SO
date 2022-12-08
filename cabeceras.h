@@ -48,6 +48,7 @@ typedef struct listas {
     lista allocateMalloc;
     lista allocateShared;
     lista allocateMmap;
+    char** envp;
 } structListas;
 
 #include <stdio.h>
@@ -66,6 +67,9 @@ typedef struct listas {
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/resource.h>
+#include <grp.h>
+#include <stdio_ext.h>
+#include <pwd.h>
 //#include "funcionesAuxiliares.h"
 
 #include "comandos.h"

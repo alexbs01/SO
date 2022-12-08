@@ -935,3 +935,36 @@ void liberarMmap(void *addr) {
     munmap(liberar->memoryAddress, liberar->size);
     free(liberar);
 }
+
+int BuscarVariable (char * var, char *e[]) { /*busca una variable en el entorno que se le pasa como parámetro*/
+    int posicion=0;
+    char aux[MAXVAR];
+
+    strcpy (aux,var);
+    strcat (aux,"=");
+
+    while (e[posicion] != NULL)
+        if (!strncmp(e[posicion], aux, strlen(aux)))
+            return (posicion);
+        else
+            posicion++;
+    errno = ENOENT;   /*no hay tal variable*/
+    return(-1);
+}
+
+int CambiarVariable(char * var, char * valor, char *e[]) {
+  int posicion;
+  char *aux;
+
+  if((posicion = BuscarVariable(var, e)) == -1) {
+      return (-1);
+  }
+  if((aux = (char *) malloc(strlen(var) + strlen(valor) + 2)) == NULL) {
+      return -1;
+  }
+  strcpy(aux,var);
+  strcat(aux,"=");
+  strcat(aux,valor);
+  e[posicion]=aux;
+  return (posicion);
+}

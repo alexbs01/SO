@@ -653,17 +653,61 @@ int priority(char *tokens[], int ntokens, structListas *listas) {
 }
 
 int showvar(char *tokens[], int ntokens, structListas *listas) {
+    extern char **environ;
+
     if(ntokens == 0) { // Mostramos todas las variables de entorno
-        extern char **environ;
 
+        // Hacemos un bucle para recorrer todas las variables de entorno
+        for(int i = 0; environ[i] != NULL; i++) {
+            char *value = strtok(NULL, "=");
 
+            printf("\n%p->main arg3[%d]=(%p) %s", &environ[i], i,  environ[i], environ[i]);
+        }
+
+    } else if(ntokens == 1) { // Mostramos solo una variable de entorno
+        // Obtenemos el valor de la variable de entorno con getenv
+        char *val = getenv(tokens[0]);
+        int x = BuscarVariable(tokens[0], __environ);
+
+        if(val == NULL) {
+            printf("La variable de entorno '%s' no está definida.\n", tokens[0]);
+            return 0;
+        }
+
+        printf("Con arg3 main %s(%p) @%p\n",__environ[x],__environ[x],&listas->envp[x]);
+        printf("  Con environ %s(%p) @%p\n", __environ[x], __environ[x], &__environ[x]);
+        printf("    Con getenv %s(%p)\n", getenv(tokens[0]), &val);
+
+    } else{
+        printf("Número de parámetros incorrecto.");
     }
 
     return 0;
 }
 
 int changevar(char *tokens[], int ntokens, structListas *listas) {
+    char *aux = malloc(MAX_LENGTH);
 
+    if(ntokens == 3) {
+        if(strcmp(tokens[0], "-a") == 0) {
+            CambiarVariable(tokens[1], tokens[2], listas->envp);
+
+        } else if(strcmp(tokens[0], "-e") == 0) {
+            CambiarVariable(tokens[1], tokens[2], __environ);
+
+        } else if(strcmp(tokens[0], "-p") == 0) {
+            strcpy(aux,tokens[1]);
+            strcat(aux,"=");
+            strcat(aux,(tokens[2]));
+            putenv(aux);
+
+        } else {
+            printf("changevar [-a | -e | -p] <var> <valor>");
+        }
+
+    } else {
+        printf("changevar [-a | -e | -p] <var> <valor>");
+    }
     return 0;
 }
 
