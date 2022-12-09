@@ -43,12 +43,22 @@ struct allocateMmap {
     char fich[MAX_LENGTH];
 };
 
+struct job {
+    int pid;
+    int uid;
+    int priority;
+    char fecha[MAX_LENGTH];
+    enum state{FINISHED, STOPPED, SIGNALED, ACTIVE} state;
+    char name[MAX_LENGTH];
+};
+
 typedef struct listas {
     lista historial;
     lista allocateMalloc;
     lista allocateShared;
     lista allocateMmap;
-    char** envp;
+    char **envp;
+    lista job;
 } structListas;
 
 #include <stdio.h>

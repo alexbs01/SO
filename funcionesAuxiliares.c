@@ -63,23 +63,6 @@ struct cmd cmds[] = {
         {NULL, NULL}
 };
 
-/*
--> ayuda fork
-fork 	El shell hace fork y queda en espera a que su hijo termine
--> ayuda execute
-execute VAR1 VAR2 ..prog args....[@pri]	Ejecuta, sin crear proceso,prog con argumentos
-	 en un entorno que contiene solo las variables VAR1, VAR2...
--> ayuda listjobs
-listjobs 	Lista los procesos en segundo plano
--> ayuda deljobs
-deljobs [-term][-sig]	Elimina los procesos de la lista procesos en sp
-	-term: los terminados
-	-sig: los terminados por senal
--> ayuda job
-job [-fg] pid	Muestra informacion del proceso pid.
-		-fg: lo pasa a primer plano
- */
-
 int processInput(char *tokens[], int ntokens, structListas *listas) {
     int exit = 0;
 
