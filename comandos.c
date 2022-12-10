@@ -615,7 +615,7 @@ int recurse(char *tokens[], int ntokens, structListas *listas) {
 }
 
 int priority(char *tokens[], int ntokens, structListas *listas) {
-    char errorParametrosDeMas[] = "Deben de ser 2 parámetros o menos";
+    char errorParametrosDeMas[] = "Deben de ser 2 parámetros o menos y la prioridad estar en [-20, 19]";
     char errorNoExistePid[] = "Imposible encontrar pid ";
     char errorNoSeCambioPrioridad[] = "No se pudo cambiar la prioridad del proceso ";
 
@@ -633,7 +633,7 @@ int priority(char *tokens[], int ntokens, structListas *listas) {
             printf("Prioridad del proceso %d es %d", pid, getpriority(PRIO_PROCESS, pid));
         }
         
-    } else if(ntokens == 2) { // Cambiar prioridad del pid indicado
+    } else if(ntokens == 2 && atoi(tokens[1]) >= -20 && atoi(tokens[1]) <= 19) { // Cambiar prioridad del pid indicado
         int pid = atoi(tokens[0]);
         int prioridad = atoi(tokens[1]);
 
@@ -706,7 +706,7 @@ int changevar(char *tokens[], int ntokens, structListas *listas) {
     } else {
         printf("changevar [-a | -e | -p] <var> <valor>");
     }
-    
+
     return 0;
 }
 
