@@ -721,12 +721,12 @@ int showenv(char *tokens[], int ntokens, structListas *listas) {
 
     } else if(ntokens == 1 && strcmp(tokens[0], "-environ") == 0) {
         for(int i = 0; __environ[i] != NULL; i++) {
-            printf("\n%p->environ[%d]=(%p) %s", &__environ[i], i, __environ[i], __environ[i]);
+            printf("\n%p->environ[%d]=(%p) %s", &listas->envp[i], i, listas->envp[i], listas->envp[i]);
         }
 
     } else if(ntokens == 1 && strcmp(tokens[0], "-addr") == 0) {
         printf("environ:   %p (almacenado en %p)\n",&__environ[0],&__environ);
-        printf("main arg3: %p (almacenado en %p)\n",&environ[0],&listas->envp);
+        printf("main arg3: %p (almacenado en %p)\n",&listas->envp[0],&listas->envp);
 
     } else {
         printf("Uso: showenv [-environ|-addr]");
