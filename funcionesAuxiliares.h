@@ -68,4 +68,5 @@ void liberarShared(void *addr);
 
 int BuscarVariable (char * var, char *e[]);
 int CambiarVariable(char * var, char * valor, char *e[]);
+
 #endif //SHELL_C_FUNCIONESAUXILIARES_H

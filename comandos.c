@@ -659,8 +659,6 @@ int showvar(char *tokens[], int ntokens, structListas *listas) {
 
         // Hacemos un bucle para recorrer todas las variables de entorno
         for(int i = 0; environ[i] != NULL; i++) {
-            char *value = strtok(NULL, "=");
-
             printf("\n%p->main arg3[%d]=(%p) %s", &environ[i], i,  environ[i], environ[i]);
         }
 
@@ -679,7 +677,7 @@ int showvar(char *tokens[], int ntokens, structListas *listas) {
         printf("    Con getenv %s(%p)\n", getenv(tokens[0]), &val);
 
     } else{
-        printf("Número de parámetros incorrecto.");
+        printf("Número de parámetros incorrecto. Uso: showvar [<var>]");
     }
 
     return 0;
@@ -708,11 +706,29 @@ int changevar(char *tokens[], int ntokens, structListas *listas) {
     } else {
         printf("changevar [-a | -e | -p] <var> <valor>");
     }
+    
     return 0;
 }
 
 
 int showenv(char *tokens[], int ntokens, structListas *listas) {
+    extern char **environ;
+
+    if(ntokens == 0) {
+        showvar(NULL, 0, NULL);
+
+    } else if(ntokens == 1 && strcmp(tokens[0], "-environ") == 0) {
+        for(int i = 0; __environ[i] != NULL; i++) {
+            printf("\n%p->environ[%d]=(%p) %s", &__environ[i], i, __environ[i], __environ[i]);
+        }
+
+    } else if(ntokens == 1 && strcmp(tokens[0], "-addr") == 0) {
+        printf("environ:   %p (almacenado en %p)\n",&__environ[0],&__environ);
+        printf("main arg3: %p (almacenado en %p)\n",&environ[0],&listas->envp);
+
+    } else {
+        printf("Uso: showenv [-environ|-addr]");
+    }
 
     return 0;
 }
@@ -722,16 +738,19 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
     pid_t pid;
 
     if((pid = fork()) == 0) {
-/*		VaciarListaProcesos(&LP); Depende de la implementación de cada uno*/
+        /* VaciarListaProcesos(&LP); Depende de la implementación de cada uno */
         printf("ejecutando proceso %d\n", getpid());
 
     } else if(pid != -1) {
         waitpid(pid, NULL, 0);
     }
+    return 0;
 }
 
 
 int execute(char *tokens[], int ntokens, structListas *listas) {
+    extern char **environ;
+    execve(tokens[0], tokens, environ);
 
     return 0;
 }
