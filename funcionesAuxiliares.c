@@ -949,5 +949,7 @@ int CambiarVariable(char * var, char * valor, char *e[]) {
   strcat(aux,"=");
   strcat(aux,valor);
   e[posicion]=aux;
+
+  free(aux);
   return (posicion);
 }

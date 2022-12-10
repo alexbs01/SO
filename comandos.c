@@ -684,7 +684,6 @@ int showvar(char *tokens[], int ntokens, structListas *listas) {
 }
 
 int changevar(char *tokens[], int ntokens, structListas *listas) {
-    char *aux = malloc(MAX_LENGTH);
 
     if(ntokens == 3) {
         if(strcmp(tokens[0], "-a") == 0) {
@@ -694,11 +693,14 @@ int changevar(char *tokens[], int ntokens, structListas *listas) {
             CambiarVariable(tokens[1], tokens[2], __environ);
 
         } else if(strcmp(tokens[0], "-p") == 0) {
+            char *aux = malloc(MAX_LENGTH);
+
             strcpy(aux,tokens[1]);
             strcat(aux,"=");
             strcat(aux,(tokens[2]));
             putenv(aux);
 
+            free(aux);
         } else {
             printf("changevar [-a | -e | -p] <var> <valor>");
         }
