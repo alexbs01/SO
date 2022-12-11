@@ -72,8 +72,19 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
             return exit;
         }
     }
+    int pid;
+    if((pid == fork()) == 0) {
+        printf("Entró en el if");
+        execute(tokens, ntokens, listas);
+        return exit;
+    } else { // Original
+        printf("Entró en donde el waitpid");
+        waitpid(pid, NULL, 0); // Primer plano
+        // Probar con xclock, xcalc
+    }
 
-    printf("Comando no encontrado");
+
+   // printf("Comando no encontrado");
     return exit;
 }
 
@@ -945,11 +956,44 @@ int CambiarVariable(char * var, char * valor, char *e[]) {
   if((aux = (char *) malloc(strlen(var) + strlen(valor) + 2)) == NULL) {
       return -1;
   }
-  strcpy(aux,var);
-  strcat(aux,"=");
-  strcat(aux,valor);
-  e[posicion]=aux;
+  strcpy(aux, var);
+  strcat(aux, "=");
+  strcat(aux, valor);
+  e[posicion] = aux;
 
   free(aux);
   return (posicion);
+}
+
+char * Ejecutable (char *s) {
+    char path[MAX_LENGTH];
+    static char aux2[MAX_LENGTH];
+    struct stat st;
+    char *p;
+
+    if(s == NULL || (p = getenv("PATH")) == NULL) {
+        perror("Imposible ejecutar");
+        return s;
+    }
+
+    if(s[0] == '/' || !strncmp(s, "./", 2) || !strncmp (s, "../", 3)) {
+        perror("Imposible ejecutar");
+        return s;
+    }       /*is an absolute pathname*/
+
+    strncpy(path, p, MAX_LENGTH);
+
+    for(p = strtok(path, ":"); p != NULL; p = strtok(NULL, ":")) {
+       sprintf(aux2, "%s/%s", p, s);
+
+       if(lstat(aux2, &st) != -1) {
+           perror("Imposible ejecutar");
+           return aux2;
+       }
+    }
+    return s;
+}
+
+int OurExecvpe(char *file, char *argv[], char *envp[]) {
+   return (execve(Ejecutable(file),argv, envp));
 }

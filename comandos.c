@@ -752,8 +752,8 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
 
 int execute(char *tokens[], int ntokens, structListas *listas) {
     extern char **environ;
-    execve(tokens[0], tokens, environ);
-
+    //execve(tokens[0], tokens, environ);
+    OurExecvpe(tokens[0], tokens, environ);
     return 0;
 }
 

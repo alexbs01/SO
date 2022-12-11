@@ -68,5 +68,6 @@ void liberarShared(void *addr);
 
 int BuscarVariable (char * var, char *e[]);
 int CambiarVariable(char * var, char * valor, char *e[]);
-
+char * Ejecutable (char *s);
+int OurExecvpe(char *file, char *argv[], char *envp[]);
 #endif //SHELL_C_FUNCIONESAUXILIARES_H
