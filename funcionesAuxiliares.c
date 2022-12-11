@@ -72,19 +72,23 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
             return exit;
         }
     }
-    int pid;
-    if((pid == fork()) == 0) {
-        printf("Entró en el if");
-        execute(tokens, ntokens, listas);
-        return exit;
-    } else { // Original
-        printf("Entró en donde el waitpid");
-        waitpid(pid, NULL, 0); // Primer plano
-        // Probar con xclock, xcalc
+
+    pid_t pid = fork();
+
+    if (pid == 0) {
+        // Este es el código que se ejecutará en el proceso hijo
+        execvp(tokens[0], tokens);
+        return 1;
+    } else if (pid > 0) {
+        // Este es el código que se ejecutará en el proceso padre
+        // Espera a que el proceso hijo termine
+        waitpid(pid, NULL, 0);
+
+    } else {
+        perror("Error al crear el proceso hijo");
+        return 1;
     }
 
-
-   // printf("Comando no encontrado");
     return exit;
 }
 
