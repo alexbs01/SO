@@ -700,7 +700,6 @@ int changevar(char *tokens[], int ntokens, structListas *listas) {
             strcat(aux,(tokens[2]));
             putenv(aux);
 
-            free(aux);
         } else {
             printf("changevar [-a | -e | -p] <var> <valor>");
         }
