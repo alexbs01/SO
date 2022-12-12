@@ -73,7 +73,11 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
         }
     }
 
-    pid_t pid = fork();
+    if(strcmp(tokens[ntokens - 1], "&") == 0) {
+        comandoBackground(tokens, ntokens - 1, listas);
+
+    }
+    /*pid_t pid = fork();
 
     if (pid == 0) {
         // Este es el código que se ejecutará en el proceso hijo
@@ -87,7 +91,7 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
     } else {
         perror("Error al crear el proceso hijo");
         return 1;
-    }
+    }*/
 
     return exit;
 }
@@ -975,12 +979,10 @@ char * Ejecutable (char *s) {
     char *p;
 
     if(s == NULL || (p = getenv("PATH")) == NULL) {
-        perror("Imposible ejecutar");
         return s;
     }
 
     if(s[0] == '/' || !strncmp(s, "./", 2) || !strncmp (s, "../", 3)) {
-        perror("Imposible ejecutar");
         return s;
     }       /*is an absolute pathname*/
 
@@ -990,7 +992,6 @@ char * Ejecutable (char *s) {
        sprintf(aux2, "%s/%s", p, s);
 
        if(lstat(aux2, &st) != -1) {
-           perror("Imposible ejecutar");
            return aux2;
        }
     }
@@ -999,4 +1000,116 @@ char * Ejecutable (char *s) {
 
 int OurExecvpe(char *file, char *argv[], char *envp[]) {
    return (execve(Ejecutable(file),argv, envp));
+}
+
+int comandoBackground(char *tokens[], int ntokens, structListas *listas) {
+    int prioridad = 0;
+    char *firstPart = strtok(tokens[ntokens - 1], "@");
+
+    if(strcmp(firstPart, "@") == 0) {
+        char *secongPart = strtok(NULL, "@");
+        prioridad = atoi(secongPart);
+        nice(prioridad);
+    }
+
+
+    return 0;
+}
+
+/*las siguientes funciones nos permiten obtener el nombre de una senal a partir
+del número y viceversa */
+static struct SEN sigstrnum[]={
+        {"HUP", SIGHUP},
+        {"INT", SIGINT},
+        {"QUIT", SIGQUIT},
+        {"ILL", SIGILL},
+        {"TRAP", SIGTRAP},
+        {"ABRT", SIGABRT},
+        {"IOT", SIGIOT},
+        {"BUS", SIGBUS},
+        {"FPE", SIGFPE},
+        {"KILL", SIGKILL},
+        {"USR1", SIGUSR1},
+        {"SEGV", SIGSEGV},
+        {"USR2", SIGUSR2},
+        {"PIPE", SIGPIPE},
+        {"ALRM", SIGALRM},
+        {"TERM", SIGTERM},
+        {"CHLD", SIGCHLD},
+        {"CONT", SIGCONT},
+        {"STOP", SIGSTOP},
+        {"TSTP", SIGTSTP},
+        {"TTIN", SIGTTIN},
+        {"TTOU", SIGTTOU},
+        {"URG", SIGURG},
+        {"XCPU", SIGXCPU},
+        {"XFSZ", SIGXFSZ},
+        {"VTALRM", SIGVTALRM},
+        {"PROF", SIGPROF},
+        {"WINCH", SIGWINCH},
+        {"IO", SIGIO},
+        {"SYS", SIGSYS},
+
+/*senales que no hay en todas partes*/
+#ifdef SIGPOLL
+        {"POLL", SIGPOLL},
+#endif
+#ifdef SIGPWR
+        {"PWR", SIGPWR},
+#endif
+#ifdef SIGEMT
+        {"EMT", SIGEMT},
+#endif
+#ifdef SIGINFO
+        {"INFO", SIGINFO},
+#endif
+#ifdef SIGSTKFLT
+        {"STKFLT", SIGSTKFLT},
+#endif
+#ifdef SIGCLD
+        {"CLD", SIGCLD},
+#endif
+#ifdef SIGLOST
+        {"LOST", SIGLOST},
+#endif
+#ifdef SIGCANCEL
+        {"CANCEL", SIGCANCEL},
+#endif
+#ifdef SIGTHAW
+        {"THAW", SIGTHAW},
+#endif
+#ifdef SIGFREEZE
+        {"FREEZE", SIGFREEZE},
+#endif
+#ifdef SIGLWP
+        {"LWP", SIGLWP},
+#endif
+#ifdef SIGWAITING
+        {"WAITING", SIGWAITING},
+#endif
+        {NULL,-1},
+};    /*fin array sigstrnum */
+
+
+int ValorSenal(char * sen) { /*devuelve el numero de senial a partir del nombre*/
+
+    int i;
+    for (i=0; sigstrnum[i].nombre!=NULL; i++) {
+        if (!strcmp(sen, sigstrnum[i].nombre)) {
+            return sigstrnum[i].senal;
+        }
+    }
+    return -1;
+}
+
+
+char *NombreSenal(int sen) { /*devuelve el nombre senal a partir de la senal*/
+			/* para sitios donde no hay sig2str*/
+    int i;
+    for (i=0; sigstrnum[i].nombre!=NULL; i++) {
+        if (sen == sigstrnum[i].senal) {
+            return sigstrnum[i].nombre;
+        }
+    }
+    return ("SIGUNKNOWN");
 }

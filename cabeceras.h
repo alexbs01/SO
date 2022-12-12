@@ -6,7 +6,7 @@
 */
 #ifndef SHELL_CABECERAS_H
 #define SHELL_CABECERAS_H
-
+#define _GNV_SOURCE
 #define MAX_LENGTH 255
 #define MAX_PATH 255
 
@@ -45,10 +45,10 @@ struct allocateMmap {
 
 struct job {
     int pid;
-    int uid;
-    int priority;
+    char uName[MAX_LENGTH];
+    //int priority;
     char fecha[MAX_LENGTH];
-    enum state{FINISHED, STOPPED, SIGNALED, ACTIVE} state;
+    char state[MAX_LENGTH];
     char name[MAX_LENGTH];
 };
 
@@ -60,6 +60,11 @@ typedef struct listas {
     char **envp;
     lista job;
 } structListas;
+
+struct SEN {
+    char *nombre;
+    int senal;
+};
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -80,6 +85,7 @@ typedef struct listas {
 #include <grp.h>
 #include <stdio_ext.h>
 #include <pwd.h>
+#include <signal.h>
 //#include "funcionesAuxiliares.h"
 
 #include "comandos.h"

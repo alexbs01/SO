@@ -751,25 +751,135 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
 
 int execute(char *tokens[], int ntokens, structListas *listas) {
     extern char **environ;
-    //execve(tokens[0], tokens, environ);
-    OurExecvpe(tokens[0], tokens, environ);
+    int prioridad = 0;
+    char *firstPart = strtok(tokens[ntokens - 1], "@");
+    prioridad = atoi(firstPart);
+    printf("BBBB");
+    printf("%d ", prioridad);
+
+
+    if(strcmp(firstPart, "@") == 0) {
+        char *secondPart = strtok(NULL, "@");
+        prioridad = atoi(secondPart);
+        printf("%d ", prioridad);
+    }
+
+    char *aux[ntokens - 1];
+
+    for(int i = 0; i < ntokens + 1; i++) {
+        aux[i] = tokens[i];
+    }
+
+    OurExecvpe(tokens[0], aux, environ);
+
     return 0;
+
+    //uid_t uid = getuid();
+    //struct passwd *pw = getpwuid(uid);
+    //if(pw) {
+    //  printf("Nombre de usuario actual: %s\n", pw->pw_name);
+    //
+    //  setpwuid(uid, pw->pw_name);
+    //
+    //  pw = getpwuid(uid);
+    //
+    //  if(pw) {
+    //      printf("Nuevo nombre de usuario: %s\n", pw->pw_name);
+    //  }
+    // }
 }
 
 
 int listjobs(char *tokens[], int ntokens, structListas *listas) {
-
+    if(isEmptyList(listas->job)) {
+        printf("\n");
+    } else {
+        for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
+            struct job *j = get(listas->job, p);
+            printf("%d\t%s p=%d %s %s (%d) %s", j->pid, j->uName,
+                   getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
+                   ValorSenal(j->state), j->name);
+        }
+    }
     return 0;
 }
 
 
 int deljobs(char *tokens[], int ntokens, structListas *listas) {
+    if(ntokens == 0) {
+        listjobs(NULL, 0, listas);
+
+    } else if(ntokens == 1 && strcmp(tokens[0], "-term") == 0) {
+        for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
+            struct job *j = get(listas->job, p);
+            if(ValorSenal(j->state) == ValorSenal("TERM")) {
+                deleteAtPosition(&listas->job, p);
+            }
+        }
+
+    } else if(ntokens == 2 && strcmp(tokens[0], "-sig") == 0) {
+        for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
+            struct job *j = get(listas->job, p);
+            if(ValorSenal(j->state) == ValorSenal(tokens[2])) {
+                deleteAtPosition(&listas->job, p);
+            }
+        }
+
+    } else {
+        printf("deljobs [-term][-sig]\tElimina los procesos de la lista procesos en sp\n"
+               "\t-term: los terminados\n"
+               "\t-sig: los terminados por senal");
+    }
 
     return 0;
 }
 
 
 int job(char *tokens[], int ntokens, structListas *listas) {
+    if(ntokens == 0) {
+        listjobs(NULL, 0, listas);
 
+    } else if(ntokens == 1) {
+        int pid = atoi(tokens[0]);
+
+        for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
+            struct job *j = get(listas->job, p);
+
+            if(j->pid == pid) {
+                printf("%d\t%s p=%d %s %s (%d) %s", j->pid, j->uName,
+                       getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
+                       ValorSenal(j->state), j->name);
+                break;
+            }
+
+        }
+    } else if(ntokens == 2 && strcmp(tokens[0], "-fg") == 0) {
+        int pid = atoi(tokens[1]);
+        int status;
+
+        // Si el proceso está detenido o en segundo plano, lo reanuda
+        if(waitpid(pid, &status, WUNTRACED | WCONTINUED) < 0) {
+            perror("waitpid");
+            return 0;
+        }
+
+        if(WIFSTOPPED(status)) {
+            // Si el proceso está detenido, lo manda a primer plano
+            if(tcsetpgrp(STDIN_FILENO, pid) < 0) {
+                perror("tcsetpgrp");
+                return 0;
+            }
+
+            // Reanuda el proceso
+            if(kill(-pid, SIGCONT) < 0) {
+                perror("kill");
+                return 0;
+            }
+        }
+        
+    } else {
+        printf("job [-fg] pid\tMuestra informacion del proceso pid.\n"
+               "\t\t-fg: lo pasa a primer plano");
+    }
     return 0;
 }

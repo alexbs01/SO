@@ -70,4 +70,7 @@ int BuscarVariable (char * var, char *e[]);
 int CambiarVariable(char * var, char * valor, char *e[]);
 char * Ejecutable (char *s);
 int OurExecvpe(char *file, char *argv[], char *envp[]);
+int comandoBackground(char *tokens[], int ntokens, structListas *listas);
+int ValorSenal(char * sen);
+char *NombreSenal(int sen);
 #endif //SHELL_C_FUNCIONESAUXILIARES_H
