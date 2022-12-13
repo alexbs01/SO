@@ -73,7 +73,33 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
         }
     }
 
-    if(strcmp(tokens[ntokens - 1], "&") != 0) {
+    pid_t pid = fork();
+
+    if(pid == 0) {
+        if(strcmp(tokens[ntokens - 1], "&") == 0) {
+            tokens[ntokens - 1] = NULL;
+            execute(tokens, ntokens - 1, listas);
+            
+        } else {
+            execute(tokens, ntokens, listas);
+        }
+
+        return 1;
+
+    } else if(pid > 0) {
+        if(strcmp(tokens[ntokens - 1], "&") != 0) {
+            waitpid(pid, NULL, 0);
+
+        } else if(strcmp(tokens[ntokens - 1], "&") == 0) {
+            return 0;
+
+        } else {
+            perror("Error al crear el proceso hijo");
+            return 1;
+        }
+    }
+
+    /*if(strcmp(tokens[ntokens - 1], "&") != 0) {
         pid_t pid = fork();
 
         if(pid == 0) {
@@ -90,19 +116,11 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
             return 1;
         }
     } else if(strcmp(tokens[ntokens - 1], "&") == 0){
-        char *aux[ntokens];
-
-        ntokens--;
-        for(int i = 0; i < ntokens; i++) {
-            aux[i] = tokens[i];
-            //strcpy(aux[i], tokens[i]);
-        }
-
         pid_t pid = fork();
 
         //printf("tokens[0]: %s\nntokens: %d", tokens[0], ntokens);
-        if(pid > 0) {
-            char fecha[MAX_LENGTH];
+        if(pid > 0) {*/
+            /*char fecha[MAX_LENGTH];
             struct job *j = malloc(sizeof(struct job));
             j->pid = pid;
             strcpy(j->state, NombreSenal(kill(pid, 0)));
@@ -114,12 +132,19 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
             strcpy(j->uName, getlogin());
             strcpy(j->name, tokens[0]);
 
-            insert(&listas->job, j);
-            return exit;
+            insert(&listas->job, j);*/
+            /*return exit;
         } else if(pid == 0) {
+            ntokens--;
+            char *aux[ntokens];
+
+            for(int i = 0; i < ntokens; i++) {
+                aux[i] = tokens[i];
+                //strcpy(aux[i], tokens[i]);
+            }
             // Este es el código que se ejecutará en el proceso hijo
             execute(aux, ntokens, listas);
-            return 0;
+            return 1;
         }
 
 
@@ -128,7 +153,8 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
             perror("Error al crear el proceso hijo");
             return 1;
         }
-    }
+    }*/
+
 
 
     return exit;
