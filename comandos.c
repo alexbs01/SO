@@ -750,21 +750,24 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
 
 int execute(char *tokens[], int ntokens, structListas *listas) {
     extern char **environ;
-    int i=0;
-    char *aux, *envp[25], *aux2;
-
-    aux= getenv(tokens[0]);
-    while (aux!=NULL){
-        strcpy(aux2, tokens[i]);
-        strcat(aux2, "=");
-        strcat(aux2, aux);
-        envp[i]=aux2;
-        i++;
-        aux= getenv(tokens[i]);
-    }envp[i]=NULL;
-
-    int prioridad = 0;
+    int i = 0, prioridad = 0, j = 0;
+    char *aux = malloc(MAX_LENGTH), *envp[25], *aux2;
     char *existPriority = strchr(tokens[ntokens - 1], '@');
+
+    aux2 = getenv(tokens[0]);
+
+    while(aux2 != NULL){
+        strcpy(aux, tokens[i]);
+        strcat(aux, "=");
+        strcat(aux, aux2);
+        envp[j] = aux2;
+        i++;
+        j++;
+        aux2 = getenv(tokens[i]);
+        ntokens--;
+    }
+
+    envp[j] = NULL;
 
     if(existPriority != NULL) {
         prioridad = atoi(strtok(tokens[ntokens - 1], "@"));
@@ -772,13 +775,21 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
         ntokens--;
     }
 
-    char *aux[ntokens - 1];
+    //printf("tokens: %s\n", tokens[i]);
 
-    for(int i = 0; i < ntokens + 1; i++) {
-        aux[i] = tokens[i];
+    char *auxiliar[ntokens];
+    printf("ntokens: %d\n", ntokens);
+
+    for(int k = i; k <= ntokens + i; k++) {
+        auxiliar[k - i] = tokens[k];
+        printf("Para k: %d\n\tauxiliar:%s \n\ttokens: %s\n\n", k, auxiliar[k - i], tokens[k]);
     }
 
-    OurExecvpe(tokens[0], tokens, __environ);
+    /*for(int k = 0; k < ntokens; k++) {
+        printf("Para k: %d\nauxiliar:%s \ntokens: %s\n\n", k, auxiliar[k], tokens[k]);
+    }*/
+
+    OurExecvpe(auxiliar[0], auxiliar, envp);
 
     return 0;
 }
@@ -797,12 +808,15 @@ int listjobs(char *tokens[], int ntokens, structListas *listas) {
                 if(WIFEXITED(status)) {
                     strcpy(j->state,"FINISHED");
                     j->out= WEXITSTATUS(status);
+
                 }else if(WIFSTOPPED(status)) {
                     strcpy(j->state,"STOPPED");
                     j->out= WSTOPSIG(status);
+
                 }else if(WIFSIGNALED(status)) {
                     strcpy(j->state,"SIGNALED");
                     j->out= WSTOPSIG(status);
+
                 }else if(WIFEXITED(status)) {
                     strcpy(j->state,"ACTIVE");
                     j->out = 0;
