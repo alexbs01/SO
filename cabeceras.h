@@ -45,11 +45,11 @@ struct allocateMmap {
 
 struct job {
     int pid;
-    char *uName;
+    char uName[MAX_LENGTH];
     //int priority;
-    char *fecha;
+    char fecha[MAX_LENGTH];
     char *state;
-    char *name;
+    char name[MAX_LENGTH];
     int out;
 };
 

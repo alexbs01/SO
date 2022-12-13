@@ -19,8 +19,8 @@ int main(int argc, char *argv[], char *envp[]) {
     lista allocateMalloc = createEmptyList();
     lista allocateShared = createEmptyList();
     lista allocateMmap = createEmptyList();
-
-    structListas listas = {historial, allocateMalloc, allocateShared, allocateMmap, envp};
+    lista job = createEmptyList();
+    structListas listas = {historial, allocateMalloc, allocateShared, allocateMmap, envp, job};
 
     while(endShell != 1) {
 

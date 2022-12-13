@@ -79,7 +79,7 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
         if(strcmp(tokens[ntokens - 1], "&") == 0) {
             tokens[ntokens - 1] = NULL;
             execute(tokens, ntokens - 1, listas);
-            
+
         } else {
             execute(tokens, ntokens, listas);
         }
@@ -91,6 +91,24 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
             waitpid(pid, NULL, 0);
 
         } else if(strcmp(tokens[ntokens - 1], "&") == 0) {
+            char fecha[MAX_LENGTH];
+            struct job *j = malloc(sizeof(struct job));
+            j->pid = pid;
+
+            int senal;
+           /* pid_t result = waitpid(pid, &senal, WNOHANG);
+            //wait(&senal);
+            strcpy(j->state, NombreSenal(senal));*/
+
+            time_t tm = time(NULL);
+            strftime(fecha, MAX_LENGTH, "%b %d %H:%M ", localtime(&tm));
+
+            strcpy(j->fecha, fecha);
+            strcpy(j->uName, getlogin());
+            strcpy(j->name, tokens[0]);
+
+            insert(&listas->job, j);
+
             return 0;
 
         } else {

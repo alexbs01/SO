@@ -807,7 +807,7 @@ int listjobs(char *tokens[], int ntokens, structListas *listas) {
             struct job *j = get(listas->job, p);
 
             int status;
-            if(waitpid(j->pid,&status,WNOHANG|WCONTINUED|WUNTRACED) == j->pid) {
+            if(waitpid(j->pid, &status,WNOHANG|WCONTINUED|WUNTRACED) == j->pid) {
                 if(WIFEXITED(status)) {
                     strcpy(j->state,"FINISHED");
                     j->out= WEXITSTATUS(status);
