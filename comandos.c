@@ -750,7 +750,7 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
 
 int execute(char *tokens[], int ntokens, structListas *listas) {
     extern char **environ;
-    int i = 0, prioridad = 0, j = 0;
+    int i = 0, prioridad = 0, j = 0, bucle = 0;
     char *aux = malloc(MAX_LENGTH), *envp[25], *aux2;
     char *existPriority = strchr(tokens[ntokens - 1], '@');
 
@@ -765,6 +765,7 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
         j++;
         aux2 = getenv(tokens[i]);
         ntokens--;
+        bucle = 1;
     }
 
     envp[j] = NULL;
@@ -778,18 +779,20 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
     //printf("tokens: %s\n", tokens[i]);
 
     char *auxiliar[ntokens];
-    printf("ntokens: %d\n", ntokens);
+    //printf("ntokens: %d\n", ntokens);
 
     for(int k = i; k <= ntokens + i; k++) {
         auxiliar[k - i] = tokens[k];
-        printf("Para k: %d\n\tauxiliar:%s \n\ttokens: %s\n\n", k, auxiliar[k - i], tokens[k]);
+        //printf("Para k: %d\n\tauxiliar:%s \n\ttokens: %s\n\n", k, auxiliar[k - i], tokens[k]);
     }
 
-    /*for(int k = 0; k < ntokens; k++) {
-        printf("Para k: %d\nauxiliar:%s \ntokens: %s\n\n", k, auxiliar[k], tokens[k]);
-    }*/
+    if(bucle == 1) {
+        OurExecvpe(auxiliar[0], auxiliar, envp);
 
-    OurExecvpe(auxiliar[0], auxiliar, envp);
+    } else {
+        OurExecvpe(auxiliar[0], auxiliar, environ);
+
+    }
 
     return 0;
 }

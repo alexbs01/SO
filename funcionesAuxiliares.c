@@ -73,25 +73,54 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
         }
     }
 
-    /*if(strcmp(tokens[ntokens - 1], "&") == 0) {
-        comandoBackground(tokens, ntokens - 1, listas);
+    if(strcmp(tokens[ntokens - 1], "&") != 0) {
+        pid_t pid = fork();
 
-    }*/
-    /*pid_t pid = fork();
+        if(pid == 0) {
+            // Este es el código que se ejecutará en el proceso hijo
+            execute(tokens, ntokens, listas);
+            return 1;
+        } else if(pid > 0) {
+            // Este es el código que se ejecutará en el proceso padre
+            // Espera a que el proceso hijo termine
+            waitpid(pid, NULL, 0);
 
-    if (pid == 0) {
-        // Este es el código que se ejecutará en el proceso hijo
-        execvp(tokens[0], tokens);
-        return 1;
-    } else if (pid > 0) {
-        // Este es el código que se ejecutará en el proceso padre
-        // Espera a que el proceso hijo termine
-        waitpid(pid, NULL, 0);
+        } else {
+            perror("Error al crear el proceso hijo");
+            return 1;
+        }
+    } else if(strcmp(tokens[ntokens - 1], "&") == 0){
+        char *aux[ntokens];
 
-    } else {
-        perror("Error al crear el proceso hijo");
-        return 1;
-    }*/
+        printf("tokens 0: %s\n", tokens[0]);
+        printf("tokens 1: %s\n", tokens[1]);
+        ntokens--;
+        for(int i = 0; i < ntokens; i++) {
+            aux[i] = tokens[i];
+            //strcpy(aux[i], tokens[i]);
+        }
+        printf("tokens 0: %s\n", aux[0]);
+        printf("tokens 1: %s\n", aux[1]);
+
+
+
+        pid_t pid = fork();
+
+        //printf("tokens[0]: %s\nntokens: %d", tokens[0], ntokens);
+        if(pid == 0) {
+            // Este es el código que se ejecutará en el proceso hijo
+            execute(aux, ntokens, listas);
+            return 0;
+        }
+
+        fflush(stdin);
+
+        if(pid < 0) {
+            perror("Error al crear el proceso hijo");
+            return 1;
+        }
+    }
+
 
     return exit;
 }
