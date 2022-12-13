@@ -73,10 +73,10 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
         }
     }
 
-    if(strcmp(tokens[ntokens - 1], "&") == 0) {
+    /*if(strcmp(tokens[ntokens - 1], "&") == 0) {
         comandoBackground(tokens, ntokens - 1, listas);
 
-    }
+    }*/
     /*pid_t pid = fork();
 
     if (pid == 0) {

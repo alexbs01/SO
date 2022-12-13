@@ -6,7 +6,7 @@
 */
 #ifndef SHELL_CABECERAS_H
 #define SHELL_CABECERAS_H
-#define _GNV_SOURCE
+
 #define MAX_LENGTH 255
 #define MAX_PATH 255
 
@@ -68,7 +68,6 @@ struct SEN {
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <time.h>
 #include <errno.h> // Incluye la función: perror
 #include <string.h>
@@ -86,6 +85,8 @@ struct SEN {
 #include <stdio_ext.h>
 #include <pwd.h>
 #include <signal.h>
+#include <unistd.h>
+#define _GNV_SOURCE
 //#include "funcionesAuxiliares.h"
 
 #include "comandos.h"
