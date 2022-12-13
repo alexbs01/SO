@@ -750,6 +750,7 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
 
 
 int execute(char *tokens[], int ntokens, structListas *listas) {
+    /*
     extern char **environ;
     int prioridad = 0;
     char *firstPart = strtok(tokens[ntokens - 1], "@");
@@ -773,7 +774,53 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
     OurExecvpe(tokens[0], aux, environ);
 
     return 0;
+    */
+    int priority, i = 0, cnt = 0, j;
+    bool sp, prio;
+    char env[20], direccion[20];
+    char *array[20], *enviroments[20];
 
+    sp = strcmp(tokens[ntokens - 1], "&");
+    if(sp) {
+        tokens[ntokens - 1] = 0;
+        ntokens--;
+        prio = strcmp(tokens[ntokens - 1], "@");
+
+        if(prio) {
+            priority = atoi(strtok(tokens[ntokens - 1],"@"));
+            ntokens--;
+        }
+    }
+
+    strcpy(getenv(tokens[i]), env);
+    while(strcmp(env, NULL) == 0) {
+        strcpy(env, enviroments[i]);
+        strcpy(getenv(tokens[i]), env);
+        i++;
+    }
+
+    strcpy(NULL, enviroments[i]);
+    strcpy(Ejecutable(tokens[i]), array[cnt]);
+
+    j = i + 1;
+    while(j + 1 != ntokens) {
+        cnt++;
+        strcpy(tokens[j], array[cnt]);
+        j++;
+    }
+    strcpy(NULL, array[i]);
+
+    if(i == 0) {
+        if(execv(array[0], array) == -1) {
+            perror("La función execv no funciona.");
+        }
+    } else {
+        if(execve(array[0], array, enviroments) == -1) {
+            perror("La función execve no funciona.");
+        }
+    }
+
+    //
     //uid_t uid = getuid();
     //struct passwd *pw = getpwuid(uid);
     //if(pw) {

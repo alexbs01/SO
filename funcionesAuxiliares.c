@@ -1113,3 +1113,7 @@ char *NombreSenal(int sen) { /*devuelve el nombre senal a partir de la senal*/
     }
     return ("SIGUNKNOWN");
 }
+
+void detectProgram() {
+
+}
