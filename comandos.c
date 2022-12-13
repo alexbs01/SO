@@ -867,7 +867,7 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
 
 int job(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 0) {
-        listjobs(NULL, 0, listas);
+        listjobs(NULL, 1, listas);
     } else if(ntokens == 1) {
         int pid = atoi(tokens[0]);
 

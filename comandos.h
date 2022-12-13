@@ -14,8 +14,6 @@
 #include <libgen.h> // Para el comando <list>
 #include <grp.h>    // Para el comando <list>
 #include <pwd.h>    // Para el comando <list>
-
-
 #include "lista.h"
 
 #define MAX_LENGTH 255
@@ -47,13 +45,13 @@ int memfill(char *tokens[], int ntokens, structListas *listas);  // Rellena una 
 int memory(char *tokens[], int ntokens, structListas *listas);   // Muestra direcciones de memoria
 int recurse(char *tokens[], int ntokens, structListas *listas);  // Muestra una las direcciones de memoria de una función recursiva
 
-int priority(char *tokens[], int ntokens, structListas *listas);
-int showvar(char *tokens[], int ntokens, structListas *listas);
-int changevar(char *tokens[], int ntokens, structListas *listas);
-int showenv(char *tokens[], int ntokens, structListas *listas);
-int forkA(char *tokens[], int ntokens, structListas *listas);
-int execute(char *tokens[], int ntokens, structListas *listas);
-int listjobs(char *tokens[], int ntokens, structListas *listas);
-int deljobs(char *tokens[], int ntokens, structListas *listas);
-int job(char *tokens[], int ntokens, structListas *listas);
+int priority(char *tokens[], int ntokens, structListas *listas); // Muestra y cambia la prioridad de un proceso
+int showvar(char *tokens[], int ntokens, structListas *listas);  // Muestras las variables de entorno
+int changevar(char *tokens[], int ntokens, structListas *listas);// Cambia una varible de entorno de tres formas distintas
+int showenv(char *tokens[], int ntokens, structListas *listas);  // Muestra el entorno o las variables de entorno
+int forkA(char *tokens[], int ntokens, structListas *listas);    // Hace fork del shell
+int execute(char *tokens[], int ntokens, structListas *listas);  // Ejecuta un programa, con @N, asigna una prioridad N
+int listjobs(char *tokens[], int ntokens, structListas *listas); // Lista los procesos en ejecución
+int deljobs(char *tokens[], int ntokens, structListas *listas);  // Elimina de la lista de procesos
+int job(char *tokens[], int ntokens, structListas *listas);      // Lista procesos y permite pasar a primer plano los de background
 #endif //SHELL_C_COMANDOS_H

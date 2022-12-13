@@ -92,28 +92,37 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
     } else if(strcmp(tokens[ntokens - 1], "&") == 0){
         char *aux[ntokens];
 
-        printf("tokens 0: %s\n", tokens[0]);
-        printf("tokens 1: %s\n", tokens[1]);
         ntokens--;
         for(int i = 0; i < ntokens; i++) {
             aux[i] = tokens[i];
             //strcpy(aux[i], tokens[i]);
         }
-        printf("tokens 0: %s\n", aux[0]);
-        printf("tokens 1: %s\n", aux[1]);
-
-
 
         pid_t pid = fork();
 
         //printf("tokens[0]: %s\nntokens: %d", tokens[0], ntokens);
-        if(pid == 0) {
+        if(pid > 0) {
+            char fecha[MAX_LENGTH];
+            struct job *j = malloc(sizeof(struct job));
+            j->pid = pid;
+            strcpy(j->state, NombreSenal(kill(pid, 0)));
+
+            time_t tm = time(NULL);
+            strftime(fecha, MAX_LENGTH, "%b %d %H:%M ", localtime(&tm));
+
+            strcpy(j->fecha, fecha);
+            strcpy(j->uName, getlogin());
+            strcpy(j->name, tokens[0]);
+
+            insert(&listas->job, j);
+            return exit;
+        } else if(pid == 0) {
             // Este es el código que se ejecutará en el proceso hijo
             execute(aux, ntokens, listas);
             return 0;
         }
 
-        fflush(stdin);
+
 
         if(pid < 0) {
             perror("Error al crear el proceso hijo");

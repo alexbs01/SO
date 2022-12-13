@@ -21,7 +21,7 @@ typedef struct statCommand {
 } SStatListCommand;
 
 #include "lista.h"
-
+#include <time.h>
 struct allocateMalloc {
     void *memoryAddress;
     long int size;
@@ -45,11 +45,11 @@ struct allocateMmap {
 
 struct job {
     int pid;
-    char uName[MAX_LENGTH];
+    char *uName;
     //int priority;
-    char fecha[MAX_LENGTH];
-    char state[MAX_LENGTH];
-    char name[MAX_LENGTH];
+    char *fecha;
+    char *state;
+    char *name;
     int out;
 };
 
@@ -69,7 +69,7 @@ struct SEN {
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h>
+
 #include <errno.h> // Incluye la función: perror
 #include <string.h>
 #include <sys/utsname.h> // Utilizada por la función infosis
