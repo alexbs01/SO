@@ -50,6 +50,7 @@ struct job {
     char fecha[MAX_LENGTH];
     char state[MAX_LENGTH];
     char name[MAX_LENGTH];
+    int out;
 };
 
 typedef struct listas {
@@ -86,7 +87,7 @@ struct SEN {
 #include <pwd.h>
 #include <signal.h>
 #include <unistd.h>
-#define _GNV_SOURCE
+#define _GNU_SOURCE
 //#include "funcionesAuxiliares.h"
 
 #include "comandos.h"

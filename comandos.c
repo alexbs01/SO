@@ -6,7 +6,6 @@
 */
 
 #include "comandos.h"
-
 int global1 = 1, global2 = 2, global3 = 3;
 
 int autores(char *tokens[], int ntokens, structListas *listas) {
@@ -764,7 +763,6 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
         aux= getenv(tokens[i]);
     }envp[i]=NULL;
 
-
     int prioridad = 0;
     char *existPriority = strchr(tokens[ntokens - 1], '@');
 
@@ -780,19 +778,38 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
         aux[i] = tokens[i];
     }
 
-    OurExecvpe(tokens[0], aux, environ);
+    OurExecvpe(tokens[0], tokens, __environ);
 
     return 0;
 }
 
 
 int listjobs(char *tokens[], int ntokens, structListas *listas) {
+
     if(isEmptyList(listas->job)) {
         printf("\n");
     } else {
         for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
             struct job *j = get(listas->job, p);
-            printf("%d\t%s p=%d %s %s (%d) %s", j->pid, j->uName,
+
+            int status;
+            if(waitpid(j->pid,&status,WNOHANG|WCONTINUED|WUNTRACED) == j->pid) {
+                if(WIFEXITED(status)) {
+                    strcpy(j->state,"FINISHED");
+                    j->out= WEXITSTATUS(status);
+                }else if(WIFSTOPPED(status)) {
+                    strcpy(j->state,"STOPPED");
+                    j->out= WSTOPSIG(status);
+                }else if(WIFSIGNALED(status)) {
+                    strcpy(j->state,"SIGNALED");
+                    j->out= WSTOPSIG(status);
+                }else if(WIFEXITED(status)) {
+                    strcpy(j->state,"ACTIVE");
+                    j->out = 0;
+                }
+            }
+
+            printf("%d\t%s p=%d %s %s (%03d) %s", j->pid, j->uName,
                    getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
                    ValorSenal(j->state), j->name);
         }
@@ -834,7 +851,6 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
 int job(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 0) {
         listjobs(NULL, 0, listas);
-
     } else if(ntokens == 1) {
         int pid = atoi(tokens[0]);
 
