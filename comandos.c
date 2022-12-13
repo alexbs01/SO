@@ -751,6 +751,20 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
 
 int execute(char *tokens[], int ntokens, structListas *listas) {
     extern char **environ;
+    int i=0;
+    char *aux, *envp[25], *aux2;
+
+    aux= getenv(tokens[0]);
+    while (aux!=NULL){
+        strcpy(aux2, tokens[i]);
+        strcat(aux2, "=");
+        strcat(aux2, aux);
+        envp[i]=aux2;
+        i++;
+        aux= getenv(tokens[i]);
+    }envp[i]=NULL;
+
+
     int prioridad = 0;
     char *existPriority = strchr(tokens[ntokens - 1], '@');
 
