@@ -78,7 +78,8 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
     if(pid == 0) {
         if(strcmp(tokens[ntokens - 1], "&") == 0) {
             tokens[ntokens - 1] = NULL;
-            execute(tokens, ntokens - 1, listas);
+            ntokens--;
+            execute(tokens, ntokens, listas);
 
         } else {
             execute(tokens, ntokens, listas);

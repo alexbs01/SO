@@ -772,6 +772,7 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
 
     if(existPriority != NULL) {
         prioridad = atoi(strtok(tokens[ntokens - 1], "@"));
+        tokens[ntokens - 1] = NULL;
         nice(prioridad);
         ntokens--;
     }
