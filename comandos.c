@@ -798,8 +798,9 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
 
 int listjobs(char *tokens[], int ntokens, structListas *listas) {
 
-    if(isEmptyList(listas->job)) {
+    if(isEmptyList(listas->job)) { // Si la lista está vacía no muestra nada
         printf("\n");
+
     } else {
         for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
             struct job *j = get(listas->job, p);
@@ -807,24 +808,24 @@ int listjobs(char *tokens[], int ntokens, structListas *listas) {
             int status;
             if(waitpid(j->pid, &status,WNOHANG|WCONTINUED|WUNTRACED) == j->pid) {
                 if(WIFEXITED(status)) {
-                    strcpy(j->state,"FINISHED");
-                    j->out= WEXITSTATUS(status);
+                    strcpy(j->state, "FINISHED");
+                    j->out = WEXITSTATUS(status);
 
                 }else if(WIFSTOPPED(status)) {
-                    strcpy(j->state,"STOPPED");
-                    j->out= WSTOPSIG(status);
+                    strcpy(j->state, "STOPPED");
+                    j->out = WSTOPSIG(status);
 
                 }else if(WIFSIGNALED(status)) {
-                    strcpy(j->state,"SIGNALED");
-                    j->out= WSTOPSIG(status);
+                    strcpy(j->state, "SIGNALED");
+                    j->out = WSTOPSIG(status);
 
                 }else if(WIFEXITED(status)) {
-                    strcpy(j->state,"ACTIVE");
+                    strcpy(j->state, "ACTIVE");
                     j->out = 0;
                 }
             }
 
-            printf("%d\t%s p=%d %s %s (%03d) %s", j->pid, j->uName,
+            printf("%d\t%s p=%d %s %s (%03d) %s\n", j->pid, j->uName,
                    getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
                    ValorSenal(j->state), j->name);
         }

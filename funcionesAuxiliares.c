@@ -94,19 +94,21 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
         } else if(strcmp(tokens[ntokens - 1], "&") == 0) { // Si lo lleva se guarda la información del proceso
             char fecha[MAX_LENGTH];
             struct job *j = malloc(sizeof(struct job));
+            strcpy(j->name, "");
             j->pid = pid;
 
-            int senal;
-           /* pid_t result = waitpid(pid, &senal, WNOHANG);
-            //wait(&senal);
-            strcpy(j->state, NombreSenal(senal));*/
+            strcpy(j->state, "ACTIVE");
 
             time_t tm = time(NULL);
-            strftime(fecha, MAX_LENGTH, "%b %d %H:%M ", localtime(&tm));
-
+            strftime(fecha, MAX_LENGTH, "%Y/%m/%d %H:%M:%S", localtime(&tm));
             strcpy(j->fecha, fecha);
+
             strcpy(j->uName, getlogin());
-            strcpy(j->name, tokens[0]);
+            for(int i = 0; i < ntokens - 1; i++) {
+                strcat(j->name, tokens[i]);
+                strcat(j->name, " ");
+            }
+
 
             insert(&listas->job, j);
 

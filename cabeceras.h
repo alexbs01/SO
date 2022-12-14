@@ -48,7 +48,7 @@ struct job {
     char uName[MAX_LENGTH];
     //int priority;
     char fecha[MAX_LENGTH];
-    char *state;
+    char state[MAX_LENGTH];
     char name[MAX_LENGTH];
     int out;
 };
