@@ -49,5 +49,6 @@ int main(int argc, char *argv[], char *envp[]) {
     deleteList(&listas.allocateShared, liberarShared);
     deleteList(&listas.allocateMmap, liberarMmap);
     deleteList(&listas.historial, free);
+    deleteList(&listas.job, free);
     return 0;
 }

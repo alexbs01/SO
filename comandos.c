@@ -851,8 +851,13 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
 
             if(strcmp(LMB->state,"FINISHED") == 0) {
                 deleteAtPosition(&listas->job, p);
+            } else {
+                free(LMB);
             }
         }
+        
+
+
 
     } else if(ntokens == 2 && strcmp(tokens[0], "-sig") == 0) {
         for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
