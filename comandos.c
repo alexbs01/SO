@@ -747,15 +747,16 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
     return 0;
 }
 
-
 int execute(char *tokens[], int ntokens, structListas *listas) {
     extern char **environ;
-    int i = 0, prioridad = 0, j = 0, bucle = 0;
+    int i = 0, prioridad = 0, j = 0, hayVariablesDeEntorno = 0;
     char *aux = malloc(MAX_LENGTH), *envp[64], *aux2;
     char *existPriority = strchr(tokens[ntokens - 1], '@');
+    char *auxiliar[ntokens];
 
     aux2 = getenv(tokens[0]);
 
+    // Si hay variables de entorno, aux2 no será nulo
     while(aux2 != NULL){
         strcpy(aux, tokens[i]);
         strcat(aux, "=");
@@ -765,11 +766,12 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
         j++;
         aux2 = getenv(tokens[i]);
         ntokens--;
-        bucle = 1;
+        hayVariablesDeEntorno = 1;
     }
 
     envp[j] = NULL;
 
+    // Si ponemos una prioridad hacemos que se ejecute con nice
     if(existPriority != NULL) {
         prioridad = atoi(strtok(tokens[ntokens - 1], "@"));
         tokens[ntokens - 1] = NULL;
@@ -777,32 +779,17 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
         ntokens--;
     }
 
-    //printf("tokens: %s\n", tokens[i]);
-
-    char *auxiliar[ntokens];
-    //printf("ntokens: %d\n", ntokens);
-
+    // Hacemos que el comando empiece en tokens[0]
     for(int k = i; k <= ntokens + i; k++) {
         auxiliar[k - i] = tokens[k];
-        //printf("Para k: %d\n\tauxiliar:%s \n\ttokens: %s\n\n", k, auxiliar[k - i], tokens[k]);
     }
 
-    if(bucle == 1) {
-        printf("envp 0:%s\n", envp[0]);
-        printf("envp 1:%s\n", envp[1]);
-        printf("envp 2:%s\n", envp[2]);
-        printf("envp 3:%s\n", envp[3]);
-        printf("envp 4:%s\n", envp[4]);
+    // Si hay variables de entorno solo se utilizarán esas
+    if(hayVariablesDeEntorno == 1) {
         OurExecvpe(auxiliar[0], auxiliar, envp);
 
     } else {
-        printf("envp 0:%s\n", environ[0]);
-        printf("envp 1:%s\n", environ[1]);
-        printf("envp 2:%s\n", environ[2]);
-        printf("envp 3:%s\n", environ[3]);
-        printf("envp 4:%s\n", environ[4]);
         OurExecvpe(auxiliar[0], auxiliar, environ);
-
     }
 
     return 0;

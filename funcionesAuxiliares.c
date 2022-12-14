@@ -75,7 +75,7 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
 
     pid_t pid = fork();
 
-    if(pid == 0) {
+    if(pid == 0) { // Aquí se ejecuta el hijo creado
         if(strcmp(tokens[ntokens - 1], "&") == 0) {
             tokens[ntokens - 1] = NULL;
             ntokens--;
@@ -87,11 +87,11 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
 
         return 1;
 
-    } else if(pid > 0) {
+    } else if(pid > 0) { // Aquí se ejecuta el padre
         if(strcmp(tokens[ntokens - 1], "&") != 0) {
-            waitpid(pid, NULL, 0);
+            waitpid(pid, NULL, 0); // Si no lleva '&', espera a que el hijo termine
 
-        } else if(strcmp(tokens[ntokens - 1], "&") == 0) {
+        } else if(strcmp(tokens[ntokens - 1], "&") == 0) { // Si lo lleva se guarda la información del proceso
             char fecha[MAX_LENGTH];
             struct job *j = malloc(sizeof(struct job));
             j->pid = pid;
@@ -112,69 +112,11 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
 
             return 0;
 
-        } else {
-            perror("Error al crear el proceso hijo");
-            return 1;
         }
+    } else { // Si el pid es menor que 0 es que hubo un error
+        perror("Error al crear el proceso hijo");
+        return 1;
     }
-
-    /*if(strcmp(tokens[ntokens - 1], "&") != 0) {
-        pid_t pid = fork();
-
-        if(pid == 0) {
-            // Este es el código que se ejecutará en el proceso hijo
-            execute(tokens, ntokens, listas);
-            return 1;
-        } else if(pid > 0) {
-            // Este es el código que se ejecutará en el proceso padre
-            // Espera a que el proceso hijo termine
-            waitpid(pid, NULL, 0);
-
-        } else {
-            perror("Error al crear el proceso hijo");
-            return 1;
-        }
-    } else if(strcmp(tokens[ntokens - 1], "&") == 0){
-        pid_t pid = fork();
-
-        //printf("tokens[0]: %s\nntokens: %d", tokens[0], ntokens);
-        if(pid > 0) {*/
-            /*char fecha[MAX_LENGTH];
-            struct job *j = malloc(sizeof(struct job));
-            j->pid = pid;
-            strcpy(j->state, NombreSenal(kill(pid, 0)));
-
-            time_t tm = time(NULL);
-            strftime(fecha, MAX_LENGTH, "%b %d %H:%M ", localtime(&tm));
-
-            strcpy(j->fecha, fecha);
-            strcpy(j->uName, getlogin());
-            strcpy(j->name, tokens[0]);
-
-            insert(&listas->job, j);*/
-            /*return exit;
-        } else if(pid == 0) {
-            ntokens--;
-            char *aux[ntokens];
-
-            for(int i = 0; i < ntokens; i++) {
-                aux[i] = tokens[i];
-                //strcpy(aux[i], tokens[i]);
-            }
-            // Este es el código que se ejecutará en el proceso hijo
-            execute(aux, ntokens, listas);
-            return 1;
-        }
-
-
-
-        if(pid < 0) {
-            perror("Error al crear el proceso hijo");
-            return 1;
-        }
-    }*/
-
-
 
     return exit;
 }
