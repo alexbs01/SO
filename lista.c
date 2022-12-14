@@ -126,6 +126,21 @@ void deleteAtPosition(lista *L, pos p) {
 
     free(p->data);
     free(p);
+    /*pos q;
+    if(p->next == NULL) { // Eliminado en la última posición
+        for(q = *L; q->next->next != NULL; q = q->next);
+        q->next = NULL;
+
+    } else { // Eliminado de un elemento que no se encuentra en los extremos
+        q = p->next;
+        p->data = q->data;
+        p->next = q->next;
+        p = q;
+    }
+
+    free(p);*/
+
+
 
     printf("\nSe hizo liberó memoria correctamente");
 }

@@ -744,6 +744,7 @@ int forkA(char *tokens[], int ntokens, structListas *listas) {
     } else if(pid != -1) {
         waitpid(pid, NULL, 0);
     }
+
     return 0;
 }
 
@@ -766,6 +767,7 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
         j++;
         aux2 = getenv(tokens[i]);
         ntokens--;
+
         hayVariablesDeEntorno = 1;
     }
 
@@ -806,28 +808,33 @@ int listjobs(char *tokens[], int ntokens, structListas *listas) {
             struct job *j = get(listas->job, p);
 
             int status;
-            if(waitpid(j->pid, &status,WNOHANG|WCONTINUED|WUNTRACED) == j->pid) {
+            if(waitpid(j->pid, &status, WNOHANG | WCONTINUED | WUNTRACED) == j->pid) {
                 if(WIFEXITED(status)) {
                     strcpy(j->state, "FINISHED");
                     j->out = WEXITSTATUS(status);
+                    j->signal = ValorSenal(NombreSenal(status));
 
                 }else if(WIFSTOPPED(status)) {
                     strcpy(j->state, "STOPPED");
                     j->out = WSTOPSIG(status);
+                    j->signal = ValorSenal(NombreSenal(status));
 
                 }else if(WIFSIGNALED(status)) {
                     strcpy(j->state, "SIGNALED");
                     j->out = WSTOPSIG(status);
+                    j->signal = ValorSenal(NombreSenal(status));
 
                 }else if(WIFEXITED(status)) {
                     strcpy(j->state, "ACTIVE");
                     j->out = 0;
+                    j->signal = ValorSenal(NombreSenal(status));
+
                 }
             }
 
             printf("%d\t%s p=%d %s %s (%03d) %s\n", j->pid, j->uName,
                    getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
-                   ValorSenal(j->state), j->name);
+                   j->signal, j->name);
         }
     }
     return 0;
@@ -840,8 +847,9 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
 
     } else if(ntokens == 1 && strcmp(tokens[0], "-term") == 0) {
         for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
-            struct job *j = get(listas->job, p);
-            if(ValorSenal(j->state) == ValorSenal("TERM")) {
+            struct job *LMB = get(listas->job, p);
+
+            if(strcmp(LMB->state,"FINISHED") == 0) {
                 deleteAtPosition(&listas->job, p);
             }
         }
@@ -863,10 +871,10 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
     return 0;
 }
 
-
 int job(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 0) {
         listjobs(NULL, 1, listas);
+
     } else if(ntokens == 1) {
         int pid = atoi(tokens[0]);
 
@@ -874,9 +882,9 @@ int job(char *tokens[], int ntokens, structListas *listas) {
             struct job *j = get(listas->job, p);
 
             if(j->pid == pid) {
-                printf("%d\t%s p=%d %s %s (%d) %s", j->pid, j->uName,
+                printf("%d\t%s p=%d %s %s (%03d) %s\n", j->pid, j->uName,
                        getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
-                       ValorSenal(j->state), j->name);
+                       j->signal, j->name);
                 break;
             }
 

@@ -109,7 +109,8 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
                 strcat(j->name, " ");
             }
 
-
+            j->out = 0;
+            j->signal = 0;
             insert(&listas->job, j);
 
             return 0;
@@ -1139,8 +1140,4 @@ char *NombreSenal(int sen) { /*devuelve el nombre senal a partir de la senal*/
         }
     }
     return ("SIGUNKNOWN");
-}
-
-void detectProgram() {
-
 }

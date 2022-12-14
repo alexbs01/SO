@@ -51,6 +51,7 @@ struct job {
     char state[MAX_LENGTH];
     char name[MAX_LENGTH];
     int out;
+    int signal;
 };
 
 typedef struct listas {
