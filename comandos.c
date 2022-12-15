@@ -710,7 +710,6 @@ int changevar(char *tokens[], int ntokens, structListas *listas) {
     return 0;
 }
 
-
 int showenv(char *tokens[], int ntokens, structListas *listas) {
     extern char **environ;
 
@@ -733,7 +732,6 @@ int showenv(char *tokens[], int ntokens, structListas *listas) {
     return 0;
 }
 
-
 int forkA(char *tokens[], int ntokens, structListas *listas) {
     pid_t pid;
 
@@ -755,6 +753,8 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
     char *existPriority = strchr(tokens[ntokens - 1], '@');
     char *auxiliar[ntokens];
 
+    // Si ponemos una prioridad hacemos que se ejecute con nice
+
     aux2 = getenv(tokens[0]);
 
     // Si hay variables de entorno, aux2 no será nulo
@@ -773,7 +773,6 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
 
     envp[j] = NULL;
 
-    // Si ponemos una prioridad hacemos que se ejecute con nice
     if(existPriority != NULL) {
         prioridad = atoi(strtok(tokens[ntokens - 1], "@"));
         tokens[ntokens - 1] = NULL;
@@ -796,7 +795,6 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
 
     return 0;
 }
-
 
 int listjobs(char *tokens[], int ntokens, structListas *listas) {
 
@@ -836,7 +834,6 @@ int listjobs(char *tokens[], int ntokens, structListas *listas) {
     return 0;
 }
 
-
 int deljobs(char *tokens[], int ntokens, structListas *listas) {
     if(ntokens == 0) {
         listjobs(NULL, 0, listas);
@@ -855,7 +852,6 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
             }
         }
 
-
         if(elementsNumber(listas->job) == 1 || elementsNumber(listas->job) == 2) {
             pos p = first(listas->job);
             struct job *LMB = get(listas->job, p);
@@ -864,7 +860,6 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
                 deleteAtPosition(&listas->job, p);
             }
         }
-
 
     } else if(ntokens == 1 && strcmp(tokens[0], "-sig") == 0) {
         listjobs(NULL, 0, listas);
@@ -923,20 +918,19 @@ int job(char *tokens[], int ntokens, structListas *listas) {
 
         // Si el proceso está detenido o en segundo plano, lo reanuda
         if(waitpid(pid, &status, WUNTRACED | WCONTINUED) < 0) {
-            perror("waitpid");
+            perror("Error de waitpid");
             return 0;
         }
 
         if(WIFSTOPPED(status)) {
             // Si el proceso está detenido, lo manda a primer plano
             if(tcsetpgrp(STDIN_FILENO, pid) < 0) {
-                perror("tcsetpgrp");
                 return 0;
             }
 
             // Reanuda el proceso
             if(kill(-pid, SIGCONT) < 0) {
-                perror("kill");
+                perror("Error de kill");
                 return 0;
             }
         }

@@ -110,7 +110,6 @@ int processInput(char *tokens[], int ntokens, structListas *listas) {
             }
 
             j->out = 0;
-            j->signal = 0;
             insert(&listas->job, j);
 
             return 0;
