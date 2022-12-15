@@ -853,12 +853,19 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
             if(strcmp(LMB->state,"FINISHED") == 0) {
                 deleteAtPosition(&listas->job, p);
                 p = first(listas->job);
-            } else {
-                free(LMB);
             }
         }
 
-    } else if(ntokens == 2 && strcmp(tokens[0], "-sig") == 0) {
+        if(elementsNumber(listas->job) == 1) {
+            pos p = first(listas->job);
+            struct job *LMB = get(listas->job, p);
+            if(strcmp(LMB->state,"FINISHED") == 0) {
+                deleteAtPosition(&listas->job, p);
+            }
+        }
+
+
+        } else if(ntokens == 2 && strcmp(tokens[0], "-sig") == 0) {
         for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
             struct job *j = get(listas->job, p);
             if(ValorSenal(j->state) == ValorSenal(tokens[2])) {
