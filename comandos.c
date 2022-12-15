@@ -801,7 +801,7 @@ int execute(char *tokens[], int ntokens, structListas *listas) {
 int listjobs(char *tokens[], int ntokens, structListas *listas) {
 
     if(isEmptyList(listas->job)) { // Si la lista está vacía no muestra nada
-        printf("\n");
+        printf(" ");
 
     } else {
         for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
@@ -847,29 +847,50 @@ int deljobs(char *tokens[], int ntokens, structListas *listas) {
 
     } else if(ntokens == 1 && strcmp(tokens[0], "-term") == 0) {
         listjobs(NULL, 0, listas);
-        for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
-            struct job *LMB = get(listas->job, p);
 
-            if(strcmp(LMB->state,"FINISHED") == 0) {
-                deleteAtPosition(&listas->job, p);
-                p = first(listas->job);
+        if(elementsNumber(listas->job) != 1) {
+            for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
+                struct job *LMB = get(listas->job, p);
+
+                if(strcmp(LMB->state,"FINISHED") == 0) {
+                    deleteAtPosition(&listas->job, p);
+                    p = first(listas->job);
+                }
             }
         }
 
-        if(elementsNumber(listas->job) == 1) {
+
+        if(elementsNumber(listas->job) == 1 || elementsNumber(listas->job) == 2) {
             pos p = first(listas->job);
             struct job *LMB = get(listas->job, p);
+
             if(strcmp(LMB->state,"FINISHED") == 0) {
                 deleteAtPosition(&listas->job, p);
             }
         }
 
 
-        } else if(ntokens == 2 && strcmp(tokens[0], "-sig") == 0) {
-        for(pos p = first(listas->job); !at_end(listas->job, p); p = next(listas->job, p)) {
-            struct job *j = get(listas->job, p);
-            if(ValorSenal(j->state) == ValorSenal(tokens[2])) {
-                deleteAtPosition(&listas->job, p);
+    } else if(ntokens == 1 && strcmp(tokens[0], "-sig") == 0) {
+        listjobs(NULL, 0, listas);
+
+        if(elementsNumber(listas->job) != 1) {
+            for (pos p = first(listas->job); !at_end(listas->job, p); p = next(
+                    listas->job, p)) {
+                struct job *LMB = get(listas->job, p);
+
+                if (strcmp(LMB->state, "SIGNALED") == 0) {
+                    deleteAtPosition(&listas->job, p);
+                    p = first(listas->job);
+                }
+            }
+
+            if (elementsNumber(listas->job) != 0) {
+                pos p = first(listas->job);
+                struct job *LMB = get(listas->job, p);
+
+                if (strcmp(LMB->state, "SIGNALED") == 0) {
+                    deleteAtPosition(&listas->job, p);
+                }
             }
         }
 
