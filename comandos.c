@@ -812,29 +812,25 @@ int listjobs(char *tokens[], int ntokens, structListas *listas) {
                 if(WIFEXITED(status)) {
                     strcpy(j->state, "FINISHED");
                     j->out = WEXITSTATUS(status);
-                    j->signal = ValorSenal(NombreSenal(status));
 
                 }else if(WIFSTOPPED(status)) {
                     strcpy(j->state, "STOPPED");
                     j->out = WSTOPSIG(status);
-                    j->signal = ValorSenal(NombreSenal(status));
 
                 }else if(WIFSIGNALED(status)) {
                     strcpy(j->state, "SIGNALED");
                     j->out = WSTOPSIG(status);
-                    j->signal = ValorSenal(NombreSenal(status));
 
                 }else if(WIFEXITED(status)) {
                     strcpy(j->state, "ACTIVE");
                     j->out = 0;
-                    j->signal = ValorSenal(NombreSenal(status));
 
                 }
             }
 
-            printf("%d\t%s p=%d %s %s (%03d) %s\n", j->pid, j->uName,
+            printf("%d\t%s p=%d %s %s (%s) %s\n", j->pid, j->uName,
                    getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
-                   j->signal, j->name);
+                   NombreSenal(j->out), j->name);
         }
     }
     return 0;
@@ -914,9 +910,9 @@ int job(char *tokens[], int ntokens, structListas *listas) {
             struct job *j = get(listas->job, p);
 
             if(j->pid == pid) {
-                printf("%d\t%s p=%d %s %s (%03d) %s\n", j->pid, j->uName,
+                printf("%d\t%s p=%d %s %s (%s) %s\n", j->pid, j->uName,
                        getpriority(PRIO_PROCESS, j->pid), j->fecha, j->state,
-                       j->signal, j->name);
+                       NombreSenal(j->out), j->name);
                 break;
             }
 
